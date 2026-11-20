@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 07 - DNS Basics | LYM REALM</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;padding:20px;font-family:Arial,sans-serif;
+ color:#eaf6ff;
+ background:radial-gradient(circle at top,#064879,#020817 70%);
+ min-height:100vh;
+}
+.container{max-width:750px;margin:auto}
+h1,h2{color:#32cfff;text-shadow:0 0 12px #008cff}
+.lesson{
+ background:#081a30;border:1px solid #008cff;
+ border-radius:14px;padding:20px;margin:20px 0;
+ box-shadow:0 0 15px #0077aa44;
+}
+.code{
+ background:#020817;color:#00e5a8;padding:14px;
+ border-radius:8px;overflow-x:auto;white-space:pre-wrap;
+}
+p{line-height:1.7;color:#c5d9ec}
+a{
+ display:inline-block;background:#008fd1;color:white;
+ padding:12px 18px;border-radius:8px;
+ text-decoration:none;margin:8px 5px 0 0;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>🛡️ LESSON 07</h1>
+<h2>DNS BASICS</h2>
+<p>Learn how domain names are translated into IP addresses.</p>
+
+<div class="lesson">
+<h2>1. What is DNS?</h2>
+<p>DNS ka full form Domain Name System hai. Ye domain name ko IP address mein translate karne mein madad karta hai.</p>
+<div class="code">example.com → IP Address</div>
+</div>
+
+<div class="lesson">
+<h2>2. What is Domain Name?</h2>
+<p>Domain website ka readable naam hota hai, jaise:</p>
+<div class="code">google.com
+example.com</div>
+</div>
+
+<div class="lesson">
+<h2>3. What is IP Address?</h2>
+<p>IP address network par device ya server ki pehchan hota hai.</p>
+<div class="code">IPv4 Example:
+192.0.2.1</div>
+</div>
+
+<div class="lesson">
+<h2>4. DNS Lookup</h2>
+<p>DNS lookup se domain ke DNS records ki information milti hai.</p>
+<div class="code">nslookup example.com</div>
+</div>
+
+<div class="lesson">
+<h2>5. CURL Practice</h2>
+<p>Apne Android terminal mein practice karein:</p>
+<div class="code">curl -I https://example.com</div>
+<p>DNS records dekhne ke liye:</p>
+<div class="code">nslookup example.com</div>
+<p>Agar nslookup available nahi hai, to Android par Termux mein package install karna par sakta hai.</p>
+</div>
+
+<div class="lesson">
+<h2>6. DNS Record Types</h2>
+<p><b>A:</b> IPv4 address</p>
+<p><b>AAAA:</b> IPv6 address</p>
+<p><b>CNAME:</b> Another domain name ka alias</p>
+<p><b>MX:</b> Mail server information</p>
+<p><b>TXT:</b> Text information</p>
+</div>
+
+<div class="lesson">
+<h2>🎯 HOMEWORK</h2>
+<p>1. DNS ka full form kya hai?</p>
+<p>2. Domain Name kya hota hai?</p>
+<p>3. IP Address kya hai?</p>
+<p>4. A aur MX records mein kya farq hai?</p>
+<p>5. nslookup ka kya kaam hai?</p>
+</div>
+
+<a href="Hacking.html">← Back to Academy</a>
+<a href="lesson6.html">Previous Lesson</a>
+
+</div>
+</body>
+</html>
