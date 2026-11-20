@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 08 - DNS Records</title>
+<title>Lesson 08 - DNS Records & Subdomains</title>
 
 <style>
 *{
@@ -31,12 +31,11 @@ h1,h2{
  padding:18px;
  margin:18px 0;
 }
-code,pre{
+pre{
  color:#00ffb3;
  background:#03111f;
- padding:10px;
+ padding:12px;
  border-radius:7px;
- display:block;
  overflow-x:auto;
 }
 a{
@@ -48,63 +47,84 @@ a{
 <body>
 <div class="container">
 
-<h1>👑 Lesson 08 - DNS Records & Subdomains</h1>
+<h1>Lesson 08 - DNS Records & Subdomains</h1>
 <p>White Hat Ethical Hacking Academy</p>
 
 <div class="card">
-<h2>1. DNS کیا ہے؟</h2>
-<p>DNS کا مطلب Domain Name System ہے۔ یہ ویب سائٹ کے نام کو IP Address میں تبدیل کرتا ہے۔</p>
-<p>مثال: example.com کا IP Address معلوم کرنے کے لیے DNS استعمال ہوتا ہے۔</p>
+<h2>1. What is DNS?</h2>
+<p>DNS stands for Domain Name System. It translates domain names into IP addresses so computers can find websites.</p>
+<p>Example: example.com is a domain name that DNS can resolve to an IP address.</p>
 </div>
 
 <div class="card">
-<h2>2. DNS Records کی اقسام</h2>
-
-<p><b>A Record:</b> Domain کو IPv4 Address سے جوڑتا ہے۔</p>
-<p><b>AAAA Record:</b> Domain کو IPv6 Address سے جوڑتا ہے۔</p>
-<p><b>CNAME:</b> ایک Domain کو دوسرے Domain کا Alias بناتا ہے۔</p>
-<p><b>MX:</b> Email Server کی معلومات دیتا ہے۔</p>
-<p><b>TXT:</b> Domain کی اضافی معلومات، مثلاً SPF، محفوظ کرتا ہے۔</p>
-<p><b>NS:</b> Domain کے Name Servers بتاتا ہے۔</p>
+<h2>2. Types of DNS Records</h2>
+<p><b>A Record:</b> Maps a domain name to an IPv4 address.</p>
+<p><b>AAAA Record:</b> Maps a domain name to an IPv6 address.</p>
+<p><b>CNAME Record:</b> Makes one domain name an alias of another.</p>
+<p><b>MX Record:</b> Identifies mail servers for a domain.</p>
+<p><b>TXT Record:</b> Stores text information, often used for domain verification and email security.</p>
+<p><b>NS Record:</b> Identifies the authoritative name servers for a domain.</p>
 </div>
 
 <div class="card">
-<h2>3. Android پر DNS Practice</h2>
-<p>Termux کھولیں اور یہ Command چلائیں:</p>
+<h2>3. DNS Lookup with Termux</h2>
+<p>Run these commands in Termux:</p>
+
+<p>Find the IP address:</p>
 <pre>nslookup example.com</pre>
 
-<p>MX Record چیک کریں:</p>
+<p>Find MX records:</p>
 <pre>nslookup -type=MX gmail.com</pre>
 
-<p>NS Record چیک کریں:</p>
+<p>Find NS records:</p>
 <pre>nslookup -type=NS example.com</pre>
+
+<p>Find TXT records:</p>
+<pre>nslookup -type=TXT example.com</pre>
 </div>
 
 <div class="card">
-<h2>4. Subdomain کیا ہے؟</h2>
-<p>Subdomain کسی Domain کا ذیلی حصہ ہوتا ہے۔</p>
-<p>مثالیں:</p>
-<pre>www.example.com
+<h2>4. What is a Subdomain?</h2>
+<p>A subdomain is an additional part of a main domain name.</p>
+<p>Examples:</p>
+<pre>
+www.example.com
 mail.example.com
-blog.example.com</pre>
+blog.example.com
+shop.example.com
+</pre>
+<p>Each subdomain can be configured for a different service or purpose.</p>
 </div>
 
 <div class="card">
-<h2>5. آج کی Practice</h2>
-<p>یہ Commands چلائیں:</p>
+<h2>5. Practical Exercise</h2>
+<p>Run the following commands and observe the results:</p>
 <pre>nslookup example.com</pre>
 <pre>nslookup -type=MX gmail.com</pre>
 <pre>nslookup -type=NS example.com</pre>
 
-<p>ہر Command کا Result سمجھنے کی کوشش کریں۔</p>
+<p>Write down the IP address and the DNS records you discover.</p>
 </div>
 
 <div class="card">
-<h2>6. Ethical Hacking Rule</h2>
-<p>DNS کی معلومات صرف اپنی ویب سائٹ یا ایسی ویب سائٹ پر چیک کریں جس کی اجازت آپ کے پاس ہو۔</p>
+<h2>6. Security and Ethical Rules</h2>
+<p>DNS information can help security professionals understand how a domain is configured.</p>
+<p>Only investigate domains you own or have permission to test. Never use DNS information to attack systems.</p>
 </div>
 
-<p><a href="Hacking.html">⬅ Back to Academy</a></p>
+<div class="card">
+<h2>Lesson 08 - Summary</h2>
+<p>In this lesson, you learned:</p>
+<ul>
+<li>What DNS is</li>
+<li>Common DNS record types</li>
+<li>How to use nslookup</li>
+<li>What subdomains are</li>
+<li>Basic DNS security practices</li>
+</ul>
+</div>
+
+<p><a href="Hacking.html">Back to Academy</a></p>
 
 </div>
 </body>
