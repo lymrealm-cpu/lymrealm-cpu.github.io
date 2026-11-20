@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 06 - HTTP Methods | LYM REALM</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;padding:20px;font-family:Arial,sans-serif;
+ color:#eaf6ff;
+ background:radial-gradient(circle at top,#064879,#020817 70%);
+ min-height:100vh;
+}
+.container{max-width:750px;margin:auto}
+h1,h2{color:#32cfff;text-shadow:0 0 12px #008cff}
+.lesson{
+ background:#081a30;border:1px solid #008cff;
+ border-radius:14px;padding:20px;margin:20px 0;
+ box-shadow:0 0 15px #0077aa44;
+}
+.code{
+ background:#020817;color:#00e5a8;padding:14px;
+ border-radius:8px;overflow-x:auto;white-space:pre-wrap;
+}
+p{line-height:1.7;color:#c5d9ec}
+a{
+ display:inline-block;background:#008fd1;color:white;
+ padding:12px 18px;border-radius:8px;
+ text-decoration:none;margin:8px 5px 0 0;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>🛡️ LESSON 06</h1>
+<h2>HTTP METHODS</h2>
+<p>Learn how HTTP methods control communication between clients and servers.</p>
+
+<div class="lesson">
+<h2>1. GET</h2>
+<p>GET server se information hasil karne ke liye use hota hai.</p>
+<div class="code">curl -X GET https://example.com</div>
+</div>
+
+<div class="lesson">
+<h2>2. POST</h2>
+<p>POST server ko data bhejne ke liye use hota hai.</p>
+<div class="code">curl -X POST https://httpbin.org/post \
+-H "Content-Type: application/json" \
+-d '{"name":"LYM REALM"}'</div>
+</div>
+
+<div class="lesson">
+<h2>3. PUT</h2>
+<p>PUT kisi resource ko create ya replace karne ke liye use hota hai.</p>
+<div class="code">curl -X PUT https://httpbin.org/put \
+-H "Content-Type: application/json" \
+-d '{"name":"LYM REALM"}'</div>
+</div>
+
+<div class="lesson">
+<h2>4. PATCH</h2>
+<p>PATCH resource ke kisi hissa ko update karta hai.</p>
+<div class="code">curl -X PATCH https://httpbin.org/patch \
+-H "Content-Type: application/json" \
+-d '{"name":"LYM"}'</div>
+</div>
+
+<div class="lesson">
+<h2>5. DELETE</h2>
+<p>DELETE kisi resource ko delete karne ki request bhejta hai.</p>
+<div class="code">curl -X DELETE https://httpbin.org/delete</div>
+</div>
+
+<div class="lesson">
+<h2>🎯 HOMEWORK</h2>
+<p>1. GET ka kya kaam hai?</p>
+<p>2. POST aur PUT mein kya farq hai?</p>
+<p>3. PATCH kis liye use hota hai?</p>
+<p>4. DELETE kya karta hai?</p>
+<p>Yaad rakhein: DELETE ki practice sirf test service ya authorized system par karein.</p>
+</div>
+
+<a href="Hacking.html">← Back to Academy</a>
+<a href="lesson5.html">Previous Lesson</a>
+
+</div>
+</body>
+</html>
