@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 09 - WHOIS & Domain Information</title>
+
+<style>
+*{
+ box-sizing:border-box;
+}
+body{
+ margin:0;
+ padding:20px;
+ font-family:Arial,sans-serif;
+ color:#eaf6ff;
+ background:linear-gradient(135deg,#020817,#06365a);
+}
+.container{
+ max-width:850px;
+ margin:auto;
+}
+h1,h2{
+ color:#00d9ff;
+}
+.card{
+ background:#0b2035;
+ border:1px solid #087ca8;
+ border-radius:12px;
+ padding:18px;
+ margin:18px 0;
+}
+pre{
+ color:#00ffb3;
+ background:#03111f;
+ padding:12px;
+ border-radius:7px;
+ overflow-x:auto;
+}
+a{
+ color:#00d9ff;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>Lesson 09 - WHOIS & Domain Information</h1>
+<p>White Hat Ethical Hacking Academy</p>
+
+<div class="card">
+<h2>1. What is WHOIS?</h2>
+<p>WHOIS is a lookup service used to find registration information about domain names.</p>
+<p>It may show the registrar, registration dates, expiry dates and name servers.</p>
+<p>Some personal details may be hidden by domain privacy services.</p>
+</div>
+
+<div class="card">
+<h2>2. Important WHOIS Information</h2>
+<p><b>Domain Name:</b> The registered website name.</p>
+<p><b>Registrar:</b> The company where the domain was registered.</p>
+<p><b>Creation Date:</b> The date the domain was registered.</p>
+<p><b>Expiry Date:</b> The domain registration expiry date.</p>
+<p><b>Name Servers:</b> Servers responsible for DNS information.</p>
+<p><b>Domain Status:</b> The current registration status of a domain.</p>
+</div>
+
+<div class="card">
+<h2>3. Install WHOIS in Termux</h2>
+<p>Update Termux packages:</p>
+<pre>pkg update</pre>
+
+<p>Install WHOIS:</p>
+<pre>pkg install whois</pre>
+
+<p>View WHOIS help:</p>
+<pre>whois --help</pre>
+</div>
+
+<div class="card">
+<h2>4. WHOIS Lookup Practice</h2>
+<p>Run a lookup for a public example domain:</p>
+<pre>whois example.com</pre>
+
+<p>Look for these fields in the result:</p>
+<ul>
+<li>Registrar</li>
+<li>Creation Date</li>
+<li>Expiry Date</li>
+<li>Name Server</li>
+<li>Domain Status</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>5. Domain Privacy</h2>
+<p>Domain privacy services help protect personal registration details from public display.</p>
+<p>Not every WHOIS lookup reveals the domain owner's personal information.</p>
+</div>
+
+<div class="card">
+<h2>6. Practical Exercise</h2>
+<p>Use WHOIS to inspect example.com.</p>
+<p>Write down the registrar, creation date, expiry date and name servers if available.</p>
+<p>Compare the WHOIS information with the DNS information learned in Lesson 08.</p>
+</div>
+
+<div class="card">
+<h2>7. Ethical Rules</h2>
+<p>Use public domain information responsibly.</p>
+<p>Do not use registration details to harass, target or expose people.</p>
+<p>Only perform security testing on systems you own or have permission to test.</p>
+</div>
+
+<div class="card">
+<h2>Lesson 09 - Summary</h2>
+<ul>
+<li>Learned what WHOIS is</li>
+<li>Learned about domain registration</li>
+<li>Learned about registrars and expiry dates</li>
+<li>Practiced WHOIS in Termux</li>
+<li>Learned about domain privacy</li>
+</ul>
+</div>
+
+<p><a href="Hacking.html">Back to Academy</a></p>
+
+</div>
+</body>
+</html>
