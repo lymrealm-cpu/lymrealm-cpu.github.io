@@ -1,1 +1,123 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 04 - HTTP Status Codes | LYM REALM</title>
+
+<style>
+*{
+ box-sizing:border-box;
+}
+body{
+ margin:0;
+ padding:20px;
+ font-family:Arial,sans-serif;
+ color:#eaf6ff;
+ background:radial-gradient(circle at top,#064879,#020817 70%);
+ min-height:100vh;
+}
+h1,h2{
+ color:#32cfff;
+ text-shadow:0 0 12px #008cff;
+}
+.container{
+ max-width:750px;
+ margin:auto;
+}
+.lesson{
+ background:#081a30;
+ border:1px solid #008cff;
+ border-radius:14px;
+ padding:20px;
+ margin:20px 0;
+ box-shadow:0 0 15px #0077aa44;
+}
+.code{
+ background:#020817;
+ color:#00e5a8;
+ padding:14px;
+ border-radius:8px;
+ overflow-x:auto;
+}
+p{
+ line-height:1.7;
+ color:#c5d9ec;
+}
+a{
+ display:inline-block;
+ background:#008fd1;
+ color:white;
+ padding:12px 18px;
+ border-radius:8px;
+ text-decoration:none;
+ margin:8px 5px 0 0;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>🛡️ LESSON 04</h1>
+<h2>HTTP STATUS CODES</h2>
+<p>Understand how web servers respond to your requests.</p>
+
+<div class="lesson">
+<h2>1. HTTP 200 – OK</h2>
+<p>Server ne request successfully receive aur process ki.</p>
+<div class="code">200 OK</div>
+</div>
+
+<div class="lesson">
+<h2>2. HTTP 301 – Redirect</h2>
+<p>Website ya page kisi doosre URL par permanently move ho gaya hai.</p>
+<div class="code">301 Moved Permanently</div>
+</div>
+
+<div class="lesson">
+<h2>3. HTTP 403 – Forbidden</h2>
+<p>Server ne request samajh li, lekin access ki permission nahi di.</p>
+<div class="code">403 Forbidden</div>
+</div>
+
+<div class="lesson">
+<h2>4. HTTP 404 – Not Found</h2>
+<p>Requested page ya resource server par nahi mila.</p>
+<div class="code">404 Not Found</div>
+</div>
+
+<div class="lesson">
+<h2>5. HTTP 500 – Internal Server Error</h2>
+<p>Server ke andar unexpected error aa gaya.</p>
+<div class="code">500 Internal Server Error</div>
+</div>
+
+<div class="lesson">
+<h2>🧪 PRACTICAL CURL PRACTICE</h2>
+<p>Apne Android terminal mein ye commands practice karein:</p>
+<div class="code">
+curl -I https://example.com
+<br><br>
+curl -I -L https://example.com
+<br><br>
+curl -s -o /dev/null -w "%{http_code}\n" https://example.com
+</div>
+<p>Ye commands website ka HTTP response status check karti hain.</p>
+</div>
+
+<div class="lesson">
+<h2>🎯 HOMEWORK</h2>
+<p>In paanch status codes ke naam aur meanings yaad karein:</p>
+<p>200, 301, 403, 404, 500</p>
+<p>Practice sirf apni ya authorized websites par karein.</p>
+</div>
+
+<a href="Hacking.html">← Back to Academy</a>
+<a href="lesson3.html">Previous Lesson</a>
+
+</div>
+</body>
+</html>
+
