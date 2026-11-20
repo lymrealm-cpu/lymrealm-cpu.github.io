@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 05 - HTTP Headers | LYM REALM</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ padding:20px;
+ font-family:Arial,sans-serif;
+ color:#eaf6ff;
+ background:radial-gradient(circle at top,#064879,#020817 70%);
+ min-height:100vh;
+}
+.container{max-width:750px;margin:auto}
+h1,h2{color:#32cfff;text-shadow:0 0 12px #008cff}
+.lesson{
+ background:#081a30;
+ border:1px solid #008cff;
+ border-radius:14px;
+ padding:20px;
+ margin:20px 0;
+ box-shadow:0 0 15px #0077aa44;
+}
+.code{
+ background:#020817;
+ color:#00e5a8;
+ padding:14px;
+ border-radius:8px;
+ overflow-x:auto;
+ white-space:pre-wrap;
+}
+p{line-height:1.7;color:#c5d9ec}
+a{
+ display:inline-block;
+ background:#008fd1;
+ color:white;
+ padding:12px 18px;
+ border-radius:8px;
+ text-decoration:none;
+ margin:8px 5px 0 0;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>🛡️ LESSON 05</h1>
+<h2>HTTP REQUEST & RESPONSE HEADERS</h2>
+<p>Learn how browsers and web servers communicate.</p>
+
+<div class="lesson">
+<h2>1. What is HTTP Request?</h2>
+<p>Jab browser server se webpage ya data mangta hai, usay HTTP Request kehte hain.</p>
+<div class="code">Browser → Server
+GET / HTTP/1.1</div>
+</div>
+
+<div class="lesson">
+<h2>2. What is HTTP Response?</h2>
+<p>Server jab browser ko jawab deta hai, usay HTTP Response kehte hain.</p>
+<div class="code">Server → Browser
+HTTP/1.1 200 OK</div>
+</div>
+
+<div class="lesson">
+<h2>3. Request Headers</h2>
+<p>Request Headers server ko request ke bare mein information dete hain.</p>
+<div class="code">Host: example.com
+User-Agent: Mozilla/5.0
+Accept: text/html</div>
+</div>
+
+<div class="lesson">
+<h2>4. Response Headers</h2>
+<p>Response Headers server ke jawab ke bare mein information dete hain.</p>
+<div class="code">Content-Type: text/html
+Content-Length: 1256
+Server: Example</div>
+</div>
+
+<div class="lesson">
+<h2>5. CURL Practical</h2>
+<p>Apne Android terminal mein ye commands practice karein:</p>
+<div class="code">curl -I https://example.com
+
+curl -v https://example.com
+
+curl -H "User-Agent: LYM-REALM" https://example.com</div>
+<p>-I response headers dikhata hai.</p>
+<p>-v request aur response ki detailed information dikhata hai.</p>
+<p>-H custom request header bhejta hai.</p>
+</div>
+
+<div class="lesson">
+<h2>🎯 HOMEWORK</h2>
+<p>In sawalon ke jawab dein:</p>
+<p>1. HTTP Request kya hai?</p>
+<p>2. HTTP Response kya hai?</p>
+<p>3. Request aur Response Headers mein kya farq hai?</p>
+<p>4. curl -I ka kya kaam hai?</p>
+</div>
+
+<a href="Hacking.html">← Back to Academy</a>
+<a href="lesson4.html">Previous Lesson</a>
+
+</div>
+</body>
+</html>
