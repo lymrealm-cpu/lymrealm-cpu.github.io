@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 08 - DNS Records</title>
+
+<style>
+*{
+ box-sizing:border-box;
+}
+body{
+ margin:0;
+ padding:20px;
+ font-family:Arial,sans-serif;
+ color:#eaf6ff;
+ background:linear-gradient(135deg,#020817,#06365a);
+}
+.container{
+ max-width:850px;
+ margin:auto;
+}
+h1,h2{
+ color:#00d9ff;
+}
+.card{
+ background:#0b2035;
+ border:1px solid #087ca8;
+ border-radius:12px;
+ padding:18px;
+ margin:18px 0;
+}
+code,pre{
+ color:#00ffb3;
+ background:#03111f;
+ padding:10px;
+ border-radius:7px;
+ display:block;
+ overflow-x:auto;
+}
+a{
+ color:#00d9ff;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>👑 Lesson 08 - DNS Records & Subdomains</h1>
+<p>White Hat Ethical Hacking Academy</p>
+
+<div class="card">
+<h2>1. DNS کیا ہے؟</h2>
+<p>DNS کا مطلب Domain Name System ہے۔ یہ ویب سائٹ کے نام کو IP Address میں تبدیل کرتا ہے۔</p>
+<p>مثال: example.com کا IP Address معلوم کرنے کے لیے DNS استعمال ہوتا ہے۔</p>
+</div>
+
+<div class="card">
+<h2>2. DNS Records کی اقسام</h2>
+
+<p><b>A Record:</b> Domain کو IPv4 Address سے جوڑتا ہے۔</p>
+<p><b>AAAA Record:</b> Domain کو IPv6 Address سے جوڑتا ہے۔</p>
+<p><b>CNAME:</b> ایک Domain کو دوسرے Domain کا Alias بناتا ہے۔</p>
+<p><b>MX:</b> Email Server کی معلومات دیتا ہے۔</p>
+<p><b>TXT:</b> Domain کی اضافی معلومات، مثلاً SPF، محفوظ کرتا ہے۔</p>
+<p><b>NS:</b> Domain کے Name Servers بتاتا ہے۔</p>
+</div>
+
+<div class="card">
+<h2>3. Android پر DNS Practice</h2>
+<p>Termux کھولیں اور یہ Command چلائیں:</p>
+<pre>nslookup example.com</pre>
+
+<p>MX Record چیک کریں:</p>
+<pre>nslookup -type=MX gmail.com</pre>
+
+<p>NS Record چیک کریں:</p>
+<pre>nslookup -type=NS example.com</pre>
+</div>
+
+<div class="card">
+<h2>4. Subdomain کیا ہے؟</h2>
+<p>Subdomain کسی Domain کا ذیلی حصہ ہوتا ہے۔</p>
+<p>مثالیں:</p>
+<pre>www.example.com
+mail.example.com
+blog.example.com</pre>
+</div>
+
+<div class="card">
+<h2>5. آج کی Practice</h2>
+<p>یہ Commands چلائیں:</p>
+<pre>nslookup example.com</pre>
+<pre>nslookup -type=MX gmail.com</pre>
+<pre>nslookup -type=NS example.com</pre>
+
+<p>ہر Command کا Result سمجھنے کی کوشش کریں۔</p>
+</div>
+
+<div class="card">
+<h2>6. Ethical Hacking Rule</h2>
+<p>DNS کی معلومات صرف اپنی ویب سائٹ یا ایسی ویب سائٹ پر چیک کریں جس کی اجازت آپ کے پاس ہو۔</p>
+</div>
+
+<p><a href="Hacking.html">⬅ Back to Academy</a></p>
+
+</div>
+</body>
+</html>
