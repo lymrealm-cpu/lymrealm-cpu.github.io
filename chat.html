@@ -185,22 +185,74 @@ async function startApp(user){
  }).subscribe();
 }
 
+
 async function loadUsers(){
  const box=document.getElementById("users");
  box.textContent="Loading...";
+
  const {data,error}=await db.from("profiles")
- .select("id,username")
- .neq("id",currentUser.id)
- .order("username");
+  .select("id,username")
+  .neq("id",currentUser.id)
+  .order("username");
+
+ if(error){
+  box.textContent=error.message;
+  return;
+ }
+
+ const {data:roles,error:roleError}=await db
+  .from("user_roles")
+  .select("user_id,role");
+
+ if(roleError){
+  box.textContent=roleError.message;
+  return;
+ }
+
+ const roleMap={};
+ (roles||[]).forEach(r=>{
+  roleMap[r.user_id]=r.role;
+ });
 
  box.innerHTML="";
- if(error){box.textContent=error.message;return;}
+
  if(!data || data.length===0){
   box.textContent="No other users yet.";
   return;
  }
 
  data.forEach(u=>{
+  const b=document.createElement("button");
+  b.className="user";
+
+  if(selectedUser && selectedUser.id===u.id){
+   b.classList.add("active");
+  }
+
+  const avatar=document.createElement("span");
+  avatar.className="avatar";
+  avatar.textContent="👤";
+
+  const name=document.createElement("span");
+  name.textContent=u.username;
+
+  const role=document.createElement("span");
+  const userRole=roleMap[u.id]||"member";
+
+  role.textContent=
+   userRole==="super_admin" ? " 👑 SUPER ADMIN" :
+   userRole==="moderator" ? " 🛡️ MOD" :
+   userRole==="vip" ? " ⭐ VIP" : "";
+
+  role.style.fontSize="10px";
+  role.style.color="#ffd76a";
+
+  b.append(avatar,name,role);
+  b.onclick=()=>openChat(u);
+  box.appendChild(b);
+ });
+}
+
   const b=document.createElement("button");
   b.className="user";
   if(selectedUser && selectedUser.id===u.id)b.classList.add("active");
