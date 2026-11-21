@@ -84,6 +84,7 @@ async function register(){
   email:email,
   password:password
  });
+console.log(error);
  document.getElementById("status").innerText =
  error ? error.message : "Account created! Check your email.";
 }
