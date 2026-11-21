@@ -76,7 +76,8 @@ const supabaseClient = window.supabase.createClient(
  SUPABASE_URL,
  SUPABASE_KEY
 );
-async function register(){document.getElementById("status").innerText = "Button is working!";
+async function register({
+document.getElementById("status").innerText = "Button is working!";
  const email = document.getElementById("email").value.trim();
  const password = document.getElementById("password").value;
  const status = document.getElementById("status");
