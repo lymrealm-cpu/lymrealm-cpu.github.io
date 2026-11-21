@@ -186,21 +186,49 @@ async function startApp(user){
 }
 
 async function loadUsers(){
-const box=document.getElementById("users");
-box.textContent="Loading...";
-const {data,error}=await db.from("profiles")
-.select("id,username")
-.neq("id",currentUser.id)
-.order("username");
+ const box=document.getElementById("users");
+ box.textContent="Loading...";
 
-box.innerHTML="";
-if(error){box.textContent=error.message;return;}
-if(!data || data.length===0){
-box.textContent="No other users yet.";
-return;
-}
+ const {data,error}=await db.from("profiles")
+  .select("id,username")
+  .neq("id",currentUser.id)
+  .order("username");
 
- data.forEach(u=>{}
+ if(error){
+  box.textContent=error.message;
+  return;
+ }
+
+ const {data:roles,error:roleError}=await db
+  .from("user_roles")
+  .select("user_id,role");
+
+ if(roleError){
+  box.textContent=roleError.message;
+  return;
+ }
+
+ const roleMap={};
+
+ (roles||[]).forEach(r=>{
+  roleMap[r.user_id]=r.role;
+ });
+
+ box.innerHTML="";
+
+ if(!data || data.length===0){
+  box.textContent="No other users yet.";
+  return;
+ }
+
+ data.forEach(u=>{
+  const b=document.createElement("button");
+  b.className="user";
+
+  if(selectedUser && selectedUser.id===u.id){
+   b.classList.add("active");
+  }
+
   const avatar=document.createElement("span");
   avatar.className="avatar";
   avatar.textContent="👤";
@@ -220,23 +248,6 @@ return;
   role.style.color="#ffd76a";
 
   b.append(avatar,name,role);
-  b.onclick=()=>openChat(u);
-  box.appendChild(b);
- });
-}
-
-  const b=document.createElement("button");
-  b.className="user";
-  if(selectedUser && selectedUser.id===u.id)b.classList.add("active");
-
-  const avatar=document.createElement("span");
-  avatar.className="avatar";
-  avatar.textContent="👤";
-
-  const name=document.createElement("span");
-  name.textContent=u.username;
-
-  b.append(avatar,name);
   b.onclick=()=>openChat(u);
   box.appendChild(b);
  });
@@ -278,56 +289,53 @@ async function loadMessages(){
  box.scrollTop=box.scrollHeight;
 }
 
-
-
 async function sendMessage(){
  if(!selectedUser){
   alert("Please select a user first.");
   return;
  }
 
- // Check whether current user is muted
- const {data: mute, error: muteError} = await db
+ const {data:mute,error:muteError}=await db
   .from("member_mutes")
   .select("reason, muted_until")
-  .eq("user_id", currentUser.id)
-  .is("unmuted_at", null)
-  .gt("muted_until", new Date().toISOString())
-  .order("created_at", {ascending:false})
+  .eq("user_id",currentUser.id)
+  .is("unmuted_at",null)
+  .gt("muted_until",new Date().toISOString())
+  .order("created_at",{ascending:false})
   .limit(1)
   .maybeSingle();
 
  if(muteError){
-  alert("Mute status check failed: " + muteError.message);
+  alert("Mute status check failed: "+muteError.message);
   return;
  }
 
  if(mute){
-  const remaining = Math.max(
+  const remaining=Math.max(
    0,
-   Math.ceil((new Date(mute.muted_until) - Date.now()) / 60000)
+   Math.ceil((new Date(mute.muted_until)-Date.now())/60000)
   );
 
-  const hours = Math.floor(remaining / 60);
-  const minutes = remaining % 60;
+  const hours=Math.floor(remaining/60);
+  const minutes=remaining%60;
 
   alert(
-   "You are muted!\n" +
-   "Reason: " + mute.reason + "\n" +
-   "Time remaining: " + hours + "h " + minutes + "m"
+   "You are muted!\n"+
+   "Reason: "+mute.reason+"\n"+
+   "Time remaining: "+hours+"h "+minutes+"m"
   );
   return;
  }
 
- const input = document.getElementById("message");
- const message = input.value.trim();
+ const input=document.getElementById("message");
+ const message=input.value.trim();
 
- if(!message) return;
+ if(!message)return;
 
- const {error} = await db.from("messages").insert({
-  sender_id: currentUser.id,
-  receiver_id: selectedUser.id,
-  message: message
+ const {error}=await db.from("messages").insert({
+  sender_id:currentUser.id,
+  receiver_id:selectedUser.id,
+  message:message
  });
 
  if(error){
@@ -335,7 +343,7 @@ async function sendMessage(){
   return;
  }
 
- input.value = "";
+ input.value="";
  await loadMessages();
 }
 
