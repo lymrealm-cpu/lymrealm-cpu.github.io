@@ -47,14 +47,12 @@ button{
  font-weight:bold;
  cursor:pointer;
 }
-button:hover{background:#00bfff}
 #status{text-align:center;color:#00d9ff}
 .hidden{display:none}
 </style>
 </head>
 
 <body>
-
 <div class="container">
 
 <h1>👑 LYM REALM CHAT</h1>
@@ -63,16 +61,10 @@ button:hover{background:#00bfff}
 <div id="authBox">
 <h3>Create Account / Login</h3>
 
-<input id="email" type="email"
-placeholder="Email Address">
-
-<input id="password" type="password"
-placeholder="Password">
+<input id="email" type="email" placeholder="Email Address">
+<input id="password" type="password" placeholder="Password">
 
 <button onclick="register()">Create Account</button>
-Create Account
-</button>
-<p id="status">Button is working!</p>
 <button onclick="login()">Login</button>
 </div>
 
@@ -83,11 +75,14 @@ Create Account
 </div>
 
 <p id="status">Welcome to LYM REALM CHAT</p>
-
 </div>
 
 <script>
-const SUPABASE_KEY = "sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr_Key";
+const SUPABASE_URL =
+"https://probxnzduietjivnqrac.supabase.co";
+
+const SUPABASE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
+
 const supabaseClient = window.supabase.createClient(
 SUPABASE_URL,
 SUPABASE_KEY
@@ -97,7 +92,6 @@ const statusBox = document.getElementById("status");
 
 async function register(){
 
-document.getElementById("status").innerText = "REGISTER STARTED";
 const email = document.getElementById("email").value.trim();
 const password = document.getElementById("password").value;
 
@@ -107,43 +101,32 @@ return;
 }
 
 if(password.length < 6){
-statusBox.innerText = "Password must be 6 characters.";
+statusBox.innerText = "Password must be at least 6 characters.";
 return;
 }
 
 statusBox.innerText = "Creating account...";
 
 try{
-
-statusBox.innerText = "SUPABASE REQUEST STARTED";
-
 const {data,error} = await supabaseClient.auth.signUp({
-  email: email,
-  password: password
+email: email,
+password: password
 });
 
 if(error){
-  statusBox.innerText = "SUPABASE ERROR: " + error.message;
-  return;
-}
-
-statusBox.innerText = "ACCOUNT CREATED SUCCESSFULLY!";
-email:email,
-password:password
-});
-
-if(error){
-statusBox.innerText = "Error: " + error.message;
+statusBox.innerText = "ERROR: " + error.message;
 return;
 }
 
+if(data.session){
+showUser(data.user);
+}else{
 statusBox.innerText =
-data.session
-? "Account created successfully!"
-: "Account created! Please verify your email.";
+"Account created! Check your email for verification.";
+}
 
 }catch(err){
-statusBox.innerText = "Error: " + err.message;
+statusBox.innerText = "ERROR: " + err.message;
 }
 }
 
@@ -161,30 +144,27 @@ statusBox.innerText = "Logging in...";
 
 try{
 const {data,error} = await supabaseClient.auth.signInWithPassword({
-email:email,
-password:password
+email: email,
+password: password
 });
 
 if(error){
-statusBox.innerText = "Error: " + error.message;
+statusBox.innerText = "ERROR: " + error.message;
 return;
 }
 
 showUser(data.user);
 
 }catch(err){
-statusBox.innerText = "Error: " + err.message;
+statusBox.innerText = "ERROR: " + err.message;
 }
 }
 
 function showUser(user){
-
 document.getElementById("authBox").classList.add("hidden");
 document.getElementById("userBox").classList.remove("hidden");
-
 document.getElementById("userEmail").innerText =
 "Logged in as: " + user.email;
-
 statusBox.innerText = "Login successful!";
 }
 
@@ -199,12 +179,10 @@ return;
 
 document.getElementById("authBox").classList.remove("hidden");
 document.getElementById("userBox").classList.add("hidden");
-
 statusBox.innerText = "You are logged out.";
 }
 
 async function checkSession(){
-
 const {data,error} = await supabaseClient.auth.getSession();
 
 if(error){
@@ -218,7 +196,7 @@ showUser(data.session.user);
 }
 
 checkSession();
-
 </script>
+
 </body>
 </html>
