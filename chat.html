@@ -227,7 +227,7 @@ async function loadUsers(){
 
   if(selectedUser && selectedUser.id===u.id){
    b.classList.add("active");
-  }
+  data.forEach(u=>{
 
   const avatar=document.createElement("span");
   avatar.className="avatar";
