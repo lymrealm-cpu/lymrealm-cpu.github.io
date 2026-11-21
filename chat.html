@@ -3,200 +3,196 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LYM REALM CHAT</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-*{box-sizing:border-box}
-body{
- margin:0;
- font-family:Arial,sans-serif;
- background:linear-gradient(140deg,#06152e,#020817);
- color:#eaf6ff;
- min-height:100vh;
- padding:20px;
-}
-.container{
- max-width:430px;
- margin:35px auto;
- padding:25px;
- border:1px solid #00bfff;
- border-radius:18px;
- background:#071a32;
- box-shadow:0 0 25px #008cff55;
-}
-h1{text-align:center;color:#00c8ff}
-.tag{text-align:center;color:#9bbbd4}
-input,button{
- width:100%;
- padding:14px;
- margin:9px 0;
- border-radius:9px;
-}
-input{
- background:#020c1b;
- border:1px solid #168ac0;
- color:white;
-}
-button{
- background:#008cff;
- border:0;
- color:white;
- font-weight:bold;
- cursor:pointer;
-}
-#status{text-align:center;color:#00d9ff}
+body{margin:0;background:#101820;color:white;font-family:Arial}
+header{background:#075e54;padding:18px;font-size:22px;font-weight:bold}
+#auth,#app{padding:15px}
+input{box-sizing:border-box;width:100%;padding:13px;margin:7px 0;border-radius:8px;border:0}
+button{padding:12px;margin:5px;border:0;border-radius:7px;background:#128c7e;color:white}
+#users button{display:block;width:100%;text-align:left;background:#263b46;padding:15px}
+#messages{height:45vh;overflow-y:auto;padding:10px;background:#17232d}
+.msg{background:#075e54;padding:10px;margin:8px 0;border-radius:10px;max-width:80%;margin-left:auto}
+.other{background:#344955;margin-left:0}
+#chatbox{display:flex;gap:5px}
+#chatbox input{flex:1}
 .hidden{display:none}
 </style>
 </head>
-
 <body>
-<div class="container">
 
-<h1>👑 LYM REALM CHAT</h1>
-<p class="tag">CONNECT • CHAT • PROTECT</p>
+<header>LYM REALM CHAT</header>
 
-<div id="authBox">
-<h3>Create Account / Login</h3>
-
-<input id="email" type="email" placeholder="Email Address">
+<div id="auth">
+<h3>Login / Create Account</h3>
+<input id="email" type="email" placeholder="Email">
 <input id="password" type="password" placeholder="Password">
-
-<button onclick="register()">Create Account</button>
 <button onclick="login()">Login</button>
+<button onclick="signup()">Create Account</button>
+<p id="status"></p>
 </div>
 
-<div id="userBox" class="hidden">
-<h3>Welcome to LYM REALM!</h3>
-<p id="userEmail"></p>
+<div id="app" class="hidden">
+<p id="myname"></p>
 <button onclick="logout()">Logout</button>
-</div>
 
-<p id="status">Welcome to LYM REALM CHAT</p>
+<h3>Users</h3>
+<div id="users">Loading users...</div>
+
+<h3 id="chatTitle">Select a user to chat</h3>
+<div id="messages"></div>
+
+<div id="chatbox">
+<input id="message" placeholder="Write a message...">
+<button onclick="sendMessage()">Send</button>
+</div>
 </div>
 
 <script>
-const SUPABASE_URL =
-"https://probxnzduietjivnqrac.supabase.co";
+const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
 
-const SUPABASE_KEY = "sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
+const db = supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-const supabaseClient = window.supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
-);
+let currentUser = null;
+let selectedUser = null;
+let chatChannel = null;
 
 const statusBox = document.getElementById("status");
 
-async function register(){
-
-const email = document.getElementById("email").value.trim();
-const password = document.getElementById("password").value;
-
-if(!email || !password){
-statusBox.innerText = "Enter email and password.";
-return;
-}
-
-if(password.length < 6){
-statusBox.innerText = "Password must be at least 6 characters.";
-return;
-}
-
-statusBox.innerText = "Creating account...";
-
-try{
-const {data,error} = await supabaseClient.auth.signUp({
-email: email,
-password: password
-});
-
-if(error){
-statusBox.innerText = "ERROR: " + error.message;
-return;
-}
-
-if(data.session){
-showUser(data.user);
-}else{
-statusBox.innerText =
-"Account created! Check your email for verification.";
-}
-
-}catch(err){
-statusBox.innerText = "ERROR: " + err.message;
-}
-}
-
 async function login(){
-
-const email = document.getElementById("email").value.trim();
-const password = document.getElementById("password").value;
-
-if(!email || !password){
-statusBox.innerText = "Enter email and password.";
-return;
+ const email=document.getElementById("email").value.trim();
+ const password=document.getElementById("password").value;
+ statusBox.textContent="Logging in...";
+ const {data,error}=await db.auth.signInWithPassword({email,password});
+ if(error){statusBox.textContent=error.message;return;}
+ await startApp(data.user);
 }
 
-statusBox.innerText = "Logging in...";
-
-try{
-const {data,error} = await supabaseClient.auth.signInWithPassword({
-email: email,
-password: password
-});
-
-if(error){
-statusBox.innerText = "ERROR: " + error.message;
-return;
+async function signup(){
+ const email=document.getElementById("email").value.trim();
+ const password=document.getElementById("password").value;
+ statusBox.textContent="Creating account...";
+ const {data,error}=await db.auth.signUp({email,password});
+ if(error){statusBox.textContent=error.message;return;}
+ if(data.session){
+   await startApp(data.user);
+ }else{
+   statusBox.textContent="Account created. Check your email for confirmation, then login.";
+ }
 }
 
-showUser(data.user);
+async function startApp(user){
+ currentUser=user;
+ const username="user_"+user.id.replaceAll("-","").substring(0,8);
 
-}catch(err){
-statusBox.innerText = "ERROR: " + err.message;
-}
+ const {error:profileError}=await db.from("profiles").upsert(
+   {id:user.id,username:username},
+   {onConflict:"id",ignoreDuplicates:true}
+ );
+
+ if(profileError){
+   statusBox.textContent="Profile error: "+profileError.message;
+   return;
+ }
+
+ document.getElementById("auth").classList.add("hidden");
+ document.getElementById("app").classList.remove("hidden");
+ document.getElementById("myname").textContent="Your ID: "+username;
+
+ await loadUsers();
+
+ if(chatChannel) await db.removeChannel(chatChannel);
+ chatChannel=db.channel("live-messages")
+ .on("postgres_changes",
+   {event:"INSERT",schema:"public",table:"messages"},
+   ()=>{if(selectedUser) loadMessages();}
+ ).subscribe();
 }
 
-function showUser(user){
-document.getElementById("authBox").classList.add("hidden");
-document.getElementById("userBox").classList.remove("hidden");
-document.getElementById("userEmail").innerText =
-"Logged in as: " + user.email;
-statusBox.innerText = "Login successful!";
+async function loadUsers(){
+ const {data,error}=await db.from("profiles")
+ .select("id,username")
+ .neq("id",currentUser.id)
+ .order("username");
+
+ const box=document.getElementById("users");
+ box.innerHTML="";
+
+ if(error){box.textContent=error.message;return;}
+ if(!data || data.length===0){
+   box.textContent="No other users yet. Create another account to test chat.";
+   return;
+ }
+
+ data.forEach(user=>{
+   const button=document.createElement("button");
+   button.textContent=user.username;
+   button.onclick=()=>openChat(user);
+   box.appendChild(button);
+ });
+}
+
+async function openChat(user){
+ selectedUser=user;
+ document.getElementById("chatTitle").textContent="Chat with "+user.username;
+ await loadMessages();
+}
+
+async function loadMessages(){
+ if(!selectedUser)return;
+
+ const {data,error}=await db.from("messages")
+ .select("id,sender_id,receiver_id,message,created_at")
+ .or("sender_id.eq."+currentUser.id+",receiver_id.eq."+currentUser.id)
+ .order("created_at",{ascending:true});
+
+ const box=document.getElementById("messages");
+ box.innerHTML="";
+
+ if(error){box.textContent=error.message;return;}
+
+ data.filter(m=>
+   (m.sender_id===currentUser.id && m.receiver_id===selectedUser.id) ||
+   (m.sender_id===selectedUser.id && m.receiver_id===currentUser.id)
+ ).forEach(m=>{
+   const div=document.createElement("div");
+   div.className="msg "+(m.sender_id===currentUser.id?"":"other");
+   div.textContent=m.message;
+   box.appendChild(div);
+ });
+ box.scrollTop=box.scrollHeight;
+}
+
+async function sendMessage(){
+ if(!selectedUser){alert("Select a user first");return;}
+
+ const input=document.getElementById("message");
+ const message=input.value.trim();
+ if(!message)return;
+
+ const {error}=await db.from("messages").insert({
+   sender_id:currentUser.id,
+   receiver_id:selectedUser.id,
+   message:message
+ });
+
+ if(error){alert(error.message);return;}
+ input.value="";
+ await loadMessages();
 }
 
 async function logout(){
-
-const {error} = await supabaseClient.auth.signOut();
-
-if(error){
-statusBox.innerText = error.message;
-return;
+ if(chatChannel) await db.removeChannel(chatChannel);
+ await db.auth.signOut();
+ location.reload();
 }
 
-document.getElementById("authBox").classList.remove("hidden");
-document.getElementById("userBox").classList.add("hidden");
-statusBox.innerText = "You are logged out.";
-}
-
-async function checkSession(){
-const {data,error} = await supabaseClient.auth.getSession();
-
-if(error){
-statusBox.innerText = error.message;
-return;
-}
-
-if(data.session){
-showUser(data.session.user);
-}
-}
-
-checkSession();
+db.auth.getSession().then(({data})=>{
+ if(data.session) startApp(data.session.user);
+});
 </script>
-
 </body>
 </html>
