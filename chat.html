@@ -114,7 +114,20 @@ return;
 statusBox.innerText = "Creating account...";
 
 try{
+
+statusBox.innerText = "SUPABASE REQUEST STARTED";
+
 const {data,error} = await supabaseClient.auth.signUp({
+  email: email,
+  password: password
+});
+
+if(error){
+  statusBox.innerText = "SUPABASE ERROR: " + error.message;
+  return;
+}
+
+statusBox.innerText = "ACCOUNT CREATED SUCCESSFULLY!";
 email:email,
 password:password
 });
