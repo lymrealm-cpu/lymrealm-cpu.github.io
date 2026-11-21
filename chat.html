@@ -49,74 +49,164 @@ button{
 }
 button:hover{background:#00bfff}
 #status{text-align:center;color:#00d9ff}
+.hidden{display:none}
 </style>
 </head>
 
 <body>
+
 <div class="container">
+
 <h1>👑 LYM REALM CHAT</h1>
 <p class="tag">CONNECT • CHAT • PROTECT</p>
 
+<div id="authBox">
 <h3>Create Account / Login</h3>
 
-<input id="email" type="email" placeholder="Email Address">
-<input id="password" type="password" placeholder="Password">
+<input id="email" type="email"
+placeholder="Email Address">
+
+<input id="password" type="password"
+placeholder="Password">
 
 <button onclick="register()">Create Account</button>
 <button onclick="login()">Login</button>
+</div>
+
+<div id="userBox" class="hidden">
+<h3>Welcome to LYM REALM!</h3>
+<p id="userEmail"></p>
+<button onclick="logout()">Logout</button>
+</div>
 
 <p id="status">Welcome to LYM REALM CHAT</p>
+
 </div>
 
 <script>
-const SUPABASE_URL = "https://probxnzduietjivnqrac.supabase.co";
+const SUPABASE_URL =
+"https://probxnzduietjivnqrac.supabase.co";
 
-sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr
+// اپنی Supabase Publishable Key لگائیں
+const SUPABASE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
+
 const supabaseClient = window.supabase.createClient(
- SUPABASE_URL,
- SUPABASE_KEY
+SUPABASE_URL,
+SUPABASE_KEY
 );
-async function register({
-document.getElementById("status").innerText = "Button is working!";
- const email = document.getElementById("email").value.trim();
- const password = document.getElementById("password").value;
- const status = document.getElementById("status");
 
- if(!email || !password){
-  status.innerText = "Please enter email and password.";
-  return;
- }
+const statusBox = document.getElementById("status");
 
- status.innerText = "Creating account...";
+async function register(){
 
- try {
-  const {data, error} = await supabaseClient.auth.signUp({
-   email: email,
-   password: password
-  });
+const email = document.getElementById("email").value.trim();
+const password = document.getElementById("password").value;
 
-  if(error){
-   status.innerText = "Error: " + error.message;
-   return;
-  }
-
-  status.innerText = "Account created! Check your email.";
-  console.log(data);
-
- } catch(err) {
-  status.innerText = "Error: " + err.message;
-  console.log(err);
- }
+if(!email || !password){
+statusBox.innerText = "Enter email and password.";
+return;
 }
- const email=document.getElementById("email").value;
- const password=document.getElementById("password").value;
- const {error}=await supabaseClient.auth.signInWithPassword({
-  email:email,
-  password:password
- });
- document.getElementById("status").innerText =
- error ? error.message : "Login successful!";
+
+if(password.length < 6){
+statusBox.innerText = "Password must be 6 characters.";
+return;
 }
+
+statusBox.innerText = "Creating account...";
+
+try{
+const {data,error} = await supabaseClient.auth.signUp({
+email:email,
+password:password
+});
+
+if(error){
+statusBox.innerText = "Error: " + error.message;
+return;
+}
+
+statusBox.innerText =
+data.session
+? "Account created successfully!"
+: "Account created! Please verify your email.";
+
+}catch(err){
+statusBox.innerText = "Error: " + err.message;
+}
+}
+
+async function login(){
+
+const email = document.getElementById("email").value.trim();
+const password = document.getElementById("password").value;
+
+if(!email || !password){
+statusBox.innerText = "Enter email and password.";
+return;
+}
+
+statusBox.innerText = "Logging in...";
+
+try{
+const {data,error} = await supabaseClient.auth.signInWithPassword({
+email:email,
+password:password
+});
+
+if(error){
+statusBox.innerText = "Error: " + error.message;
+return;
+}
+
+showUser(data.user);
+
+}catch(err){
+statusBox.innerText = "Error: " + err.message;
+}
+}
+
+function showUser(user){
+
+document.getElementById("authBox").classList.add("hidden");
+document.getElementById("userBox").classList.remove("hidden");
+
+document.getElementById("userEmail").innerText =
+"Logged in as: " + user.email;
+
+statusBox.innerText = "Login successful!";
+}
+
+async function logout(){
+
+const {error} = await supabaseClient.auth.signOut();
+
+if(error){
+statusBox.innerText = error.message;
+return;
+}
+
+document.getElementById("authBox").classList.remove("hidden");
+document.getElementById("userBox").classList.add("hidden");
+
+statusBox.innerText = "You are logged out.";
+}
+
+async function checkSession(){
+
+const {data,error} = await supabaseClient.auth.getSession();
+
+if(error){
+statusBox.innerText = error.message;
+return;
+}
+
+if(data.session){
+showUser(data.session.user);
+}
+}
+
+checkSession();
+
 </script>
 </body>
 </html>
