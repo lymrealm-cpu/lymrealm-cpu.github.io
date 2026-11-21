@@ -254,19 +254,64 @@ async function loadMessages(){
  box.scrollTop=box.scrollHeight;
 }
 
-async function sendMessage(){
- if(!selectedUser){alert("Please select a user first.");return;}
- const input=document.getElementById("message");
- const message=input.value.trim();
- if(!message)return;
 
- const {error}=await db.from("messages").insert({
-  sender_id:currentUser.id,
-  receiver_id:selectedUser.id,
-  message:message
+
+async function sendMessage(){
+ if(!selectedUser){
+  alert("Please select a user first.");
+  return;
+ }
+
+ // Check whether current user is muted
+ const {data: mute, error: muteError} = await db
+  .from("member_mutes")
+  .select("reason, muted_until")
+  .eq("user_id", currentUser.id)
+  .is("unmuted_at", null)
+  .gt("muted_until", new Date().toISOString())
+  .order("created_at", {ascending:false})
+  .limit(1)
+  .maybeSingle();
+
+ if(muteError){
+  alert("Mute status check failed: " + muteError.message);
+  return;
+ }
+
+ if(mute){
+  const remaining = Math.max(
+   0,
+   Math.ceil((new Date(mute.muted_until) - Date.now()) / 60000)
+  );
+
+  const hours = Math.floor(remaining / 60);
+  const minutes = remaining % 60;
+
+  alert(
+   "You are muted!\n" +
+   "Reason: " + mute.reason + "\n" +
+   "Time remaining: " + hours + "h " + minutes + "m"
+  );
+  return;
+ }
+
+ const input = document.getElementById("message");
+ const message = input.value.trim();
+
+ if(!message) return;
+
+ const {error} = await db.from("messages").insert({
+  sender_id: currentUser.id,
+  receiver_id: selectedUser.id,
+  message: message
  });
- if(error){alert(error.message);return;}
- input.value="";
+
+ if(error){
+  alert(error.message);
+  return;
+ }
+
+ input.value = "";
  await loadMessages();
 }
 
