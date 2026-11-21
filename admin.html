@@ -123,7 +123,8 @@ async function loadMembers(){
   info.textContent="Role: "+role;
   div.append(name,info);
 
-  if(p.id!==CURRENT_ADMIN_ID){
+
+  if(role !== "super_admin"){
    const select=document.createElement("select");
    ["member","vip","moderator"].forEach(r=>{
     const option=document.createElement("option");
