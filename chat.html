@@ -96,7 +96,8 @@ SUPABASE_KEY
 const statusBox = document.getElementById("status");
 
 async function register(){
-alert("REGISTER FUNCTION WORKING!");
+
+document.getElementById("status").innerText = "REGISTER STARTED";
 const email = document.getElementById("email").value.trim();
 const password = document.getElementById("password").value;
 
