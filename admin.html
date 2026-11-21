@@ -151,6 +151,58 @@ async function loadMembers(){
    const crown=document.createElement("p");
    crown.textContent="👑 SUPER ADMIN";
    div.append(crown);
+const duration = document.createElement("select");
+
+[
+ [5,"5 Minutes"],
+ [60,"1 Hour"],
+ [180,"3 Hours"],
+ [1440,"24 Hours"]
+].forEach(item=>{
+ const option=document.createElement("option");
+ option.value=item[0];
+ option.textContent=item[1];
+ duration.appendChild(option);
+});
+
+const reason=document.createElement("input");
+reason.placeholder="Mute reason";
+reason.maxLength=300;
+
+const muteBtn=document.createElement("button");
+muteBtn.textContent="🔇 Mute Member";
+
+muteBtn.onclick=async()=>{
+ if(!reason.value.trim()){
+  alert("Please enter a reason");
+  return;
+ }
+
+ const {error}=await db.rpc("moderator_mute_member",{
+  p_user_id:p.id,
+  p_duration_minutes:Number(duration.value),
+  p_reason:reason.value.trim()
+ });
+
+ if(error){alert(error.message);return;}
+ alert("Member muted successfully!");
+};
+
+const unmuteBtn=document.createElement("button");
+unmuteBtn.textContent="🔊 Unmute Member";
+
+unmuteBtn.onclick=async()=>{
+ if(!confirm("Unmute this member?"))return;
+
+ const {error}=await db.rpc("admin_unmute_member",{
+  p_user_id:p.id
+ });
+
+ if(error){alert(error.message);return;}
+ alert("Member unmuted!");
+};
+
+div.append(duration,reason,muteBtn,unmuteBtn);
   }
   box.appendChild(div);
  });
