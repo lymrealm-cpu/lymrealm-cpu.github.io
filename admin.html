@@ -47,8 +47,7 @@ const SUPABASE_URL =
 "https://probxnzduietjivnqrac.supabase.co";
 
 const SUPABASE_KEY = "sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
-const db = window.supabase.createClient(https://probxnzduietjivnqrac.supabase.co");
-
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 async function startAdmin(){
  const {data:{user},error:loginError}=await db.auth.getUser();
 
