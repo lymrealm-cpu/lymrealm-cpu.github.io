@@ -58,24 +58,12 @@ input{
 .editbox{margin-top:12px;padding-top:10px;border-top:1px solid #31564a}
 .editbox button{width:100%}
 .section-title{font-size:14px;color:#00ed87;margin:17px 4px 8px}
-
-#onlineCount{
- color:#00ed87;
- font-size:11px;
- margin-left:5px;
-}
-
+#onlineCount{color:#00ed87;font-size:11px;margin-left:5px}
 .online-dot{
- display:inline-block;
- width:8px;
- height:8px;
- background:#00ed87;
- border-radius:50%;
- margin-right:6px;
- box-shadow:0 0 7px #00ed87;
- vertical-align:middle;
+ display:inline-block;width:8px;height:8px;background:#00ed87;
+ border-radius:50%;margin-right:6px;box-shadow:0 0 7px #00ed87;
+ vertical-align:middle
 }
-
 .member{
  width:100%;display:flex;align-items:center;gap:9px;
  text-align:left;background:#142e28;margin:5px 0;
@@ -149,7 +137,6 @@ input{
 </head>
 
 <body>
-
 <header>
  <div>
   <div class="logo">♛ LYM REALM CHAT</div>
@@ -200,13 +187,10 @@ input{
     <div class="muted">Everyone is connected here</div>
    </div>
   </div>
-
   <div id="messages">
    <div class="system-message">Welcome to LYM REALM PUBLIC CHAT</div>
   </div>
-
   <div id="voiceStatus"></div>
-
   <div class="composer">
    <input id="message" placeholder="Type a message..."
     onkeydown="if(event.key==='Enter')sendMessage()">
@@ -217,12 +201,8 @@ input{
 </div>
 
 <script>
-const SUPABASE_URL =
-"https://probxnzduietjivnqrac.supabase.co";
-
-const SUPABASE_KEY =
-"sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
-
+const SUPABASE_URL="https://probxnzduietjivnqrac.supabase.co";
+const SUPABASE_KEY="sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let currentUser=null;
@@ -236,12 +216,89 @@ let audioStream=null;
 let audioChunks=[];
 let isRecording=false;
 let isSendingVoice=false;
-
 let chatStartedAt=null;
 let appStarting=false;
+let kickCheckInterval=null;
+let kickBeingHandled=false;
 
 function showStatus(message){
  document.getElementById("status").textContent=message;
+}
+
+function sessionStorageKey(userId){
+ return "lym_chat_started_at_"+userId;
+}
+
+function timeValue(value){
+ if(!value)return null;
+ const result=new Date(value).getTime();
+ return Number.isFinite(result)?result:null;
+}
+
+function saveChatSession(userId,value){
+ if(userId&&value){
+  localStorage.setItem(sessionStorageKey(userId),String(value));
+ }
+}
+
+function stopKickChecker(){
+ if(kickCheckInterval){
+  clearInterval(kickCheckInterval);
+  kickCheckInterval=null;
+ }
+}
+
+async function removeChatChannels(){
+ if(presenceChannel){
+  const channel=presenceChannel;
+  presenceChannel=null;
+  try{await db.removeChannel(channel)}catch(e){}
+ }
+ if(liveChannel){
+  const channel=liveChannel;
+  liveChannel=null;
+  try{await db.removeChannel(channel)}catch(e){}
+ }
+ onlineUserIds=[];
+}
+
+function stopRecordingWithoutSending(){
+ if(mediaRecorder&&mediaRecorder.state!=="inactive"){
+  mediaRecorder.onstop=null;
+  try{mediaRecorder.stop()}catch(e){}
+ }
+ mediaRecorder=null;
+ isRecording=false;
+ audioChunks=[];
+ stopAudioTracks();
+
+ const btn=document.getElementById("recordBtn");
+ if(btn){
+  btn.textContent="🎙️";
+  btn.classList.remove("recording");
+  btn.disabled=false;
+ }
+ const voiceStatus=document.getElementById("voiceStatus");
+ if(voiceStatus)voiceStatus.textContent="";
+}
+
+async function showAuthMessage(message){
+ stopKickChecker();
+ stopRecordingWithoutSending();
+ await removeChatChannels();
+
+ try{await db.auth.signOut()}catch(e){}
+
+ currentUser=null;
+ chatStartedAt=null;
+ profilesMap={};
+ rolesMap={};
+
+ document.getElementById("app").style.display="none";
+ document.getElementById("auth").style.display="block";
+ document.getElementById("logoutBtn").style.display="none";
+ document.getElementById("messages").innerHTML="";
+ showStatus(message);
 }
 
 
@@ -250,6 +307,11 @@ function showStatus(message){
 async function login(){
  const email=document.getElementById("email").value.trim();
  const password=document.getElementById("password").value;
+
+ if(!email||!password){
+  showStatus("Enter email and password.");
+  return;
+ }
 
  showStatus("Logging in...");
 
@@ -270,7 +332,7 @@ async function signup(){
  const email=document.getElementById("email").value.trim();
  const password=document.getElementById("password").value;
 
- if(!email || !password){
+ if(!email||!password){
   showStatus("Enter email and password.");
   return;
  }
@@ -305,16 +367,11 @@ async function setupPresence(){
  onlineUserIds=[currentUser.id];
 
  presenceChannel=db.channel("lym-online-members",{
-  config:{
-   presence:{key:currentUser.id}
-  }
+  config:{presence:{key:currentUser.id}}
  });
 
- presenceChannel.on("presence",{
-  event:"sync"
- },()=>{
+ presenceChannel.on("presence",{event:"sync"},()=>{
   const state=presenceChannel.presenceState();
-
   const ids=Object.values(state)
    .flat()
    .map(item=>item.user_id)
@@ -322,41 +379,102 @@ async function setupPresence(){
 
   onlineUserIds=[...new Set(ids)];
 
-  if(currentUser && document.getElementById("app").style.display==="grid"){
+  if(currentUser&&document.getElementById("app").style.display==="grid"){
    loadMembers();
   }
  });
 
  await new Promise(resolve=>{
   let finished=false;
-
   const finish=()=>{
    if(finished)return;
    finished=true;
    resolve();
   };
 
-  setTimeout(finish,8000);
+  const timeout=setTimeout(finish,8000);
 
   presenceChannel.subscribe(async status=>{
    if(status==="SUBSCRIBED"){
     const {error}=await presenceChannel.track({
      user_id:currentUser.id
     });
-
-    if(error){
-     showStatus("Online status error: "+error.message);
-    }
-
+    if(error)showStatus("Online status error: "+error.message);
+    clearTimeout(timeout);
     finish();
    }
 
    if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"||status==="CLOSED"){
     showStatus("Online status connection problem. Please refresh.");
+    clearTimeout(timeout);
     finish();
    }
   });
  });
+}
+
+
+// BAN CHECK
+
+async function checkBanStatus(){
+ const {data,error}=await db.rpc("is_my_account_banned");
+
+ if(error){
+  await showAuthMessage("Account verification failed. Please try again. "+error.message);
+  return false;
+ }
+
+ if(data===true){
+  await showAuthMessage("Your account is banned by Admin. Contact Super Admin.");
+  return false;
+ }
+
+ return true;
+}
+
+
+// KICK DETECTION
+
+async function handleKicked(){
+ if(kickBeingHandled)return;
+ kickBeingHandled=true;
+
+ await showAuthMessage(
+  "You were kicked by Super Admin. You may log in again."
+ );
+
+ kickBeingHandled=false;
+}
+
+async function checkKickStatus(){
+ if(!currentUser||!chatStartedAt||kickBeingHandled)return;
+
+ const userId=currentUser.id;
+ const originalTime=timeValue(chatStartedAt);
+
+ const {data,error}=await db.rpc("get_my_chat_started_at");
+
+ if(error){
+  return;
+ }
+
+ if(!currentUser||currentUser.id!==userId)return;
+
+ const serverTime=timeValue(data);
+
+ if(serverTime===null||originalTime===null)return;
+
+ if(serverTime!==originalTime){
+  await handleKicked();
+ }
+}
+
+function startKickChecker(){
+ stopKickChecker();
+
+ kickCheckInterval=setInterval(()=>{
+  checkKickStatus();
+ },4000);
 }
 
 
@@ -367,25 +485,28 @@ async function startApp(user,isNewLogin=false){
  appStarting=true;
 
  try{
+  // Ban check happens before chat opens.
+  const allowed=await checkBanStatus();
+  if(!allowed)return;
+
   currentUser=user;
 
   if(isNewLogin){
    const {data,error}=await db.rpc("start_fresh_chat");
 
    if(error){
-    showStatus("Chat start error: "+error.message);
-    await db.auth.signOut();
-    currentUser=null;
+    await showAuthMessage("Chat start error: "+error.message);
     return;
    }
 
    chatStartedAt=data;
+   saveChatSession(user.id,chatStartedAt);
 
   }else{
    const {data,error}=await db.rpc("get_my_chat_started_at");
 
    if(error){
-    showStatus("Chat session error: "+error.message);
+    await showAuthMessage("Chat session error: "+error.message);
     return;
    }
 
@@ -395,24 +516,43 @@ async function startApp(user,isNewLogin=false){
     const result=await db.rpc("start_fresh_chat");
 
     if(result.error){
-     showStatus("Chat start error: "+result.error.message);
+     await showAuthMessage("Chat start error: "+result.error.message);
      return;
     }
 
     chatStartedAt=result.data;
    }
+
+   // Detect a kick even if the user refreshed the page.
+   const previousTime=localStorage.getItem(sessionStorageKey(user.id));
+
+   if(previousTime){
+    const oldValue=timeValue(previousTime);
+    const newValue=timeValue(chatStartedAt);
+
+    if(oldValue!==null&&newValue!==null&&oldValue!==newValue){
+     await handleKicked();
+     return;
+    }
+   }
+
+   saveChatSession(user.id,chatStartedAt);
   }
 
-  const username="user_"+
-   user.id.replaceAll("-","").substring(0,8);
+  if(!chatStartedAt){
+   await showAuthMessage("Chat session could not be started. Please login again.");
+   return;
+  }
 
-  const {error}=await db.from("profiles").upsert(
+  const username="user_"+user.id.replaceAll("-","").substring(0,8);
+
+  const {error:profileError}=await db.from("profiles").upsert(
    {id:user.id,username:username},
    {onConflict:"id",ignoreDuplicates:true}
   );
 
-  if(error){
-   showStatus("Profile error: "+error.message);
+  if(profileError){
+   await showAuthMessage("Profile error: "+profileError.message);
    return;
   }
 
@@ -425,8 +565,12 @@ async function startApp(user,isNewLogin=false){
 
   await setupPresence();
 
+  if(!currentUser)return;
+
   await loadMembers();
   await loadMessages();
+
+  if(!currentUser)return;
 
   if(liveChannel){
    await db.removeChannel(liveChannel);
@@ -438,11 +582,13 @@ async function startApp(user,isNewLogin=false){
    schema:"public",
    table:"messages"
   },payload=>{
-   if(payload.new.receiver_id===null){
+   if(payload.new.receiver_id===null&&currentUser){
     loadMessages();
    }
   })
   .subscribe();
+
+  startKickChecker();
 
  }finally{
   appStarting=false;
@@ -450,9 +596,11 @@ async function startApp(user,isNewLogin=false){
 }
 
 
-// LOAD MEMBERS - ONLY ONLINE USERS
+// LOAD MEMBERS
 
 async function loadMembers(){
+ if(!currentUser)return;
+
  const box=document.getElementById("users");
  box.textContent="Loading online members...";
 
@@ -500,10 +648,8 @@ async function loadMembers(){
   myRole==="vip"?"⭐ VIP MEMBER":"MEMBER";
 
  box.innerHTML="";
-
- // ONLINE COUNT UPDATE
- document.getElementById("onlineCount").textContent =
-  onlineProfiles.length + " Online";
+ document.getElementById("onlineCount").textContent=
+  onlineProfiles.length+" Online";
 
  if(!onlineProfiles.length){
   box.textContent="No online members.";
@@ -529,7 +675,6 @@ async function loadMembers(){
   name.className="member-name";
   name.textContent=p.username||"Member";
 
-  // GREEN ONLINE DOT
   const dot=document.createElement("span");
   dot.className="online-dot";
   name.prepend(dot);
@@ -586,11 +731,7 @@ async function changeUsername(){
 async function loadMessages(){
  const box=document.getElementById("messages");
 
- if(!chatStartedAt){
-  box.innerHTML=
-   '<div class="system-message">Chat session not ready.</div>';
-  return;
- }
+ if(!chatStartedAt||!currentUser)return;
 
  const {data,error}=await db.from("messages")
  .select("id,sender_id,receiver_id,message,created_at,message_type,audio_path")
@@ -614,6 +755,8 @@ async function loadMessages(){
  }
 
  for(const m of data){
+  if(!currentUser)return;
+
   const div=document.createElement("div");
   div.className="msg "+(m.sender_id===currentUser.id?"mine":"");
 
@@ -673,7 +816,7 @@ async function sendMessage(){
  const input=document.getElementById("message");
  const message=input.value.trim();
 
- if(!message)return;
+ if(!message||!currentUser)return;
 
  const sendButton=document.getElementById("sendBtn");
  sendButton.disabled=true;
@@ -684,7 +827,11 @@ async function sendMessage(){
   });
 
   if(error){
-   alert(error.message);
+   if(error.message.toLowerCase().includes("banned")){
+    await showAuthMessage("Your account is banned by Admin. Contact Super Admin.");
+   }else{
+    alert(error.message);
+   }
    return;
   }
 
@@ -702,6 +849,8 @@ async function sendMessage(){
 // START VOICE RECORDING
 
 async function startRecording(){
+ if(!currentUser)return;
+
  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
   alert("Microphone is not supported. Open the website in Chrome using HTTPS.");
   return;
@@ -743,7 +892,7 @@ async function startRecording(){
     return;
    }
 
-   await uploadVoice(blob);
+   if(currentUser)await uploadVoice(blob);
   };
 
   mediaRecorder.start();
@@ -806,7 +955,7 @@ function stopAudioTracks(){
 // UPLOAD AND SEND VOICE
 
 async function uploadVoice(blob){
- if(isSendingVoice)return;
+ if(isSendingVoice||!currentUser)return;
 
  isSendingVoice=true;
 
@@ -826,9 +975,7 @@ async function uploadVoice(blob){
     upsert:false
    });
 
-  if(uploadError){
-   throw uploadError;
-  }
+  if(uploadError)throw uploadError;
 
   const {error:sendError}=await db.rpc("send_group_voice_message",{
    p_audio_path:path
@@ -836,6 +983,12 @@ async function uploadVoice(blob){
 
   if(sendError){
    await db.storage.from("voice-messages").remove([path]);
+
+   if(sendError.message.toLowerCase().includes("banned")){
+    await showAuthMessage("Your account is banned by Admin. Contact Super Admin.");
+    return;
+   }
+
    throw sendError;
   }
 
@@ -861,31 +1014,17 @@ async function uploadVoice(blob){
 // LOGOUT
 
 async function logout(){
- if(isRecording){
-  if(mediaRecorder&&mediaRecorder.state!=="inactive"){
-   mediaRecorder.onstop=null;
-   mediaRecorder.stop();
-  }
+ const userId=currentUser?.id;
 
-  isRecording=false;
-  audioChunks=[];
+ stopKickChecker();
+ stopRecordingWithoutSending();
+ await removeChatChannels();
+
+ if(userId){
+  localStorage.removeItem(sessionStorageKey(userId));
  }
 
- stopAudioTracks();
-
- if(presenceChannel){
-  await db.removeChannel(presenceChannel);
-  presenceChannel=null;
- }
-
- onlineUserIds=[];
-
- if(liveChannel){
-  await db.removeChannel(liveChannel);
-  liveChannel=null;
- }
-
- await db.auth.signOut();
+ try{await db.auth.signOut()}catch(e){}
 
  currentUser=null;
  chatStartedAt=null;
