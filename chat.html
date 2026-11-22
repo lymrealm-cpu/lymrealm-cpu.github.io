@@ -4,81 +4,161 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LYM REALM CHAT</title>
+<title>LYM REALM | PUBLIC CHAT</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#061713;color:white;font-family:Arial,sans-serif}
+body{
+ margin:0;background:#061713;color:white;
+ font-family:Arial,sans-serif
+}
 button,input{font:inherit}
-header{height:95px;background:#006b43;display:flex;align-items:center;
-justify-content:space-between;padding:15px 25px;border-bottom:2px solid #00d98b}
-.logo{font-size:27px;font-weight:bold;letter-spacing:1px}
-.sub{font-size:13px;color:#c8ffe6;margin-top:5px}
-button{cursor:pointer;border:0;border-radius:10px;padding:12px 18px;
-background:#00a96b;color:white;font-weight:bold}
+header{
+ height:80px;background:#006b43;display:flex;
+ align-items:center;justify-content:space-between;
+ padding:12px 22px;border-bottom:2px solid #00d98b
+}
+.logo{font-size:25px;font-weight:bold}
+.sub{font-size:12px;color:#c8ffe6;margin-top:5px}
+button{
+ cursor:pointer;border:0;border-radius:9px;
+ padding:11px 15px;background:#00a96b;
+ color:white;font-weight:bold
+}
 button:hover{background:#00c982}
 button:disabled{opacity:.5;cursor:not-allowed}
-#auth{max-width:420px;margin:70px auto;padding:25px;background:#102b25;border-radius:18px}
-input{width:100%;padding:14px;border:1px solid #28584a;border-radius:10px;
-background:#10251f;color:white;margin:7px 0;outline:none}
-#auth button{margin:5px 0;width:100%}
-#status{color:#aaffd2}
-#app{display:none;height:calc(100vh - 95px);grid-template-columns:340px 1fr}
-.sidebar{background:#09221c;padding:18px;border-right:1px solid #087b55;overflow:auto}
-.profile{display:flex;align-items:center;gap:15px;padding:10px 5px 22px;
-border-bottom:1px solid #31564a;margin-bottom:20px}
-.avatar{width:65px;height:65px;border-radius:50%;background:#087c53;
-display:grid;place-items:center;font-size:27px;border:2px solid #00e995}
-.muted{color:#9bb6ad;font-size:13px}
+input{
+ width:100%;padding:12px;border:1px solid #28584a;
+ border-radius:9px;background:#10251f;color:white;
+ margin:6px 0;outline:none
+}
+#auth{
+ max-width:420px;margin:60px auto;padding:25px;
+ background:#102b25;border-radius:18px
+}
+#auth button{width:100%;margin-top:8px}
+#status{color:#aaffd2;font-size:13px}
+#app{
+ display:none;height:calc(100vh - 80px);
+ grid-template-columns:290px 1fr
+}
+.sidebar{
+ background:#09221c;padding:14px;
+ border-right:1px solid #087b55;overflow:auto
+}
+.profile{
+ padding:12px;background:#102e25;border-radius:12px;
+ margin-bottom:12px
+}
+.avatar{
+ width:48px;height:48px;border-radius:50%;
+ background:#087c53;display:grid;place-items:center;
+ font-size:23px;border:2px solid #00e995;flex-shrink:0
+}
+.myrow{display:flex;align-items:center;gap:12px}
 .green{color:#00ed87}
-.user{width:100%;display:flex;align-items:center;gap:14px;text-align:left;
-background:#142e28;margin:7px 0;padding:14px;border:1px solid transparent}
-.user.active{border:2px solid #00e995;box-shadow:0 0 12px #00a96b}
-.dot{width:11px;height:11px;border-radius:50%;background:#00ed87;display:inline-block}
+.muted{color:#9bb6ad;font-size:12px}
+.editbox{
+ margin-top:12px;padding-top:10px;
+ border-top:1px solid #31564a
+}
+.editbox button{width:100%}
+.section-title{
+ font-size:14px;color:#00ed87;
+ margin:17px 4px 8px
+}
+.member{
+ width:100%;display:flex;align-items:center;
+ gap:9px;text-align:left;background:#142e28;
+ margin:5px 0;padding:9px;border:1px solid transparent;
+ border-radius:9px
+}
+.member.me{border-color:#00b978}
+.member .avatar{width:36px;height:36px;font-size:17px}
+.member-info{min-width:0;flex:1}
+.member-name{
+ font-size:13px;font-weight:bold;
+ overflow-wrap:anywhere
+}
+.member-role{font-size:10px;color:#ffd76a;margin-top:3px}
 .chat{display:flex;flex-direction:column;min-width:0}
-.chathead{height:85px;background:#09221c;display:flex;align-items:center;
-gap:15px;padding:15px 22px;border-bottom:1px solid #087b55}
-.chathead .avatar{width:52px;height:52px}
-#messages{flex:1;overflow:auto;padding:20px;background-color:#071c17;
-background-image:radial-gradient(#173b30 1px,transparent 1px);
-background-size:22px 22px}
-.msg{max-width:75%;width:fit-content;background:#263c38;border-radius:16px;
-padding:12px 15px;margin:10px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.chathead{
+ height:70px;background:#09221c;display:flex;
+ align-items:center;gap:12px;padding:12px 20px;
+ border-bottom:1px solid #087b55
+}
+.chathead .avatar{width:43px;height:43px}
+#messages{
+ flex:1;overflow:auto;padding:18px;
+ background-color:#071c17;
+ background-image:radial-gradient(#173b30 1px,transparent 1px);
+ background-size:22px 22px
+}
+.msg{
+ max-width:75%;width:fit-content;
+ background:#263c38;border-radius:14px;
+ padding:10px 13px;margin:10px 0;
+ white-space:pre-wrap;overflow-wrap:anywhere
+}
 .msg.mine{margin-left:auto;background:#007e50}
-.time{font-size:10px;color:#c1d8cf;text-align:right;margin-top:7px}
-.composer{display:flex;gap:10px;padding:14px;background:#09221c}
-.composer input{margin:0;flex:1}
+.sender{
+ font-size:12px;font-weight:bold;
+ color:#ffd76a;margin-bottom:6px
+}
+.msg.mine .sender{color:#aaffd2}
+.time{
+ font-size:10px;color:#c1d8cf;
+ text-align:right;margin-top:7px
+}
+.system-message{
+ text-align:center;color:#9bb6ad;
+ font-size:12px;margin:15px
+}
+.composer{
+ display:flex;gap:9px;padding:12px;
+ background:#09221c
+}
+.composer input{margin:0;flex:1;min-width:0}
 .composer button{min-width:75px}
-.hidden{display:none}
 @media(max-width:650px){
- header{height:75px;padding:12px}
- .logo{font-size:19px}
- #app{height:calc(100vh - 75px);grid-template-columns:115px 1fr}
- .sidebar{padding:8px}
- .profile{display:block;text-align:center}
- .profile .avatar{margin:auto;width:48px;height:48px}
- .profile .details{font-size:10px;overflow-wrap:anywhere;margin-top:8px}
- .user{padding:10px 3px;display:block;text-align:center;font-size:11px}
- .user .avatar{width:35px;height:35px;margin:0 auto 5px;font-size:17px}
- .user .dot{width:8px;height:8px}
- .chathead{height:70px;padding:9px}
- .chathead .avatar{width:40px;height:40px}
- #messages{padding:10px}
- .msg{max-width:90%;font-size:14px}
- .composer{padding:8px;gap:5px}
- .composer input{min-width:0}
- .composer button{padding:10px}
+ header{height:70px;padding:10px}
+ .logo{font-size:18px}
+ #app{height:calc(100vh - 70px);grid-template-columns:112px 1fr}
+ .sidebar{padding:6px}
+ .profile{padding:7px}
+ .myrow{display:block;text-align:center}
+ .profile .avatar{margin:auto;width:38px;height:38px;font-size:18px}
+ .profile .muted{font-size:9px;margin-top:5px}
+ #myname{font-size:11px;overflow-wrap:anywhere}
+ .editbox{padding-top:6px}
+ .editbox input{padding:7px;font-size:10px}
+ .editbox button{padding:7px 2px;font-size:10px}
+ .section-title{font-size:11px;margin:12px 2px 6px}
+ .member{display:block;text-align:center;padding:7px 2px}
+ .member .avatar{width:30px;height:30px;margin:auto;font-size:15px}
+ .member-name{font-size:10px;margin-top:4px}
+ .member-role{font-size:8px;overflow-wrap:anywhere}
+ .chathead{height:60px;padding:8px}
+ .chathead .avatar{width:36px;height:36px}
+ #messages{padding:8px}
+ .msg{max-width:92%;font-size:13px;padding:9px}
+ .composer{padding:7px;gap:5px}
+ .composer button{padding:10px 8px;min-width:60px}
 }
 </style>
 </head>
+
 <body>
 
 <header>
  <div>
   <div class="logo">♛ LYM REALM CHAT</div>
-  <div class="sub">CONNECT • CHAT • SHARE</div>
+  <div class="sub">ONE REALM • ONE COMMUNITY</div>
  </div>
- <button id="logoutBtn" onclick="logout()" style="display:none">Logout</button>
+ <button id="logoutBtn" onclick="logout()" style="display:none">
+  Logout
+ </button>
 </header>
 
 <div id="auth">
@@ -91,34 +171,54 @@ padding:12px 15px;margin:10px 0;white-space:pre-wrap;overflow-wrap:anywhere}
 </div>
 
 <div id="app">
+
  <aside class="sidebar">
+
   <div class="profile">
-   <div class="avatar">👑</div>
-   <div class="details">
-    <div class="muted">Your ID</div>
-    <div id="myname" class="green">Loading...</div>
+   <div class="myrow">
+    <div class="avatar">👑</div>
+    <div>
+     <div class="muted">YOUR USERNAME</div>
+     <strong id="myname" class="green">Loading...</strong>
+     <div id="myrole" class="muted"></div>
+    </div>
+   </div>
+
+   <div class="editbox">
+    <div class="muted">Change Username</div>
+    <input id="newUsername" maxlength="20"
+     placeholder="New username">
+    <button onclick="changeUsername()">Save Username</button>
    </div>
   </div>
-  <h3>♟ Users</h3>
-  <div id="users">Loading users...</div>
+
+  <div class="section-title">♛ COMMUNITY MEMBERS</div>
+  <div id="users">Loading members...</div>
+
  </aside>
 
  <main class="chat">
+
   <div class="chathead">
-   <div class="avatar">👑</div>
+   <div class="avatar">🌍</div>
    <div>
-    <strong id="chatTitle">Select a user</strong>
-    <div class="muted">LYM REALM CHAT</div>
+    <strong>🌍 MAIN PUBLIC CHAT</strong>
+    <div class="muted">Everyone is connected here</div>
    </div>
   </div>
+
   <div id="messages">
-   <p class="muted">Choose a user to start chatting.</p>
+   <div class="system-message">
+    Welcome to LYM REALM PUBLIC CHAT
+   </div>
   </div>
+
   <div class="composer">
    <input id="message" placeholder="Type a message..."
     onkeydown="if(event.key==='Enter')sendMessage()">
    <button id="sendBtn" onclick="sendMessage()">Send</button>
   </div>
+
  </main>
 </div>
 
@@ -129,14 +229,14 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
 "sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
 
-const db = supabase.createClient(
- SUPABASE_URL,
- SUPABASE_KEY
+const db=supabase.createClient(
+ SUPABASE_URL,SUPABASE_KEY
 );
 
 let currentUser=null;
-let selectedUser=null;
 let liveChannel=null;
+let profilesMap={};
+let rolesMap={};
 
 function showStatus(message){
  document.getElementById("status").textContent=message;
@@ -171,6 +271,11 @@ async function signup(){
 
  const email=document.getElementById("email").value.trim();
  const password=document.getElementById("password").value;
+
+ if(!email || !password){
+  showStatus("Enter email and password.");
+  return;
+ }
 
  showStatus("Creating account...");
 
@@ -213,145 +318,187 @@ async function startApp(user){
  document.getElementById("auth").style.display="none";
  document.getElementById("app").style.display="grid";
  document.getElementById("logoutBtn").style.display="block";
- document.getElementById("myname").textContent=username;
 
- await loadUsers();
+ await loadMembers();
+ await loadMessages();
 
  if(liveChannel){
   await db.removeChannel(liveChannel);
  }
 
- liveChannel=db.channel("lym-live-chat")
- .on("postgres_changes",
- {
+ liveChannel=db.channel("lym-public-group-chat")
+ .on("postgres_changes",{
   event:"INSERT",
   schema:"public",
   table:"messages"
- },
- payload=>{
-
-  const m=payload.new;
-
-  if(selectedUser &&
-    (
-     (m.sender_id===currentUser.id &&
-      m.receiver_id===selectedUser.id) ||
-     (m.sender_id===selectedUser.id &&
-      m.receiver_id===currentUser.id)
-    )){
-       loadMessages();
+ },payload=>{
+  if(payload.new.receiver_id===null){
+   loadMessages();
   }
-
- }).subscribe();
+ })
+ .subscribe();
 }
 
 
-// LOAD USERS
+// LOAD MEMBERS
 
-async function loadUsers(){
+async function loadMembers(){
 
  const box=document.getElementById("users");
- box.textContent="Loading...";
+ box.textContent="Loading members...";
 
- const {data,error}=await db.from("profiles")
-  .select("id,username")
-  .neq("id",currentUser.id)
-  .order("username");
+ const {data:profiles,error}=await db.from("profiles")
+ .select("id,username");
 
  if(error){
-  box.textContent=error.message;
+  box.textContent="Profile error: "+error.message;
   return;
  }
 
  const {data:roles,error:roleError}=await db
-  .from("user_roles")
-  .select("user_id,role");
+ .from("user_roles")
+ .select("user_id,role");
 
  if(roleError){
-  box.textContent=roleError.message;
+  box.textContent="Role error: "+roleError.message;
   return;
  }
 
- const roleMap={};
+ profilesMap={};
+ rolesMap={};
+
+ (profiles||[]).forEach(p=>{
+  profilesMap[p.id]=p.username;
+ });
 
  (roles||[]).forEach(r=>{
-  roleMap[r.user_id]=r.role;
+  rolesMap[r.user_id]=r.role;
  });
+
+ const priority={
+  super_admin:1,
+  moderator:2,
+  vip:3,
+  member:4
+ };
+
+ profiles.sort((a,b)=>{
+  const roleA=priority[rolesMap[a.id]||"member"]||4;
+  const roleB=priority[rolesMap[b.id]||"member"]||4;
+  return roleA-roleB ||
+   (a.username||"").localeCompare(b.username||"");
+ });
+
+ const myUsername=profilesMap[currentUser.id]||"Member";
+ const myRole=rolesMap[currentUser.id]||"member";
+
+ document.getElementById("myname").textContent=myUsername;
+
+ document.getElementById("myrole").textContent=
+  myRole==="super_admin" ? "👑 SUPER ADMIN" :
+  myRole==="moderator" ? "🛡️ MODERATOR" :
+  myRole==="vip" ? "⭐ VIP MEMBER" : "MEMBER";
 
  box.innerHTML="";
 
- if(!data || data.length===0){
-  box.textContent="No other users yet.";
+ if(!profiles.length){
+  box.textContent="No members found.";
   return;
  }
 
- data.forEach(u=>{
+ profiles.forEach(p=>{
 
-  const b=document.createElement("button");
-  b.className="user";
+  const role=rolesMap[p.id]||"member";
 
-  if(selectedUser && selectedUser.id===u.id){
-   b.classList.add("active");
-  }
+  const b=document.createElement("div");
+  b.className="member"+(p.id===currentUser.id?" me":"");
 
-  const avatar=document.createElement("span");
+  const avatar=document.createElement("div");
   avatar.className="avatar";
-  avatar.textContent="👤";
+  avatar.textContent=
+   role==="super_admin" ? "👑" :
+   role==="moderator" ? "🛡️" :
+   role==="vip" ? "⭐" : "👤";
 
-  const name=document.createElement("span");
-  name.textContent=u.username;
+  const info=document.createElement("div");
+  info.className="member-info";
 
-  const role=document.createElement("span");
-  const userRole=roleMap[u.id]||"member";
+  const name=document.createElement("div");
+  name.className="member-name";
+  name.textContent=p.username||"Member";
 
-  role.textContent=
-   userRole==="super_admin" ? " 👑 SUPER ADMIN" :
-   userRole==="moderator" ? " 🛡️ MOD" :
-   userRole==="vip" ? " ⭐ VIP" : "";
+  const roleText=document.createElement("div");
+  roleText.className="member-role";
+  roleText.textContent=
+   role==="super_admin" ? "SUPER ADMIN" :
+   role==="moderator" ? "MODERATOR" :
+   role==="vip" ? "VIP MEMBER" : "MEMBER";
 
-  role.style.fontSize="10px";
-  role.style.color="#ffd76a";
+  info.append(name,roleText);
 
-  b.append(avatar,name,role);
-  b.onclick=()=>openChat(u);
-
+  b.append(avatar,info);
   box.appendChild(b);
  });
 }
 
 
-// OPEN CHAT
+// CHANGE USERNAME
 
-async function openChat(user){
+async function changeUsername(){
 
- selectedUser=user;
+ const input=document.getElementById("newUsername");
+ const username=input.value.trim();
 
- document.getElementById("chatTitle").textContent=user.username;
+ if(username.length<3 || username.length>20){
+  alert("Username must be 3 to 20 characters.");
+  return;
+ }
 
- await loadUsers();
+ if(!/^[A-Za-z0-9_]+$/.test(username)){
+  alert("Use only letters, numbers and underscores.");
+  return;
+ }
+
+ const {error}=await db.rpc("update_my_username",{
+  p_username:username
+ });
+
+ if(error){
+  alert(error.message);
+  return;
+ }
+
+ input.value="";
+ alert("Username updated successfully!");
+
+ await loadMembers();
  await loadMessages();
 }
 
 
-// LOAD MESSAGES
+// LOAD GROUP MESSAGES
 
 async function loadMessages(){
-
- if(!selectedUser)return;
 
  const box=document.getElementById("messages");
 
  const {data,error}=await db.from("messages")
  .select("id,sender_id,receiver_id,message,created_at")
- .or(
-  `and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedUser.id}),and(sender_id.eq.${selectedUser.id},receiver_id.eq.${currentUser.id})`
- )
- .order("created_at",{ascending:true});
+ .is("receiver_id",null)
+ .order("created_at",{ascending:true})
+ .limit(300);
+
+ if(error){
+  box.innerHTML="";
+  box.textContent="Message error: "+error.message;
+  return;
+ }
 
  box.innerHTML="";
 
- if(error){
-  box.textContent=error.message;
+ if(!data || data.length===0){
+  box.innerHTML=
+   '<div class="system-message">No messages yet. Start the conversation!</div>';
   return;
  }
 
@@ -362,18 +509,31 @@ async function loadMessages(){
   div.className="msg "+
    (m.sender_id===currentUser.id?"mine":"");
 
+  const sender=document.createElement("div");
+  sender.className="sender";
+
+  const senderRole=rolesMap[m.sender_id]||"member";
+  const senderName=profilesMap[m.sender_id]||"Member";
+
+  sender.textContent=
+   (senderRole==="super_admin"?"👑 ":
+    senderRole==="moderator"?"🛡️ ":
+    senderRole==="vip"?"⭐ ":"")+
+   senderName;
+
   const content=document.createElement("div");
   content.textContent=m.message;
 
   const time=document.createElement("div");
   time.className="time";
-
-  time.textContent=new Date(m.created_at).toLocaleTimeString([],{
+  time.textContent=new Date(m.created_at).toLocaleString([],{
+   month:"short",
+   day:"numeric",
    hour:"2-digit",
    minute:"2-digit"
   });
 
-  div.append(content,time);
+  div.append(sender,content,time);
   box.appendChild(div);
  });
 
@@ -381,14 +541,9 @@ async function loadMessages(){
 }
 
 
-// SEND MESSAGE - SECURE RPC
+// SEND GROUP MESSAGE
 
 async function sendMessage(){
-
- if(!selectedUser){
-  alert("Please select a user first.");
-  return;
- }
 
  const input=document.getElementById("message");
  const message=input.value.trim();
@@ -400,8 +555,7 @@ async function sendMessage(){
 
  try{
 
-  const {error}=await db.rpc("send_chat_message",{
-   p_receiver_id:selectedUser.id,
+  const {error}=await db.rpc("send_group_message",{
    p_message:message
   });
 
@@ -451,7 +605,7 @@ db.auth.getSession().then(({data,error})=>{
  }
 
 });
-
 </script>
+
 </body>
 </html>
