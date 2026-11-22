@@ -44,8 +44,18 @@ button:disabled{opacity:.5}
 .small{
  color:#aab5ca;
  font-size:13px;
+ margin:6px 0;
+}
+.danger{
+ background:#d94b4b;
+ color:white;
+}
+.success{
+ background:#218c63;
+ color:white;
 }
 #app{display:none}
+input{width:220px}
 </style>
 </head>
 
@@ -61,6 +71,7 @@ button:disabled{opacity:.5}
   <p>Total Members: <b id="total">0</b></p>
   <p>Moderators: <b id="mods">0</b></p>
   <p>VIP Members: <b id="vips">0</b></p>
+  <p>Blocked Members: <b id="blockedCount">0</b></p>
  </div>
 
  <div class="card">
@@ -88,6 +99,8 @@ const db = window.supabase.createClient(
  SUPABASE_KEY
 );
 
+let currentAdminId = null;
+
 
 // ADMIN LOGIN
 
@@ -101,6 +114,8 @@ async function startAdmin(){
   "Please login first.";
   return;
  }
+
+ currentAdminId = user.id;
 
  const {data:myRole,error:roleError} = await db
   .from("user_roles")
@@ -156,10 +171,28 @@ async function loadMembers(){
   return;
  }
 
+ const {data:blocks,error:blockError} = await db
+  .from("member_blocks")
+  .select("blocker_id,blocked_user_id,reason");
+
+ if(blockError){
+  box.innerText="Block list error: "+blockError.message;
+  return;
+ }
+
  const roleMap={};
+ const blockMap={};
 
  (roles||[]).forEach(r=>{
   roleMap[r.user_id]=r.role;
+ });
+
+ // Show blocks created by this Super Admin
+
+ (blocks||[]).forEach(b=>{
+  if(b.blocker_id===currentAdminId){
+   blockMap[b.blocked_user_id]=b;
+  }
  });
 
  let modCount=0;
@@ -176,6 +209,9 @@ async function loadMembers(){
  document.getElementById("mods").innerText=modCount;
  document.getElementById("vips").innerText=vipCount;
 
+ document.getElementById("blockedCount").innerText=
+ Object.keys(blockMap).length;
+
  box.innerHTML="";
 
  if(!profiles || profiles.length===0){
@@ -186,6 +222,7 @@ async function loadMembers(){
  profiles.forEach(p=>{
 
   const role=roleMap[p.id]||"member";
+  const isBlocked=!!blockMap[p.id];
 
   const div=document.createElement("div");
   div.className="member";
@@ -198,7 +235,6 @@ async function loadMembers(){
   info.textContent="Role: "+role;
 
   div.append(name,info);
-
 
   // SUPER ADMIN PROTECTION
 
@@ -274,9 +310,9 @@ async function loadMembers(){
 
    // MUTE REASON
 
-   const reason=document.createElement("input");
-   reason.placeholder="Mute reason";
-   reason.maxLength=300;
+   const muteReason=document.createElement("input");
+   muteReason.placeholder="Mute reason";
+   muteReason.maxLength=300;
 
 
    // MUTE MEMBER
@@ -286,8 +322,8 @@ async function loadMembers(){
 
    muteBtn.onclick=async()=>{
 
-    if(!reason.value.trim()){
-     alert("Please enter a reason");
+    if(!muteReason.value.trim()){
+     alert("Please enter a mute reason");
      return;
     }
 
@@ -298,7 +334,7 @@ async function loadMembers(){
      {
       p_user_id:p.id,
       p_duration_minutes:Number(duration.value),
-      p_reason:reason.value.trim()
+      p_reason:muteReason.value.trim()
      }
     );
 
@@ -343,10 +379,97 @@ async function loadMembers(){
 
    div.append(
     duration,
-    reason,
+    muteReason,
     muteBtn,
     unmuteBtn
    );
+
+
+   // BLOCK REASON
+
+   const blockReason=document.createElement("input");
+   blockReason.placeholder="Block reason";
+   blockReason.maxLength=300;
+
+   // BLOCK STATUS
+
+   const blockStatus=document.createElement("div");
+   blockStatus.className="small";
+
+   if(isBlocked){
+    blockStatus.textContent="🚫 Blocked by you";
+   }else{
+    blockStatus.textContent="✅ Not blocked by you";
+   }
+
+   div.append(blockStatus,blockReason);
+
+
+   // BLOCK MEMBER
+
+   const blockBtn=document.createElement("button");
+   blockBtn.textContent="🚫 Block Member";
+   blockBtn.className="danger";
+   blockBtn.style.display=isBlocked?"none":"inline-block";
+
+   blockBtn.onclick=async()=>{
+
+    if(!confirm("Are you sure you want to block this member?"))return;
+
+    blockBtn.disabled=true;
+
+    const {error}=await db.rpc(
+     "admin_block_member",
+     {
+      p_user_id:p.id,
+      p_reason:blockReason.value.trim()||null
+     }
+    );
+
+    blockBtn.disabled=false;
+
+    if(error){
+     alert(error.message);
+     return;
+    }
+
+    alert("Member block record created!");
+    await loadMembers();
+   };
+
+
+   // UNBLOCK MEMBER
+
+   const unblockBtn=document.createElement("button");
+   unblockBtn.textContent="✅ Unblock Member";
+   unblockBtn.className="success";
+   unblockBtn.style.display=isBlocked?"inline-block":"none";
+
+   unblockBtn.onclick=async()=>{
+
+    if(!confirm("Are you sure you want to unblock this member?"))return;
+
+    unblockBtn.disabled=true;
+
+    const {error}=await db.rpc(
+     "admin_unblock_member",
+     {
+      p_user_id:p.id
+     }
+    );
+
+    unblockBtn.disabled=false;
+
+    if(error){
+     alert(error.message);
+     return;
+    }
+
+    alert("Member unblocked!");
+    await loadMembers();
+   };
+
+   div.append(blockBtn,unblockBtn);
   }
 
   box.appendChild(div);
@@ -384,7 +507,8 @@ async function loadNotifications(){
 
   p.textContent=
    "🔔 "+n.notification_type+
-   " — "+new Date(n.created_at).toLocaleString();
+   " — "+new Date(n.created_at).toLocaleString()+
+   (n.is_read?"":" — NEW");
 
   box.appendChild(p);
  });
