@@ -6,46 +6,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LYM REALM | Admin Panel</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 *{box-sizing:border-box}
-body{
- margin:0;background:#0b1020;color:white;
- font-family:Arial,sans-serif;padding:18px;
-}
-h1{color:#e8bd59}
-.card{
- background:#171f35;padding:16px;
- border-radius:14px;margin:12px 0;
-}
-input,select,button{
- padding:12px;border:0;border-radius:8px;
- margin:5px;max-width:100%;
-}
-button{
- background:#d6a83f;color:#111;
- font-weight:bold;cursor:pointer;
-}
+body{margin:0;background:#0b1020;color:white;font-family:Arial,sans-serif;padding:18px}
+h1,.section-title{color:#e8bd59}
+.card{background:#171f35;padding:16px;border-radius:14px;margin:12px 0}
+input,select,button{padding:12px;border:0;border-radius:8px;margin:5px;max-width:100%}
+button{background:#d6a83f;color:#111;font-weight:bold;cursor:pointer}
 button:disabled{opacity:.5}
-.member,.record{
- border-bottom:1px solid #35405a;
- padding:12px 0;overflow-wrap:anywhere;
-}
+.member,.record{border-bottom:1px solid #35405a;padding:12px 0;overflow-wrap:anywhere}
 .small{color:#aab5ca;font-size:13px;margin:6px 0}
 .danger{background:#d94b4b;color:white}
 .success{background:#218c63;color:white}
+.warning{background:#b87925;color:white}
 #app{display:none}
 input{width:220px}
-.record-message{
- background:#10182b;padding:10px;
- border-radius:8px;margin:8px 0;
- white-space:pre-wrap;overflow-wrap:anywhere;
-}
+.record-message{background:#10182b;padding:10px;border-radius:8px;margin:8px 0;white-space:pre-wrap;overflow-wrap:anywhere}
 audio{width:100%;max-width:420px;margin-top:8px}
-.section-title{color:#e8bd59}
 </style>
 </head>
-
 <body>
 
 <h1>👑 LYM REALM ADMIN</h1>
@@ -53,94 +32,70 @@ audio{width:100%;max-width:420px;margin-top:8px}
 
 <div id="app">
 
- <div class="card">
-  <h2>📊 Dashboard</h2>
-  <p>Total Members: <b id="total">0</b></p>
-  <p>Moderators: <b id="mods">0</b></p>
-  <p>VIP Members: <b id="vips">0</b></p>
-  <p>Blocked Members: <b id="blockedCount">0</b></p>
- </div>
+<div class="card">
+<h2>📊 Dashboard</h2>
+<p>Total Members: <b id="total">0</b></p>
+<p>Moderators: <b id="mods">0</b></p>
+<p>VIP Members: <b id="vips">0</b></p>
+<p>Blocked Members: <b id="blockedCount">0</b></p>
+<p>Banned Members: <b id="bannedCount">0</b></p>
+</div>
 
- <div class="card">
-  <h2>👥 Member Management</h2>
-  <div id="members">Loading members...</div>
- </div>
+<div class="card">
+<h2>👥 Member Management</h2>
+<div id="members">Loading members...</div>
+</div>
 
- <!-- CHAT RECORDS -->
+<div class="card">
+<h2 class="section-title">💬 Text Chat Records</h2>
+<button onclick="loadChatRecords()">🔄 Refresh Records</button>
+<div id="textRecords">Loading text records...</div>
+</div>
 
- <div class="card">
-  <h2 class="section-title">💬 Text Chat Records</h2>
-  <button onclick="loadChatRecords()">🔄 Refresh Records</button>
-  <div id="textRecords">Loading text records...</div>
- </div>
+<div class="card">
+<h2 class="section-title">🎤 Voice Chat Records</h2>
+<button onclick="loadChatRecords()">🔄 Refresh Voice Records</button>
+<div id="voiceRecords">Loading voice records...</div>
+</div>
 
- <!-- VOICE RECORDS -->
-
- <div class="card">
-  <h2 class="section-title">🎤 Voice Chat Records</h2>
-  <button onclick="loadChatRecords()">🔄 Refresh Voice Records</button>
-  <div id="voiceRecords">Loading voice records...</div>
- </div>
-
- <div class="card">
-  <h2>🔔 Notifications</h2>
-  <div id="notifications">Loading notifications...</div>
- </div>
+<div class="card">
+<h2>🔔 Notifications</h2>
+<div id="notifications">Loading notifications...</div>
+</div>
 
 </div>
 
 <script>
+const SUPABASE_URL="https://probxnzduietjivnqrac.supabase.co";
+const SUPABASE_KEY="sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
 
-const SUPABASE_URL =
-"https://probxnzduietjivnqrac.supabase.co";
-
-const SUPABASE_KEY =
-"sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
-
-const db = window.supabase.createClient(
- SUPABASE_URL,
- SUPABASE_KEY
-);
-
-let currentAdminId = null;
-
-
-// ADMIN LOGIN
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let currentAdminId=null;
 
 async function startAdmin(){
+ const {data:{user},error:loginError}=await db.auth.getUser();
 
- const {data:{user},error:loginError} =
- await db.auth.getUser();
-
- if(loginError || !user){
-  document.getElementById("status").innerText =
-  "Please login first.";
+ if(loginError||!user){
+  document.getElementById("status").innerText="Please login first.";
   return;
  }
 
- currentAdminId = user.id;
+ currentAdminId=user.id;
 
- const {data:myRole,error:roleError} = await db
-  .from("user_roles")
-  .select("role")
-  .eq("user_id",user.id)
-  .maybeSingle();
+ const {data:myRole,error:roleError}=await db
+  .from("user_roles").select("role").eq("user_id",user.id).maybeSingle();
 
  if(roleError){
-  document.getElementById("status").innerText =
-  "Role error: "+roleError.message;
+  document.getElementById("status").innerText="Role error: "+roleError.message;
   return;
  }
 
- if(!myRole || myRole.role!=="super_admin"){
-  document.getElementById("status").innerText =
-  "Access Denied.";
+ if(!myRole||myRole.role!=="super_admin"){
+  document.getElementById("status").innerText="Access Denied.";
   return;
  }
 
- document.getElementById("status").innerText =
- "Welcome Super Admin 👑";
-
+ document.getElementById("status").innerText="Welcome Super Admin 👑";
  document.getElementById("app").style.display="block";
 
  await loadMembers();
@@ -148,83 +103,56 @@ async function startAdmin(){
  await loadChatRecords();
 }
 
-
-// LOAD MEMBERS
-
 async function loadMembers(){
-
  const box=document.getElementById("members");
  box.innerHTML="Loading...";
 
- const {data:profiles,error} = await db
-  .from("profiles")
-  .select("id,username")
-  .order("created_at",{ascending:false});
+ const [profileResult,roleResult,blockResult,banResult]=await Promise.all([
+  db.from("profiles").select("id,username").order("created_at",{ascending:false}),
+  db.from("user_roles").select("user_id,role"),
+  db.from("member_blocks").select("blocker_id,blocked_user_id,reason"),
+  db.from("member_bans").select("user_id,reason,created_at")
+ ]);
 
- if(error){
-  box.innerText=error.message;
-  return;
- }
+ if(profileResult.error){box.innerText=profileResult.error.message;return;}
+ if(roleResult.error){box.innerText=roleResult.error.message;return;}
+ if(blockResult.error){box.innerText="Block list error: "+blockResult.error.message;return;}
+ if(banResult.error){box.innerText="Ban list error: "+banResult.error.message;return;}
 
- const {data:roles,error:roleError} = await db
-  .from("user_roles")
-  .select("user_id,role");
-
- if(roleError){
-  box.innerText=roleError.message;
-  return;
- }
-
- const {data:blocks,error:blockError} = await db
-  .from("member_blocks")
-  .select("blocker_id,blocked_user_id,reason");
-
- if(blockError){
-  box.innerText="Block list error: "+blockError.message;
-  return;
- }
-
+ const profiles=profileResult.data||[];
  const roleMap={};
  const blockMap={};
+ const banMap={};
 
- (roles||[]).forEach(r=>{
-  roleMap[r.user_id]=r.role;
+ (roleResult.data||[]).forEach(r=>roleMap[r.user_id]=r.role);
+
+ (blockResult.data||[]).forEach(b=>{
+  if(b.blocker_id===currentAdminId)blockMap[b.blocked_user_id]=b;
  });
 
- (blocks||[]).forEach(b=>{
-  if(b.blocker_id===currentAdminId){
-   blockMap[b.blocked_user_id]=b;
-  }
- });
+ (banResult.data||[]).forEach(b=>banMap[b.user_id]=b);
 
- let modCount=0;
- let vipCount=0;
+ let modCount=0,vipCount=0;
 
- (profiles||[]).forEach(p=>{
+ profiles.forEach(p=>{
   if(roleMap[p.id]==="moderator")modCount++;
   if(roleMap[p.id]==="vip")vipCount++;
  });
 
- document.getElementById("total").innerText=
- (profiles||[]).length;
-
+ document.getElementById("total").innerText=profiles.length;
  document.getElementById("mods").innerText=modCount;
  document.getElementById("vips").innerText=vipCount;
-
- document.getElementById("blockedCount").innerText=
- Object.keys(blockMap).length;
+ document.getElementById("blockedCount").innerText=Object.keys(blockMap).length;
+ document.getElementById("bannedCount").innerText=Object.keys(banMap).length;
 
  box.innerHTML="";
 
- if(!profiles || profiles.length===0){
-  box.innerText="No members found.";
-  return;
- }
+ if(!profiles.length){box.innerText="No members found.";return;}
 
  profiles.forEach(p=>{
-
   const role=roleMap[p.id]||"member";
   const isBlocked=!!blockMap[p.id];
+  const isBanned=!!banMap[p.id];
 
   const div=document.createElement("div");
   div.className="member";
@@ -239,413 +167,292 @@ async function loadMembers(){
   div.append(name,info);
 
   if(role==="super_admin"){
-
    const crown=document.createElement("p");
-   crown.textContent="👑 SUPER ADMIN";
+   crown.textContent="👑 SUPER ADMIN — Protected";
    div.append(crown);
-
-  }else{
-
-   // CHANGE ROLE
-
-   const select=document.createElement("select");
-
-   ["member","vip","moderator"].forEach(r=>{
-
-    const option=document.createElement("option");
-    option.value=r;
-    option.textContent=r;
-
-    if(r===role)option.selected=true;
-
-    select.appendChild(option);
-   });
-
-   const save=document.createElement("button");
-   save.textContent="Save Role";
-
-   save.onclick=async()=>{
-
-    if(!confirm("Change this member's role?"))return;
-
-    save.disabled=true;
-
-    const {error}=await db.rpc("set_member_role",{
-     p_user_id:p.id,
-     p_role:select.value
-    });
-
-    save.disabled=false;
-
-    if(error){
-     alert(error.message);
-     return;
-    }
-
-    alert("Role updated!");
-    await loadMembers();
-   };
-
-   div.append(select,save);
-
-   // MUTE DURATION
-
-   const duration=document.createElement("select");
-
-   [
-    [5,"5 Minutes"],
-    [60,"1 Hour"],
-    [180,"3 Hours"],
-    [1440,"24 Hours"]
-   ].forEach(item=>{
-
-    const option=document.createElement("option");
-    option.value=item[0];
-    option.textContent=item[1];
-
-    duration.appendChild(option);
-   });
-
-   const muteReason=document.createElement("input");
-   muteReason.placeholder="Mute reason";
-   muteReason.maxLength=300;
-
-   // MUTE
-
-   const muteBtn=document.createElement("button");
-   muteBtn.textContent="🔇 Mute Member";
-
-   muteBtn.onclick=async()=>{
-
-    if(!muteReason.value.trim()){
-     alert("Please enter a mute reason");
-     return;
-    }
-
-    muteBtn.disabled=true;
-
-    const {error}=await db.rpc(
-     "moderator_mute_member",
-     {
-      p_user_id:p.id,
-      p_duration_minutes:Number(duration.value),
-      p_reason:muteReason.value.trim()
-     }
-    );
-
-    muteBtn.disabled=false;
-
-    if(error){
-     alert(error.message);
-     return;
-    }
-
-    alert("Member muted successfully!");
-   };
-
-   // UNMUTE
-
-   const unmuteBtn=document.createElement("button");
-   unmuteBtn.textContent="🔊 Unmute Member";
-
-   unmuteBtn.onclick=async()=>{
-
-    if(!confirm("Unmute this member?"))return;
-
-    unmuteBtn.disabled=true;
-
-    const {error}=await db.rpc(
-     "admin_unmute_member",
-     {p_user_id:p.id}
-    );
-
-    unmuteBtn.disabled=false;
-
-    if(error){
-     alert(error.message);
-     return;
-    }
-
-    alert("Member unmuted!");
-   };
-
-   div.append(duration,muteReason,muteBtn,unmuteBtn);
-
-   // BLOCK
-
-   const blockReason=document.createElement("input");
-   blockReason.placeholder="Block reason";
-   blockReason.maxLength=300;
-
-   const blockStatus=document.createElement("div");
-   blockStatus.className="small";
-
-   blockStatus.textContent=isBlocked?
-    "🚫 Blocked by you":"✅ Not blocked by you";
-
-   div.append(blockStatus,blockReason);
-
-   const blockBtn=document.createElement("button");
-   blockBtn.textContent="🚫 Block Member";
-   blockBtn.className="danger";
-   blockBtn.style.display=isBlocked?"none":"inline-block";
-
-   blockBtn.onclick=async()=>{
-
-    if(!confirm("Are you sure you want to block this member?"))return;
-
-    blockBtn.disabled=true;
-
-    const {error}=await db.rpc(
-     "admin_block_member",
-     {
-      p_user_id:p.id,
-      p_reason:blockReason.value.trim()||null
-     }
-    );
-
-    blockBtn.disabled=false;
-
-    if(error){
-     alert(error.message);
-     return;
-    }
-
-    alert("Member block record created!");
-    await loadMembers();
-   };
-
-   const unblockBtn=document.createElement("button");
-   unblockBtn.textContent="✅ Unblock Member";
-   unblockBtn.className="success";
-   unblockBtn.style.display=isBlocked?"inline-block":"none";
-
-   unblockBtn.onclick=async()=>{
-
-    if(!confirm("Are you sure you want to unblock this member?"))return;
-
-    unblockBtn.disabled=true;
-
-    const {error}=await db.rpc(
-     "admin_unblock_member",
-     {p_user_id:p.id}
-    );
-
-    unblockBtn.disabled=false;
-
-    if(error){
-     alert(error.message);
-     return;
-    }
-
-    alert("Member unblocked!");
-    await loadMembers();
-   };
-
-   div.append(blockBtn,unblockBtn);
+   box.appendChild(div);
+   return;
   }
 
+  // CHANGE ROLE
+  const select=document.createElement("select");
+
+  ["member","vip","moderator"].forEach(r=>{
+   const option=document.createElement("option");
+   option.value=r;
+   option.textContent=r;
+   if(r===role)option.selected=true;
+   select.appendChild(option);
+  });
+
+  const save=document.createElement("button");
+  save.textContent="Save Role";
+  save.onclick=async()=>{
+   if(!confirm("Change this member's role?"))return;
+   save.disabled=true;
+   const {error}=await db.rpc("set_member_role",{p_user_id:p.id,p_role:select.value});
+   save.disabled=false;
+   if(error){alert(error.message);return;}
+   alert("Role updated!");
+   await loadMembers();
+  };
+  div.append(select,save);
+
+  // MUTE
+  const duration=document.createElement("select");
+  [[5,"5 Minutes"],[60,"1 Hour"],[180,"3 Hours"],[1440,"24 Hours"]].forEach(item=>{
+   const option=document.createElement("option");
+   option.value=item[0];
+   option.textContent=item[1];
+   duration.appendChild(option);
+  });
+
+  const muteReason=document.createElement("input");
+  muteReason.placeholder="Mute reason";
+  muteReason.maxLength=300;
+
+  const muteBtn=document.createElement("button");
+  muteBtn.textContent="🔇 Mute Member";
+  muteBtn.onclick=async()=>{
+   if(!muteReason.value.trim()){alert("Please enter a mute reason");return;}
+   muteBtn.disabled=true;
+   const {error}=await db.rpc("moderator_mute_member",{
+    p_user_id:p.id,
+    p_duration_minutes:Number(duration.value),
+    p_reason:muteReason.value.trim()
+   });
+   muteBtn.disabled=false;
+   if(error){alert(error.message);return;}
+   alert("Member muted successfully!");
+  };
+
+  const unmuteBtn=document.createElement("button");
+  unmuteBtn.textContent="🔊 Unmute Member";
+  unmuteBtn.onclick=async()=>{
+   if(!confirm("Unmute this member?"))return;
+   unmuteBtn.disabled=true;
+   const {error}=await db.rpc("admin_unmute_member",{p_user_id:p.id});
+   unmuteBtn.disabled=false;
+   if(error){alert(error.message);return;}
+   alert("Member unmuted!");
+  };
+
+  div.append(duration,muteReason,muteBtn,unmuteBtn);
+
+  // BLOCK / UNBLOCK
+  const blockReason=document.createElement("input");
+  blockReason.placeholder="Block reason";
+  blockReason.maxLength=300;
+
+  const blockStatus=document.createElement("div");
+  blockStatus.className="small";
+  blockStatus.textContent=isBlocked?"🚫 Blocked by you":"✅ Not blocked by you";
+  div.append(blockStatus,blockReason);
+
+  const blockBtn=document.createElement("button");
+  blockBtn.textContent="🚫 Block Member";
+  blockBtn.className="danger";
+  blockBtn.style.display=isBlocked?"none":"inline-block";
+  blockBtn.onclick=async()=>{
+   if(!confirm("Are you sure you want to block this member?"))return;
+   blockBtn.disabled=true;
+   const {error}=await db.rpc("admin_block_member",{
+    p_user_id:p.id,p_reason:blockReason.value.trim()||null
+   });
+   blockBtn.disabled=false;
+   if(error){alert(error.message);return;}
+   alert("Member block record created!");
+   await loadMembers();
+  };
+
+  const unblockBtn=document.createElement("button");
+  unblockBtn.textContent="✅ Unblock Member";
+  unblockBtn.className="success";
+  unblockBtn.style.display=isBlocked?"inline-block":"none";
+  unblockBtn.onclick=async()=>{
+   if(!confirm("Are you sure you want to unblock this member?"))return;
+   unblockBtn.disabled=true;
+   const {error}=await db.rpc("admin_unblock_member",{p_user_id:p.id});
+   unblockBtn.disabled=false;
+   if(error){alert(error.message);return;}
+   alert("Member unblocked!");
+   await loadMembers();
+  };
+
+  div.append(blockBtn,unblockBtn);
+
+  // BAN / UNBAN
+  const banReason=document.createElement("input");
+  banReason.placeholder="Ban reason";
+  banReason.maxLength=300;
+
+  const banStatus=document.createElement("div");
+  banStatus.className="small";
+  banStatus.textContent=isBanned?"⛔ BANNED":"✅ Not banned";
+  div.append(banStatus,banReason);
+
+  const banBtn=document.createElement("button");
+  banBtn.textContent="⛔ Ban Member";
+  banBtn.className="danger";
+  banBtn.style.display=isBanned?"none":"inline-block";
+  banBtn.onclick=async()=>{
+   if(!confirm("BAN this member? They will be denied chat access."))return;
+   banBtn.disabled=true;
+   const {error}=await db.rpc("admin_ban_member",{
+    p_user_id:p.id,
+    p_reason:banReason.value.trim()||null
+   });
+   banBtn.disabled=false;
+   if(error){alert(error.message);return;}
+   alert("Ban record created. Chat enforcement will be connected next.");
+   await loadMembers();
+  };
+
+  const unbanBtn=document.createElement("button");
+  unbanBtn.textContent="✅ Unban Member";
+  unbanBtn.className="success";
+  unbanBtn.style.display=isBanned?"inline-block":"none";
+  unbanBtn.onclick=async()=>{
+   if(!confirm("Unban this member?"))return;
+   unbanBtn.disabled=true;
+   const {error}=await db.rpc("admin_unban_member",{p_user_id:p.id});
+   unbanBtn.disabled=false;
+   if(error){alert(error.message);return;}
+   alert("Member unbanned!");
+   await loadMembers();
+  };
+
+  div.append(banBtn,unbanBtn);
+
+  // KICK
+  const kickBtn=document.createElement("button");
+  kickBtn.textContent="👢 Kick Member";
+  kickBtn.className="warning";
+  kickBtn.onclick=async()=>{
+   if(!confirm("Kick this member out of the chat now? They can log in again."))return;
+   kickBtn.disabled=true;
+   const {error}=await db.rpc("admin_kick_member",{p_user_id:p.id});
+   kickBtn.disabled=false;
+   if(error){alert(error.message);return;}
+   alert("Kick command sent. Chat enforcement will be connected next.");
+   await loadMembers();
+  };
+
+  div.append(kickBtn);
   box.appendChild(div);
  });
 }
 
-
-// LOAD CHAT RECORDS
-
+// CHAT RECORDS
 async function loadChatRecords(){
-
  const textBox=document.getElementById("textRecords");
  const voiceBox=document.getElementById("voiceRecords");
-
  textBox.innerHTML="Loading text messages...";
  voiceBox.innerHTML="Loading voice messages...";
 
- // Get all messages
-
- const {data:messages,error} = await db
-  .from("messages")
+ const {data:messages,error}=await db.from("messages")
   .select("id,sender_id,receiver_id,message,created_at,message_type,audio_path")
-  .order("created_at",{ascending:false})
-  .limit(200);
+  .order("created_at",{ascending:false}).limit(200);
 
  if(error){
-
   textBox.textContent="Text records error: "+error.message;
   voiceBox.textContent="Voice records error: "+error.message;
-
   return;
  }
 
- // Get usernames
-
- const {data:profiles, error:profileError} = await db
-  .from("profiles")
+ const {data:profiles,error:profileError}=await db.from("profiles")
   .select("id,username");
 
  if(profileError){
-
   textBox.textContent="Profile error: "+profileError.message;
   voiceBox.textContent="Profile error: "+profileError.message;
-
   return;
  }
 
  const names={};
+ (profiles||[]).forEach(p=>names[p.id]=p.username||"Member");
 
- (profiles||[]).forEach(p=>{
-  names[p.id]=p.username||"Member";
- });
-
- const textMessages=(messages||[]).filter(m=>{
-  return m.message && !m.audio_path;
- });
-
- const voiceMessages=(messages||[]).filter(m=>{
-  return !!m.audio_path;
- });
-
- // TEXT RECORDS
+ const textMessages=(messages||[]).filter(m=>m.message&&!m.audio_path);
+ const voiceMessages=(messages||[]).filter(m=>!!m.audio_path);
 
  textBox.innerHTML="";
+ if(!textMessages.length)textBox.textContent="No text messages found.";
 
- if(textMessages.length===0){
-
-  textBox.textContent="No text messages found.";
-
- }else{
-
-  textMessages.forEach(m=>{
-
-   const div=document.createElement("div");
-   div.className="record";
-
-   const sender=document.createElement("b");
-   sender.textContent="👤 "+(names[m.sender_id]||"Unknown Member");
-
-   const time=document.createElement("div");
-   time.className="small";
-   time.textContent=new Date(m.created_at).toLocaleString();
-
-   const receiver=document.createElement("div");
-   receiver.className="small";
-   receiver.textContent=m.receiver_id?
-    "To: "+(names[m.receiver_id]||"Member"):
-    "🌍 Public Group";
-
-   const message=document.createElement("div");
-   message.className="record-message";
-   message.textContent=m.message;
-
-   div.append(sender,time,receiver,message);
-   textBox.appendChild(div);
-  });
- }
-
- // VOICE RECORDS
+ textMessages.forEach(m=>{
+  const div=document.createElement("div");
+  div.className="record";
+  const sender=document.createElement("b");
+  sender.textContent="👤 "+(names[m.sender_id]||"Unknown Member");
+  const time=document.createElement("div");
+  time.className="small";
+  time.textContent=new Date(m.created_at).toLocaleString();
+  const receiver=document.createElement("div");
+  receiver.className="small";
+  receiver.textContent=m.receiver_id?"To: "+(names[m.receiver_id]||"Member"):"🌍 Public Group";
+  const message=document.createElement("div");
+  message.className="record-message";
+  message.textContent=m.message;
+  div.append(sender,time,receiver,message);
+  textBox.appendChild(div);
+ });
 
  voiceBox.innerHTML="";
+ if(!voiceMessages.length)voiceBox.textContent="No voice messages found.";
 
- if(voiceMessages.length===0){
+ for(const m of voiceMessages){
+  const div=document.createElement("div");
+  div.className="record";
+  const sender=document.createElement("b");
+  sender.textContent="🎤 "+(names[m.sender_id]||"Unknown Member");
+  const time=document.createElement("div");
+  time.className="small";
+  time.textContent=new Date(m.created_at).toLocaleString();
+  const receiver=document.createElement("div");
+  receiver.className="small";
+  receiver.textContent=m.receiver_id?"To: "+(names[m.receiver_id]||"Member"):"🌍 Public Group";
+  const player=document.createElement("div");
+  player.className="small";
+  player.textContent="Preparing voice message...";
+  div.append(sender,time,receiver,player);
+  voiceBox.appendChild(div);
 
-  voiceBox.textContent="No voice messages found.";
+  const {data:urlData,error:urlError}=await db.storage
+   .from("voice-messages").createSignedUrl(m.audio_path,3600);
 
- }else{
-
-  for(const m of voiceMessages){
-
-   const div=document.createElement("div");
-   div.className="record";
-
-   const sender=document.createElement("b");
-   sender.textContent="🎤 "+(names[m.sender_id]||"Unknown Member");
-
-   const time=document.createElement("div");
-   time.className="small";
-   time.textContent=new Date(m.created_at).toLocaleString();
-
-   const receiver=document.createElement("div");
-   receiver.className="small";
-   receiver.textContent=m.receiver_id?
-    "To: "+(names[m.receiver_id]||"Member"):
-    "🌍 Public Group";
-
-   const player=document.createElement("div");
-   player.className="small";
-   player.textContent="Preparing voice message...";
-
-   div.append(sender,time,receiver,player);
-   voiceBox.appendChild(div);
-
-   // PRIVATE STORAGE SIGNED URL
-
-   const {data:urlData,error:urlError}=await db
-    .storage
-    .from("voice-messages")
-    .createSignedUrl(m.audio_path,3600);
-
-   if(urlError || !urlData || !urlData.signedUrl){
-
-    player.textContent=
-     "Voice unavailable: "+(urlError?.message||"Could not create audio link");
-
-    continue;
-   }
-
-   player.textContent="";
-
-   const audio=document.createElement("audio");
-   audio.controls=true;
-   audio.preload="none";
-   audio.src=urlData.signedUrl;
-
-   player.appendChild(audio);
+  if(urlError||!urlData||!urlData.signedUrl){
+   player.textContent="Voice unavailable: "+(urlError?.message||"Could not create audio link");
+   continue;
   }
+
+  player.textContent="";
+  const audio=document.createElement("audio");
+  audio.controls=true;
+  audio.preload="none";
+  audio.src=urlData.signedUrl;
+  player.appendChild(audio);
  }
 }
 
-
-// LOAD NOTIFICATIONS
-
+// NOTIFICATIONS
 async function loadNotifications(){
-
  const box=document.getElementById("notifications");
-
- const {data,error}=await db
-  .from("admin_notifications")
+ const {data,error}=await db.from("admin_notifications")
   .select("id,notification_type,created_at,is_read")
-  .order("created_at",{ascending:false})
-  .limit(30);
+  .order("created_at",{ascending:false}).limit(30);
 
- if(error){
-  box.innerText=error.message;
-  return;
- }
-
+ if(error){box.innerText=error.message;return;}
  box.innerHTML="";
-
- if(!data || data.length===0){
-  box.innerText="No notifications yet.";
-  return;
- }
+ if(!data||!data.length){box.innerText="No notifications yet.";return;}
 
  data.forEach(n=>{
-
   const p=document.createElement("p");
-
-  p.textContent=
-   "🔔 "+n.notification_type+
-   " — "+new Date(n.created_at).toLocaleString()+
-   (n.is_read?"":" — NEW");
-
+  p.textContent="🔔 "+n.notification_type+" — "+
+   new Date(n.created_at).toLocaleString()+(n.is_read?"":" — NEW");
   box.appendChild(p);
  });
 }
 
-
-// START ADMIN
-
 startAdmin();
-
 </script>
 </body>
 </html>
