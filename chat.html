@@ -9,10 +9,7 @@
 
 <style>
 *{box-sizing:border-box}
-body{
- margin:0;background:#061713;color:white;
- font-family:Arial,sans-serif
-}
+body{margin:0;background:#061713;color:white;font-family:Arial,sans-serif}
 button,input{font:inherit}
 header{
  height:80px;background:#006b43;display:flex;
@@ -22,9 +19,8 @@ header{
 .logo{font-size:25px;font-weight:bold}
 .sub{font-size:12px;color:#c8ffe6;margin-top:5px}
 button{
- cursor:pointer;border:0;border-radius:9px;
- padding:11px 15px;background:#00a96b;
- color:white;font-weight:bold
+ cursor:pointer;border:0;border-radius:9px;padding:11px 15px;
+ background:#00a96b;color:white;font-weight:bold
 }
 button:hover{background:#00c982}
 button:disabled{opacity:.5;cursor:not-allowed}
@@ -59,28 +55,18 @@ input{
 .myrow{display:flex;align-items:center;gap:12px}
 .green{color:#00ed87}
 .muted{color:#9bb6ad;font-size:12px}
-.editbox{
- margin-top:12px;padding-top:10px;
- border-top:1px solid #31564a
-}
+.editbox{margin-top:12px;padding-top:10px;border-top:1px solid #31564a}
 .editbox button{width:100%}
-.section-title{
- font-size:14px;color:#00ed87;
- margin:17px 4px 8px
-}
+.section-title{font-size:14px;color:#00ed87;margin:17px 4px 8px}
 .member{
- width:100%;display:flex;align-items:center;
- gap:9px;text-align:left;background:#142e28;
- margin:5px 0;padding:9px;border:1px solid transparent;
- border-radius:9px
+ width:100%;display:flex;align-items:center;gap:9px;
+ text-align:left;background:#142e28;margin:5px 0;
+ padding:9px;border:1px solid transparent;border-radius:9px
 }
 .member.me{border-color:#00b978}
 .member .avatar{width:36px;height:36px;font-size:17px}
 .member-info{min-width:0;flex:1}
-.member-name{
- font-size:13px;font-weight:bold;
- overflow-wrap:anywhere
-}
+.member-name{font-size:13px;font-weight:bold;overflow-wrap:anywhere}
 .member-role{font-size:10px;color:#ffd76a;margin-top:3px}
 .chat{display:flex;flex-direction:column;min-width:0}
 .chathead{
@@ -90,37 +76,30 @@ input{
 }
 .chathead .avatar{width:43px;height:43px}
 #messages{
- flex:1;overflow:auto;padding:18px;
- background-color:#071c17;
+ flex:1;overflow:auto;padding:18px;background-color:#071c17;
  background-image:radial-gradient(#173b30 1px,transparent 1px);
  background-size:22px 22px
 }
 .msg{
- max-width:75%;width:fit-content;
- background:#263c38;border-radius:14px;
- padding:10px 13px;margin:10px 0;
+ max-width:75%;width:fit-content;background:#263c38;
+ border-radius:14px;padding:10px 13px;margin:10px 0;
  white-space:pre-wrap;overflow-wrap:anywhere
 }
 .msg.mine{margin-left:auto;background:#007e50}
-.sender{
- font-size:12px;font-weight:bold;
- color:#ffd76a;margin-bottom:6px
-}
+.sender{font-size:12px;font-weight:bold;color:#ffd76a;margin-bottom:6px}
 .msg.mine .sender{color:#aaffd2}
-.time{
- font-size:10px;color:#c1d8cf;
- text-align:right;margin-top:7px
-}
-.system-message{
- text-align:center;color:#9bb6ad;
- font-size:12px;margin:15px
-}
+.time{font-size:10px;color:#c1d8cf;text-align:right;margin-top:7px}
+.msg audio{display:block;width: min(270px, 65vw);max-width:100%;margin-top:8px}
+.system-message{text-align:center;color:#9bb6ad;font-size:12px;margin:15px}
 .composer{
- display:flex;gap:9px;padding:12px;
- background:#09221c
+ display:flex;gap:9px;padding:12px;background:#09221c;align-items:center
 }
 .composer input{margin:0;flex:1;min-width:0}
-.composer button{min-width:75px}
+.composer button{min-width:65px}
+#recordBtn{background:#a52e38}
+#recordBtn.recording{background:#e00035;animation:pulse 1s infinite}
+#voiceStatus{font-size:11px;color:#aaffd2;padding:0 12px 8px;background:#09221c}
+@keyframes pulse{50%{opacity:.55}}
 @media(max-width:650px){
  header{height:70px;padding:10px}
  .logo{font-size:18px}
@@ -144,7 +123,8 @@ input{
  #messages{padding:8px}
  .msg{max-width:92%;font-size:13px;padding:9px}
  .composer{padding:7px;gap:5px}
- .composer button{padding:10px 8px;min-width:60px}
+ .composer button{padding:10px 7px;min-width:45px;font-size:12px}
+ .composer input{font-size:13px}
 }
 </style>
 </head>
@@ -156,9 +136,7 @@ input{
   <div class="logo">♛ LYM REALM CHAT</div>
   <div class="sub">ONE REALM • ONE COMMUNITY</div>
  </div>
- <button id="logoutBtn" onclick="logout()" style="display:none">
-  Logout
- </button>
+ <button id="logoutBtn" onclick="logout()" style="display:none">Logout</button>
 </header>
 
 <div id="auth">
@@ -171,9 +149,7 @@ input{
 </div>
 
 <div id="app">
-
  <aside class="sidebar">
-
   <div class="profile">
    <div class="myrow">
     <div class="avatar">👑</div>
@@ -183,22 +159,18 @@ input{
      <div id="myrole" class="muted"></div>
     </div>
    </div>
-
    <div class="editbox">
     <div class="muted">Change Username</div>
-    <input id="newUsername" maxlength="20"
-     placeholder="New username">
+    <input id="newUsername" maxlength="20" placeholder="New username">
     <button onclick="changeUsername()">Save Username</button>
    </div>
   </div>
 
   <div class="section-title">♛ COMMUNITY MEMBERS</div>
   <div id="users">Loading members...</div>
-
  </aside>
 
  <main class="chat">
-
   <div class="chathead">
    <div class="avatar">🌍</div>
    <div>
@@ -208,17 +180,17 @@ input{
   </div>
 
   <div id="messages">
-   <div class="system-message">
-    Welcome to LYM REALM PUBLIC CHAT
-   </div>
+   <div class="system-message">Welcome to LYM REALM PUBLIC CHAT</div>
   </div>
+
+  <div id="voiceStatus"></div>
 
   <div class="composer">
    <input id="message" placeholder="Type a message..."
     onkeydown="if(event.key==='Enter')sendMessage()">
+   <button id="recordBtn" onclick="toggleRecording()">🎙️</button>
    <button id="sendBtn" onclick="sendMessage()">Send</button>
   </div>
-
  </main>
 </div>
 
@@ -229,14 +201,17 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
 "sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
 
-const db=supabase.createClient(
- SUPABASE_URL,SUPABASE_KEY
-);
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let currentUser=null;
 let liveChannel=null;
 let profilesMap={};
 let rolesMap={};
+let mediaRecorder=null;
+let audioStream=null;
+let audioChunks=[];
+let isRecording=false;
+let isSendingVoice=false;
 
 function showStatus(message){
  document.getElementById("status").textContent=message;
@@ -246,15 +221,12 @@ function showStatus(message){
 // LOGIN
 
 async function login(){
-
  const email=document.getElementById("email").value.trim();
  const password=document.getElementById("password").value;
 
  showStatus("Logging in...");
 
- const {data,error}=await db.auth.signInWithPassword({
-  email,password
- });
+ const {data,error}=await db.auth.signInWithPassword({email,password});
 
  if(error){
   showStatus(error.message);
@@ -268,7 +240,6 @@ async function login(){
 // SIGNUP
 
 async function signup(){
-
  const email=document.getElementById("email").value.trim();
  const password=document.getElementById("password").value;
 
@@ -279,9 +250,7 @@ async function signup(){
 
  showStatus("Creating account...");
 
- const {data,error}=await db.auth.signUp({
-  email,password
- });
+ const {data,error}=await db.auth.signUp({email,password});
 
  if(error){
   showStatus(error.message);
@@ -299,7 +268,6 @@ async function signup(){
 // START APP
 
 async function startApp(user){
-
  currentUser=user;
 
  const username="user_"+
@@ -343,7 +311,6 @@ async function startApp(user){
 // LOAD MEMBERS
 
 async function loadMembers(){
-
  const box=document.getElementById("users");
  box.textContent="Loading members...";
 
@@ -356,8 +323,7 @@ async function loadMembers(){
  }
 
  const {data:roles,error:roleError}=await db
- .from("user_roles")
- .select("user_id,role");
+ .from("user_roles").select("user_id,role");
 
  if(roleError){
   box.textContent="Role error: "+roleError.message;
@@ -367,37 +333,25 @@ async function loadMembers(){
  profilesMap={};
  rolesMap={};
 
- (profiles||[]).forEach(p=>{
-  profilesMap[p.id]=p.username;
- });
+ (profiles||[]).forEach(p=>profilesMap[p.id]=p.username);
+ (roles||[]).forEach(r=>rolesMap[r.user_id]=r.role);
 
- (roles||[]).forEach(r=>{
-  rolesMap[r.user_id]=r.role;
- });
-
- const priority={
-  super_admin:1,
-  moderator:2,
-  vip:3,
-  member:4
- };
+ const priority={super_admin:1,moderator:2,vip:3,member:4};
 
  profiles.sort((a,b)=>{
   const roleA=priority[rolesMap[a.id]||"member"]||4;
   const roleB=priority[rolesMap[b.id]||"member"]||4;
-  return roleA-roleB ||
-   (a.username||"").localeCompare(b.username||"");
+  return roleA-roleB||(a.username||"").localeCompare(b.username||"");
  });
 
  const myUsername=profilesMap[currentUser.id]||"Member";
  const myRole=rolesMap[currentUser.id]||"member";
 
  document.getElementById("myname").textContent=myUsername;
-
  document.getElementById("myrole").textContent=
-  myRole==="super_admin" ? "👑 SUPER ADMIN" :
-  myRole==="moderator" ? "🛡️ MODERATOR" :
-  myRole==="vip" ? "⭐ VIP MEMBER" : "MEMBER";
+  myRole==="super_admin"?"👑 SUPER ADMIN":
+  myRole==="moderator"?"🛡️ MODERATOR":
+  myRole==="vip"?"⭐ VIP MEMBER":"MEMBER";
 
  box.innerHTML="";
 
@@ -407,18 +361,16 @@ async function loadMembers(){
  }
 
  profiles.forEach(p=>{
-
   const role=rolesMap[p.id]||"member";
-
   const b=document.createElement("div");
   b.className="member"+(p.id===currentUser.id?" me":"");
 
   const avatar=document.createElement("div");
   avatar.className="avatar";
   avatar.textContent=
-   role==="super_admin" ? "👑" :
-   role==="moderator" ? "🛡️" :
-   role==="vip" ? "⭐" : "👤";
+   role==="super_admin"?"👑":
+   role==="moderator"?"🛡️":
+   role==="vip"?"⭐":"👤";
 
   const info=document.createElement("div");
   info.className="member-info";
@@ -430,12 +382,11 @@ async function loadMembers(){
   const roleText=document.createElement("div");
   roleText.className="member-role";
   roleText.textContent=
-   role==="super_admin" ? "SUPER ADMIN" :
-   role==="moderator" ? "MODERATOR" :
-   role==="vip" ? "VIP MEMBER" : "MEMBER";
+   role==="super_admin"?"SUPER ADMIN":
+   role==="moderator"?"MODERATOR":
+   role==="vip"?"VIP MEMBER":"MEMBER";
 
   info.append(name,roleText);
-
   b.append(avatar,info);
   box.appendChild(b);
  });
@@ -445,11 +396,10 @@ async function loadMembers(){
 // CHANGE USERNAME
 
 async function changeUsername(){
-
  const input=document.getElementById("newUsername");
  const username=input.value.trim();
 
- if(username.length<3 || username.length>20){
+ if(username.length<3||username.length>20){
   alert("Username must be 3 to 20 characters.");
   return;
  }
@@ -479,11 +429,10 @@ async function changeUsername(){
 // LOAD GROUP MESSAGES
 
 async function loadMessages(){
-
  const box=document.getElementById("messages");
 
  const {data,error}=await db.from("messages")
- .select("id,sender_id,receiver_id,message,created_at")
+ .select("id,sender_id,receiver_id,message,created_at,message_type,audio_path")
  .is("receiver_id",null)
  .order("created_at",{ascending:true})
  .limit(300);
@@ -496,18 +445,14 @@ async function loadMessages(){
 
  box.innerHTML="";
 
- if(!data || data.length===0){
-  box.innerHTML=
-   '<div class="system-message">No messages yet. Start the conversation!</div>';
+ if(!data||data.length===0){
+  box.innerHTML='<div class="system-message">No messages yet. Start the conversation!</div>';
   return;
  }
 
- data.forEach(m=>{
-
+ for(const m of data){
   const div=document.createElement("div");
-
-  div.className="msg "+
-   (m.sender_id===currentUser.id?"mine":"");
+  div.className="msg "+(m.sender_id===currentUser.id?"mine":"");
 
   const sender=document.createElement("div");
   sender.className="sender";
@@ -518,33 +463,50 @@ async function loadMessages(){
   sender.textContent=
    (senderRole==="super_admin"?"👑 ":
     senderRole==="moderator"?"🛡️ ":
-    senderRole==="vip"?"⭐ ":"")+
-   senderName;
+    senderRole==="vip"?"⭐ ":"")+senderName;
 
-  const content=document.createElement("div");
-  content.textContent=m.message;
+  div.appendChild(sender);
+
+  if(m.message_type==="voice"&&m.audio_path){
+   const audio=document.createElement("audio");
+   audio.controls=true;
+   audio.preload="none";
+
+   const {data:urlData,error:urlError}=await db.storage
+    .from("voice-messages")
+    .createSignedUrl(m.audio_path,3600);
+
+   if(urlError){
+    const errorText=document.createElement("div");
+    errorText.textContent="Voice unavailable";
+    div.appendChild(errorText);
+   }else{
+    audio.src=urlData.signedUrl;
+    div.appendChild(audio);
+   }
+  }else{
+   const content=document.createElement("div");
+   content.textContent=m.message;
+   div.appendChild(content);
+  }
 
   const time=document.createElement("div");
   time.className="time";
   time.textContent=new Date(m.created_at).toLocaleString([],{
-   month:"short",
-   day:"numeric",
-   hour:"2-digit",
-   minute:"2-digit"
+   month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"
   });
 
-  div.append(sender,content,time);
+  div.appendChild(time);
   box.appendChild(div);
- });
+ }
 
  box.scrollTop=box.scrollHeight;
 }
 
 
-// SEND GROUP MESSAGE
+// SEND TEXT MESSAGE
 
 async function sendMessage(){
-
  const input=document.getElementById("message");
  const message=input.value.trim();
 
@@ -554,7 +516,6 @@ async function sendMessage(){
  sendButton.disabled=true;
 
  try{
-
   const {error}=await db.rpc("send_group_message",{
    p_message:message
   });
@@ -568,12 +529,168 @@ async function sendMessage(){
   await loadMessages();
 
  }catch(error){
-
   alert("Message error: "+error.message);
-
  }finally{
-
   sendButton.disabled=false;
+ }
+}
+
+
+// START VOICE RECORDING
+
+async function startRecording(){
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+  alert("Microphone is not supported. Open the website in Chrome using HTTPS.");
+  return;
+ }
+
+ if(!window.MediaRecorder){
+  alert("Voice recording is not supported in this browser.");
+  return;
+ }
+
+ try{
+  audioStream=await navigator.mediaDevices.getUserMedia({audio:true});
+
+  let options={};
+  if(MediaRecorder.isTypeSupported("audio/webm;codecs=opus")){
+   options.mimeType="audio/webm;codecs=opus";
+  }else if(MediaRecorder.isTypeSupported("audio/webm")){
+   options.mimeType="audio/webm";
+  }
+
+  mediaRecorder=new MediaRecorder(audioStream,options);
+  audioChunks=[];
+
+  mediaRecorder.ondataavailable=event=>{
+   if(event.data&&event.data.size>0){
+    audioChunks.push(event.data);
+   }
+  };
+
+  mediaRecorder.onstop=async()=>{
+   const blob=new Blob(audioChunks,{
+    type:mediaRecorder.mimeType||"audio/webm"
+   });
+
+   stopAudioTracks();
+
+   if(blob.size===0){
+    document.getElementById("voiceStatus").textContent="";
+    return;
+   }
+
+   await uploadVoice(blob);
+  };
+
+  mediaRecorder.start();
+  isRecording=true;
+
+  const btn=document.getElementById("recordBtn");
+  btn.textContent="⏹ Stop";
+  btn.classList.add("recording");
+
+  document.getElementById("voiceStatus").textContent=
+   "🔴 Recording... Press Stop to send your voice.";
+
+ }catch(error){
+  stopAudioTracks();
+  alert("Microphone error: "+error.message);
+ }
+}
+
+
+// STOP RECORDING
+
+function stopRecording(){
+ if(mediaRecorder&&isRecording){
+  isRecording=false;
+  mediaRecorder.stop();
+
+  const btn=document.getElementById("recordBtn");
+  btn.textContent="🎙️";
+  btn.classList.remove("recording");
+
+  document.getElementById("voiceStatus").textContent=
+   "Uploading voice message...";
+ }
+}
+
+
+// RECORD BUTTON
+
+async function toggleRecording(){
+ if(isSendingVoice)return;
+
+ if(isRecording){
+  stopRecording();
+ }else{
+  await startRecording();
+ }
+}
+
+
+// STOP MICROPHONE
+
+function stopAudioTracks(){
+ if(audioStream){
+  audioStream.getTracks().forEach(track=>track.stop());
+  audioStream=null;
+ }
+}
+
+
+// UPLOAD AND SEND VOICE
+
+async function uploadVoice(blob){
+ if(isSendingVoice)return;
+
+ isSendingVoice=true;
+
+ const status=document.getElementById("voiceStatus");
+ const btn=document.getElementById("recordBtn");
+
+ btn.disabled=true;
+
+ try{
+  const extension="webm";
+  const path=currentUser.id+"/"+Date.now()+"."+extension;
+
+  const {error:uploadError}=await db.storage
+   .from("voice-messages")
+   .upload(path,blob,{
+    contentType:"audio/webm",
+    upsert:false
+   });
+
+  if(uploadError){
+   throw uploadError;
+  }
+
+  const {error:sendError}=await db.rpc("send_group_voice_message",{
+   p_audio_path:path
+  });
+
+  if(sendError){
+   await db.storage.from("voice-messages").remove([path]);
+   throw sendError;
+  }
+
+  status.textContent="Voice message sent!";
+  await loadMessages();
+
+ }catch(error){
+  alert("Voice upload error: "+error.message);
+  status.textContent="Voice message failed.";
+ }finally{
+  isSendingVoice=false;
+  btn.disabled=false;
+
+  setTimeout(()=>{
+   if(!isRecording){
+    status.textContent="";
+   }
+  },3000);
  }
 }
 
@@ -581,6 +698,11 @@ async function sendMessage(){
 // LOGOUT
 
 async function logout(){
+ if(isRecording){
+  stopRecording();
+ }
+
+ stopAudioTracks();
 
  if(liveChannel){
   await db.removeChannel(liveChannel);
@@ -594,7 +716,6 @@ async function logout(){
 // SESSION CHECK
 
 db.auth.getSession().then(({data,error})=>{
-
  if(error){
   showStatus(error.message);
   return;
@@ -603,9 +724,7 @@ db.auth.getSession().then(({data,error})=>{
  if(data.session){
   startApp(data.session.user);
  }
-
 });
 </script>
-
 </body>
 </html>
