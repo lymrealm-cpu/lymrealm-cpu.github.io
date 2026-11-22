@@ -58,6 +58,24 @@ input{
 .editbox{margin-top:12px;padding-top:10px;border-top:1px solid #31564a}
 .editbox button{width:100%}
 .section-title{font-size:14px;color:#00ed87;margin:17px 4px 8px}
+
+#onlineCount{
+ color:#00ed87;
+ font-size:11px;
+ margin-left:5px;
+}
+
+.online-dot{
+ display:inline-block;
+ width:8px;
+ height:8px;
+ background:#00ed87;
+ border-radius:50%;
+ margin-right:6px;
+ box-shadow:0 0 7px #00ed87;
+ vertical-align:middle;
+}
+
 .member{
  width:100%;display:flex;align-items:center;gap:9px;
  text-align:left;background:#142e28;margin:5px 0;
@@ -114,6 +132,7 @@ input{
  .editbox input{padding:7px;font-size:10px}
  .editbox button{padding:7px 2px;font-size:10px}
  .section-title{font-size:11px;margin:12px 2px 6px}
+ #onlineCount{font-size:9px;margin-left:2px}
  .member{display:block;text-align:center;padding:7px 2px}
  .member .avatar{width:30px;height:30px;margin:auto;font-size:15px}
  .member-name{font-size:10px;margin-top:4px}
@@ -166,7 +185,10 @@ input{
    </div>
   </div>
 
-  <div class="section-title">♛ COMMUNITY MEMBERS</div>
+  <div class="section-title">
+   ♛ COMMUNITY MEMBERS
+   <span id="onlineCount">0 Online</span>
+  </div>
   <div id="users">Loading members...</div>
  </aside>
 
@@ -401,7 +423,6 @@ async function startApp(user,isNewLogin=false){
   document.getElementById("messages").innerHTML=
    '<div class="system-message">Welcome to your fresh LYM REALM chat!</div>';
 
-  // Presence start: current user online hoga
   await setupPresence();
 
   await loadMembers();
@@ -459,7 +480,6 @@ async function loadMembers(){
 
  const priority={super_admin:1,moderator:2,vip:3,member:4};
 
- // Sirf online users display honge
  const onlineProfiles=(profiles||[]).filter(p=>
   onlineUserIds.includes(p.id)
  );
@@ -480,6 +500,10 @@ async function loadMembers(){
   myRole==="vip"?"⭐ VIP MEMBER":"MEMBER";
 
  box.innerHTML="";
+
+ // ONLINE COUNT UPDATE
+ document.getElementById("onlineCount").textContent =
+  onlineProfiles.length + " Online";
 
  if(!onlineProfiles.length){
   box.textContent="No online members.";
@@ -504,6 +528,11 @@ async function loadMembers(){
   const name=document.createElement("div");
   name.className="member-name";
   name.textContent=p.username||"Member";
+
+  // GREEN ONLINE DOT
+  const dot=document.createElement("span");
+  dot.className="online-dot";
+  name.prepend(dot);
 
   const roleText=document.createElement("div");
   roleText.className="member-role";
@@ -844,7 +873,6 @@ async function logout(){
 
  stopAudioTracks();
 
- // Logout par online presence remove hogi
  if(presenceChannel){
   await db.removeChannel(presenceChannel);
   presenceChannel=null;
