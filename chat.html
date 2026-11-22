@@ -106,6 +106,75 @@ input{
 #recordBtn.recording{background:#e00035;animation:pulse 1s infinite}
 #voiceStatus{font-size:11px;color:#aaffd2;padding:0 12px 8px;background:#09221c}
 @keyframes pulse{50%{opacity:.55}}
+
+/* WELCOME SCREEN */
+#welcomeScreen{
+ display:none;
+ position:fixed;
+ inset:0;
+ z-index:9999;
+ background:linear-gradient(145deg,#061713,#0b3024);
+ align-items:center;
+ justify-content:center;
+ padding:15px;
+ overflow-y:auto;
+}
+.welcome-card{
+ width:100%;
+ max-width:520px;
+ background:#102b25;
+ border:1px solid #00a96b;
+ border-radius:20px;
+ padding:24px;
+ box-shadow:0 0 30px #003d2b;
+}
+.welcome-logo{
+ text-align:center;
+ color:#f5d477;
+ font-size:30px;
+ font-weight:bold;
+}
+.welcome-sub{
+ text-align:center;
+ color:#a8d8c5;
+ font-size:11px;
+ margin-top:7px;
+}
+.rules-title{
+ color:#f5d477;
+ font-size:19px;
+ margin:22px 0 13px;
+}
+.rule{
+ display:flex;
+ gap:10px;
+ margin:12px 0;
+ color:white;
+ font-size:14px;
+ line-height:1.5;
+}
+.rule-number{
+ color:#f5d477;
+ font-weight:bold;
+ min-width:20px;
+}
+.welcome-footer{
+ text-align:center;
+ color:#a8d8c5;
+ font-size:12px;
+ margin:20px 0;
+}
+#enterChatBtn{
+ width:100%;
+ padding:15px;
+ border-radius:12px;
+ background:#d7b65c;
+ color:#10251d;
+ font-size:17px;
+ font-weight:bold;
+}
+#enterChatBtn:hover{background:#f5d477}
+
 @media(max-width:650px){
  header{height:70px;padding:10px}
  .logo{font-size:18px}
@@ -132,6 +201,9 @@ input{
  .composer{padding:7px;gap:5px}
  .composer button{padding:10px 7px;min-width:45px;font-size:12px}
  .composer input{font-size:13px}
+ .welcome-card{padding:19px}
+ .welcome-logo{font-size:26px}
+ .rule{font-size:13px;margin:11px 0}
 }
 </style>
 </head>
@@ -152,6 +224,33 @@ input{
  <button onclick="login()">Login</button>
  <button onclick="signup()">Create Account</button>
  <p id="status"></p>
+</div>
+
+<!-- WELCOME SCREEN -->
+<div id="welcomeScreen">
+ <div class="welcome-card">
+  <div class="welcome-logo">♛ LYM REALM</div>
+  <div class="welcome-sub">WELCOME TO OUR COMMUNITY</div>
+
+  <div class="rules-title">📜 COMMUNITY RULES</div>
+
+  <div class="rule"><span class="rule-number">1.</span><span>سب ممبرز کی عزت کریں۔</span></div>
+  <div class="rule"><span class="rule-number">2.</span><span>گالی گلوچ اور بدتمیزی منع ہے۔</span></div>
+  <div class="rule"><span class="rule-number">3.</span><span>کسی کو دھمکی یا ہراساں نہ کریں۔</span></div>
+  <div class="rule"><span class="rule-number">4.</span><span>اسپیم اور بار بار میسج نہ کریں۔</span></div>
+  <div class="rule"><span class="rule-number">5.</span><span>بغیر اجازت لنکس شیئر نہ کریں۔</span></div>
+  <div class="rule"><span class="rule-number">6.</span><span>اپنی ذاتی معلومات شیئر نہ کریں۔</span></div>
+  <div class="rule"><span class="rule-number">7.</span><span>جعلی اکاؤنٹ اور دھوکہ دہی منع ہے۔</span></div>
+  <div class="rule"><span class="rule-number">8.</span><span>نفرت انگیز مواد منع ہے۔</span></div>
+  <div class="rule"><span class="rule-number">9.</span><span>Moderator اور Admin کا احترام کریں۔</span></div>
+  <div class="rule"><span class="rule-number">10.</span><span>قواعد توڑنے پر Mute، Kick یا Ban ہو سکتا ہے۔</span></div>
+
+  <div class="welcome-footer">
+   RESPECT EVERYONE • KEEP OUR COMMUNITY SAFE ❤️
+  </div>
+
+  <button id="enterChatBtn" onclick="enterChat()">ENTER CHAT</button>
+ </div>
 </div>
 
 <div id="app">
@@ -220,6 +319,11 @@ let chatStartedAt=null;
 let appStarting=false;
 let kickCheckInterval=null;
 let kickBeingHandled=false;
+
+// ENTER CHAT BUTTON
+function enterChat(){
+ document.getElementById("welcomeScreen").style.display="none";
+}
 
 function showStatus(message){
  document.getElementById("status").textContent=message;
@@ -295,6 +399,7 @@ async function showAuthMessage(message){
  rolesMap={};
 
  document.getElementById("app").style.display="none";
+ document.getElementById("welcomeScreen").style.display="none";
  document.getElementById("auth").style.display="block";
  document.getElementById("logoutBtn").style.display="none";
  document.getElementById("messages").innerHTML="";
@@ -303,7 +408,6 @@ async function showAuthMessage(message){
 
 
 // LOGIN
-
 async function login(){
  const email=document.getElementById("email").value.trim();
  const password=document.getElementById("password").value;
@@ -327,7 +431,6 @@ async function login(){
 
 
 // SIGNUP
-
 async function signup(){
  const email=document.getElementById("email").value.trim();
  const password=document.getElementById("password").value;
@@ -355,7 +458,6 @@ async function signup(){
 
 
 // ONLINE PRESENCE
-
 async function setupPresence(){
  if(!currentUser)return;
 
@@ -415,7 +517,6 @@ async function setupPresence(){
 
 
 // BAN CHECK
-
 async function checkBanStatus(){
  const {data,error}=await db.rpc("is_my_account_banned");
 
@@ -434,7 +535,6 @@ async function checkBanStatus(){
 
 
 // KICK DETECTION
-
 async function handleKicked(){
  if(kickBeingHandled)return;
  kickBeingHandled=true;
@@ -454,10 +554,7 @@ async function checkKickStatus(){
 
  const {data,error}=await db.rpc("get_my_chat_started_at");
 
- if(error){
-  return;
- }
-
+ if(error)return;
  if(!currentUser||currentUser.id!==userId)return;
 
  const serverTime=timeValue(data);
@@ -471,7 +568,6 @@ async function checkKickStatus(){
 
 function startKickChecker(){
  stopKickChecker();
-
  kickCheckInterval=setInterval(()=>{
   checkKickStatus();
  },4000);
@@ -479,13 +575,11 @@ function startKickChecker(){
 
 
 // START APP
-
 async function startApp(user,isNewLogin=false){
  if(appStarting)return;
  appStarting=true;
 
  try{
-  // Ban check happens before chat opens.
   const allowed=await checkBanStatus();
   if(!allowed)return;
 
@@ -523,7 +617,6 @@ async function startApp(user,isNewLogin=false){
     chatStartedAt=result.data;
    }
 
-   // Detect a kick even if the user refreshed the page.
    const previousTime=localStorage.getItem(sessionStorageKey(user.id));
 
    if(previousTime){
@@ -558,6 +651,10 @@ async function startApp(user,isNewLogin=false){
 
   document.getElementById("auth").style.display="none";
   document.getElementById("app").style.display="grid";
+
+  // SHOW WELCOME SCREEN AFTER LOGIN
+  document.getElementById("welcomeScreen").style.display="flex";
+
   document.getElementById("logoutBtn").style.display="block";
 
   document.getElementById("messages").innerHTML=
@@ -597,7 +694,6 @@ async function startApp(user,isNewLogin=false){
 
 
 // LOAD MEMBERS
-
 async function loadMembers(){
  if(!currentUser)return;
 
@@ -694,7 +790,6 @@ async function loadMembers(){
 
 
 // CHANGE USERNAME
-
 async function changeUsername(){
  const input=document.getElementById("newUsername");
  const username=input.value.trim();
@@ -727,7 +822,6 @@ async function changeUsername(){
 
 
 // LOAD CURRENT SESSION MESSAGES
-
 async function loadMessages(){
  const box=document.getElementById("messages");
 
@@ -811,7 +905,6 @@ async function loadMessages(){
 
 
 // SEND TEXT MESSAGE
-
 async function sendMessage(){
  const input=document.getElementById("message");
  const message=input.value.trim();
@@ -847,7 +940,6 @@ async function sendMessage(){
 
 
 // START VOICE RECORDING
-
 async function startRecording(){
  if(!currentUser)return;
 
@@ -913,7 +1005,6 @@ async function startRecording(){
 
 
 // STOP RECORDING
-
 function stopRecording(){
  if(mediaRecorder&&isRecording){
   isRecording=false;
@@ -930,7 +1021,6 @@ function stopRecording(){
 
 
 // RECORD BUTTON
-
 async function toggleRecording(){
  if(isSendingVoice)return;
 
@@ -943,7 +1033,6 @@ async function toggleRecording(){
 
 
 // STOP MICROPHONE
-
 function stopAudioTracks(){
  if(audioStream){
   audioStream.getTracks().forEach(track=>track.stop());
@@ -953,7 +1042,6 @@ function stopAudioTracks(){
 
 
 // UPLOAD AND SEND VOICE
-
 async function uploadVoice(blob){
  if(isSendingVoice||!currentUser)return;
 
@@ -1012,7 +1100,6 @@ async function uploadVoice(blob){
 
 
 // LOGOUT
-
 async function logout(){
  const userId=currentUser?.id;
 
@@ -1036,7 +1123,6 @@ async function logout(){
 
 
 // SESSION CHECK
-
 db.auth.getSession().then(async({data,error})=>{
  if(error){
   showStatus(error.message);
