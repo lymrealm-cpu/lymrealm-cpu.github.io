@@ -10,52 +10,39 @@
 <style>
 *{box-sizing:border-box}
 body{
- margin:0;
- background:#0b1020;
- color:white;
- font-family:Arial,sans-serif;
- padding:18px;
+ margin:0;background:#0b1020;color:white;
+ font-family:Arial,sans-serif;padding:18px;
 }
 h1{color:#e8bd59}
 .card{
- background:#171f35;
- padding:16px;
- border-radius:14px;
- margin:12px 0;
+ background:#171f35;padding:16px;
+ border-radius:14px;margin:12px 0;
 }
 input,select,button{
- padding:12px;
- border:0;
- border-radius:8px;
- margin:5px;
- max-width:100%;
+ padding:12px;border:0;border-radius:8px;
+ margin:5px;max-width:100%;
 }
 button{
- background:#d6a83f;
- color:#111;
- font-weight:bold;
- cursor:pointer;
+ background:#d6a83f;color:#111;
+ font-weight:bold;cursor:pointer;
 }
 button:disabled{opacity:.5}
-.member{
+.member,.record{
  border-bottom:1px solid #35405a;
- padding:12px 0;
+ padding:12px 0;overflow-wrap:anywhere;
 }
-.small{
- color:#aab5ca;
- font-size:13px;
- margin:6px 0;
-}
-.danger{
- background:#d94b4b;
- color:white;
-}
-.success{
- background:#218c63;
- color:white;
-}
+.small{color:#aab5ca;font-size:13px;margin:6px 0}
+.danger{background:#d94b4b;color:white}
+.success{background:#218c63;color:white}
 #app{display:none}
 input{width:220px}
+.record-message{
+ background:#10182b;padding:10px;
+ border-radius:8px;margin:8px 0;
+ white-space:pre-wrap;overflow-wrap:anywhere;
+}
+audio{width:100%;max-width:420px;margin-top:8px}
+.section-title{color:#e8bd59}
 </style>
 </head>
 
@@ -77,6 +64,22 @@ input{width:220px}
  <div class="card">
   <h2>👥 Member Management</h2>
   <div id="members">Loading members...</div>
+ </div>
+
+ <!-- CHAT RECORDS -->
+
+ <div class="card">
+  <h2 class="section-title">💬 Text Chat Records</h2>
+  <button onclick="loadChatRecords()">🔄 Refresh Records</button>
+  <div id="textRecords">Loading text records...</div>
+ </div>
+
+ <!-- VOICE RECORDS -->
+
+ <div class="card">
+  <h2 class="section-title">🎤 Voice Chat Records</h2>
+  <button onclick="loadChatRecords()">🔄 Refresh Voice Records</button>
+  <div id="voiceRecords">Loading voice records...</div>
  </div>
 
  <div class="card">
@@ -142,6 +145,7 @@ async function startAdmin(){
 
  await loadMembers();
  await loadNotifications();
+ await loadChatRecords();
 }
 
 
@@ -186,8 +190,6 @@ async function loadMembers(){
  (roles||[]).forEach(r=>{
   roleMap[r.user_id]=r.role;
  });
-
- // Show blocks created by this Super Admin
 
  (blocks||[]).forEach(b=>{
   if(b.blocker_id===currentAdminId){
@@ -235,8 +237,6 @@ async function loadMembers(){
   info.textContent="Role: "+role;
 
   div.append(name,info);
-
-  // SUPER ADMIN PROTECTION
 
   if(role==="super_admin"){
 
@@ -288,7 +288,6 @@ async function loadMembers(){
 
    div.append(select,save);
 
-
    // MUTE DURATION
 
    const duration=document.createElement("select");
@@ -307,15 +306,11 @@ async function loadMembers(){
     duration.appendChild(option);
    });
 
-
-   // MUTE REASON
-
    const muteReason=document.createElement("input");
    muteReason.placeholder="Mute reason";
    muteReason.maxLength=300;
 
-
-   // MUTE MEMBER
+   // MUTE
 
    const muteBtn=document.createElement("button");
    muteBtn.textContent="🔇 Mute Member";
@@ -348,8 +343,7 @@ async function loadMembers(){
     alert("Member muted successfully!");
    };
 
-
-   // UNMUTE MEMBER
+   // UNMUTE
 
    const unmuteBtn=document.createElement("button");
    unmuteBtn.textContent="🔊 Unmute Member";
@@ -362,9 +356,7 @@ async function loadMembers(){
 
     const {error}=await db.rpc(
      "admin_unmute_member",
-     {
-      p_user_id:p.id
-     }
+     {p_user_id:p.id}
     );
 
     unmuteBtn.disabled=false;
@@ -377,35 +369,21 @@ async function loadMembers(){
     alert("Member unmuted!");
    };
 
-   div.append(
-    duration,
-    muteReason,
-    muteBtn,
-    unmuteBtn
-   );
+   div.append(duration,muteReason,muteBtn,unmuteBtn);
 
-
-   // BLOCK REASON
+   // BLOCK
 
    const blockReason=document.createElement("input");
    blockReason.placeholder="Block reason";
    blockReason.maxLength=300;
 
-   // BLOCK STATUS
-
    const blockStatus=document.createElement("div");
    blockStatus.className="small";
 
-   if(isBlocked){
-    blockStatus.textContent="🚫 Blocked by you";
-   }else{
-    blockStatus.textContent="✅ Not blocked by you";
-   }
+   blockStatus.textContent=isBlocked?
+    "🚫 Blocked by you":"✅ Not blocked by you";
 
    div.append(blockStatus,blockReason);
-
-
-   // BLOCK MEMBER
 
    const blockBtn=document.createElement("button");
    blockBtn.textContent="🚫 Block Member";
@@ -437,9 +415,6 @@ async function loadMembers(){
     await loadMembers();
    };
 
-
-   // UNBLOCK MEMBER
-
    const unblockBtn=document.createElement("button");
    unblockBtn.textContent="✅ Unblock Member";
    unblockBtn.className="success";
@@ -453,9 +428,7 @@ async function loadMembers(){
 
     const {error}=await db.rpc(
      "admin_unblock_member",
-     {
-      p_user_id:p.id
-     }
+     {p_user_id:p.id}
     );
 
     unblockBtn.disabled=false;
@@ -474,6 +447,160 @@ async function loadMembers(){
 
   box.appendChild(div);
  });
+}
+
+
+// LOAD CHAT RECORDS
+
+async function loadChatRecords(){
+
+ const textBox=document.getElementById("textRecords");
+ const voiceBox=document.getElementById("voiceRecords");
+
+ textBox.innerHTML="Loading text messages...";
+ voiceBox.innerHTML="Loading voice messages...";
+
+ // Get all messages
+
+ const {data:messages,error} = await db
+  .from("messages")
+  .select("id,sender_id,receiver_id,message,created_at,message_type,audio_path")
+  .order("created_at",{ascending:false})
+  .limit(200);
+
+ if(error){
+
+  textBox.textContent="Text records error: "+error.message;
+  voiceBox.textContent="Voice records error: "+error.message;
+
+  return;
+ }
+
+ // Get usernames
+
+ const {data:profiles, error:profileError} = await db
+  .from("profiles")
+  .select("id,username");
+
+ if(profileError){
+
+  textBox.textContent="Profile error: "+profileError.message;
+  voiceBox.textContent="Profile error: "+profileError.message;
+
+  return;
+ }
+
+ const names={};
+
+ (profiles||[]).forEach(p=>{
+  names[p.id]=p.username||"Member";
+ });
+
+ const textMessages=(messages||[]).filter(m=>{
+  return m.message && !m.audio_path;
+ });
+
+ const voiceMessages=(messages||[]).filter(m=>{
+  return !!m.audio_path;
+ });
+
+ // TEXT RECORDS
+
+ textBox.innerHTML="";
+
+ if(textMessages.length===0){
+
+  textBox.textContent="No text messages found.";
+
+ }else{
+
+  textMessages.forEach(m=>{
+
+   const div=document.createElement("div");
+   div.className="record";
+
+   const sender=document.createElement("b");
+   sender.textContent="👤 "+(names[m.sender_id]||"Unknown Member");
+
+   const time=document.createElement("div");
+   time.className="small";
+   time.textContent=new Date(m.created_at).toLocaleString();
+
+   const receiver=document.createElement("div");
+   receiver.className="small";
+   receiver.textContent=m.receiver_id?
+    "To: "+(names[m.receiver_id]||"Member"):
+    "🌍 Public Group";
+
+   const message=document.createElement("div");
+   message.className="record-message";
+   message.textContent=m.message;
+
+   div.append(sender,time,receiver,message);
+   textBox.appendChild(div);
+  });
+ }
+
+ // VOICE RECORDS
+
+ voiceBox.innerHTML="";
+
+ if(voiceMessages.length===0){
+
+  voiceBox.textContent="No voice messages found.";
+
+ }else{
+
+  for(const m of voiceMessages){
+
+   const div=document.createElement("div");
+   div.className="record";
+
+   const sender=document.createElement("b");
+   sender.textContent="🎤 "+(names[m.sender_id]||"Unknown Member");
+
+   const time=document.createElement("div");
+   time.className="small";
+   time.textContent=new Date(m.created_at).toLocaleString();
+
+   const receiver=document.createElement("div");
+   receiver.className="small";
+   receiver.textContent=m.receiver_id?
+    "To: "+(names[m.receiver_id]||"Member"):
+    "🌍 Public Group";
+
+   const player=document.createElement("div");
+   player.className="small";
+   player.textContent="Preparing voice message...";
+
+   div.append(sender,time,receiver,player);
+   voiceBox.appendChild(div);
+
+   // PRIVATE STORAGE SIGNED URL
+
+   const {data:urlData,error:urlError}=await db
+    .storage
+    .from("voice-messages")
+    .createSignedUrl(m.audio_path,3600);
+
+   if(urlError || !urlData || !urlData.signedUrl){
+
+    player.textContent=
+     "Voice unavailable: "+(urlError?.message||"Could not create audio link");
+
+    continue;
+   }
+
+   player.textContent="";
+
+   const audio=document.createElement("audio");
+   audio.controls=true;
+   audio.preload="none";
+   audio.src=urlData.signedUrl;
+
+   player.appendChild(audio);
+  }
+ }
 }
 
 
