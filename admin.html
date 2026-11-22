@@ -1,0 +1,400 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LYM REALM | Admin Panel</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:#0b1020;
+ color:white;
+ font-family:Arial,sans-serif;
+ padding:18px;
+}
+h1{color:#e8bd59}
+.card{
+ background:#171f35;
+ padding:16px;
+ border-radius:14px;
+ margin:12px 0;
+}
+input,select,button{
+ padding:12px;
+ border:0;
+ border-radius:8px;
+ margin:5px;
+ max-width:100%;
+}
+button{
+ background:#d6a83f;
+ color:#111;
+ font-weight:bold;
+ cursor:pointer;
+}
+button:disabled{opacity:.5}
+.member{
+ border-bottom:1px solid #35405a;
+ padding:12px 0;
+}
+.small{
+ color:#aab5ca;
+ font-size:13px;
+}
+#app{display:none}
+</style>
+</head>
+
+<body>
+
+<h1>👑 LYM REALM ADMIN</h1>
+<p id="status">Checking login...</p>
+
+<div id="app">
+
+ <div class="card">
+  <h2>📊 Dashboard</h2>
+  <p>Total Members: <b id="total">0</b></p>
+  <p>Moderators: <b id="mods">0</b></p>
+  <p>VIP Members: <b id="vips">0</b></p>
+ </div>
+
+ <div class="card">
+  <h2>👥 Member Management</h2>
+  <div id="members">Loading members...</div>
+ </div>
+
+ <div class="card">
+  <h2>🔔 Notifications</h2>
+  <div id="notifications">Loading notifications...</div>
+ </div>
+
+</div>
+
+<script>
+
+const SUPABASE_URL =
+"https://probxnzduietjivnqrac.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
+
+const db = window.supabase.createClient(
+ SUPABASE_URL,
+ SUPABASE_KEY
+);
+
+
+// ADMIN LOGIN
+
+async function startAdmin(){
+
+ const {data:{user},error:loginError} =
+ await db.auth.getUser();
+
+ if(loginError || !user){
+  document.getElementById("status").innerText =
+  "Please login first.";
+  return;
+ }
+
+ const {data:myRole,error:roleError} = await db
+  .from("user_roles")
+  .select("role")
+  .eq("user_id",user.id)
+  .maybeSingle();
+
+ if(roleError){
+  document.getElementById("status").innerText =
+  "Role error: "+roleError.message;
+  return;
+ }
+
+ if(!myRole || myRole.role!=="super_admin"){
+  document.getElementById("status").innerText =
+  "Access Denied.";
+  return;
+ }
+
+ document.getElementById("status").innerText =
+ "Welcome Super Admin 👑";
+
+ document.getElementById("app").style.display="block";
+
+ await loadMembers();
+ await loadNotifications();
+}
+
+
+// LOAD MEMBERS
+
+async function loadMembers(){
+
+ const box=document.getElementById("members");
+ box.innerHTML="Loading...";
+
+ const {data:profiles,error} = await db
+  .from("profiles")
+  .select("id,username")
+  .order("created_at",{ascending:false});
+
+ if(error){
+  box.innerText=error.message;
+  return;
+ }
+
+ const {data:roles,error:roleError} = await db
+  .from("user_roles")
+  .select("user_id,role");
+
+ if(roleError){
+  box.innerText=roleError.message;
+  return;
+ }
+
+ const roleMap={};
+
+ (roles||[]).forEach(r=>{
+  roleMap[r.user_id]=r.role;
+ });
+
+ let modCount=0;
+ let vipCount=0;
+
+ (profiles||[]).forEach(p=>{
+  if(roleMap[p.id]==="moderator")modCount++;
+  if(roleMap[p.id]==="vip")vipCount++;
+ });
+
+ document.getElementById("total").innerText=
+ (profiles||[]).length;
+
+ document.getElementById("mods").innerText=modCount;
+ document.getElementById("vips").innerText=vipCount;
+
+ box.innerHTML="";
+
+ if(!profiles || profiles.length===0){
+  box.innerText="No members found.";
+  return;
+ }
+
+ profiles.forEach(p=>{
+
+  const role=roleMap[p.id]||"member";
+
+  const div=document.createElement("div");
+  div.className="member";
+
+  const name=document.createElement("b");
+  name.textContent=p.username||"Member";
+
+  const info=document.createElement("div");
+  info.className="small";
+  info.textContent="Role: "+role;
+
+  div.append(name,info);
+
+
+  // SUPER ADMIN PROTECTION
+
+  if(role==="super_admin"){
+
+   const crown=document.createElement("p");
+   crown.textContent="👑 SUPER ADMIN";
+   div.append(crown);
+
+  }else{
+
+   // CHANGE ROLE
+
+   const select=document.createElement("select");
+
+   ["member","vip","moderator"].forEach(r=>{
+
+    const option=document.createElement("option");
+    option.value=r;
+    option.textContent=r;
+
+    if(r===role)option.selected=true;
+
+    select.appendChild(option);
+   });
+
+   const save=document.createElement("button");
+   save.textContent="Save Role";
+
+   save.onclick=async()=>{
+
+    if(!confirm("Change this member's role?"))return;
+
+    save.disabled=true;
+
+    const {error}=await db.rpc("set_member_role",{
+     p_user_id:p.id,
+     p_role:select.value
+    });
+
+    save.disabled=false;
+
+    if(error){
+     alert(error.message);
+     return;
+    }
+
+    alert("Role updated!");
+    await loadMembers();
+   };
+
+   div.append(select,save);
+
+
+   // MUTE DURATION
+
+   const duration=document.createElement("select");
+
+   [
+    [5,"5 Minutes"],
+    [60,"1 Hour"],
+    [180,"3 Hours"],
+    [1440,"24 Hours"]
+   ].forEach(item=>{
+
+    const option=document.createElement("option");
+    option.value=item[0];
+    option.textContent=item[1];
+
+    duration.appendChild(option);
+   });
+
+
+   // MUTE REASON
+
+   const reason=document.createElement("input");
+   reason.placeholder="Mute reason";
+   reason.maxLength=300;
+
+
+   // MUTE MEMBER
+
+   const muteBtn=document.createElement("button");
+   muteBtn.textContent="🔇 Mute Member";
+
+   muteBtn.onclick=async()=>{
+
+    if(!reason.value.trim()){
+     alert("Please enter a reason");
+     return;
+    }
+
+    muteBtn.disabled=true;
+
+    const {error}=await db.rpc(
+     "moderator_mute_member",
+     {
+      p_user_id:p.id,
+      p_duration_minutes:Number(duration.value),
+      p_reason:reason.value.trim()
+     }
+    );
+
+    muteBtn.disabled=false;
+
+    if(error){
+     alert(error.message);
+     return;
+    }
+
+    alert("Member muted successfully!");
+   };
+
+
+   // UNMUTE MEMBER
+
+   const unmuteBtn=document.createElement("button");
+   unmuteBtn.textContent="🔊 Unmute Member";
+
+   unmuteBtn.onclick=async()=>{
+
+    if(!confirm("Unmute this member?"))return;
+
+    unmuteBtn.disabled=true;
+
+    const {error}=await db.rpc(
+     "admin_unmute_member",
+     {
+      p_user_id:p.id
+     }
+    );
+
+    unmuteBtn.disabled=false;
+
+    if(error){
+     alert(error.message);
+     return;
+    }
+
+    alert("Member unmuted!");
+   };
+
+   div.append(
+    duration,
+    reason,
+    muteBtn,
+    unmuteBtn
+   );
+  }
+
+  box.appendChild(div);
+ });
+}
+
+
+// LOAD NOTIFICATIONS
+
+async function loadNotifications(){
+
+ const box=document.getElementById("notifications");
+
+ const {data,error}=await db
+  .from("admin_notifications")
+  .select("id,notification_type,created_at,is_read")
+  .order("created_at",{ascending:false})
+  .limit(30);
+
+ if(error){
+  box.innerText=error.message;
+  return;
+ }
+
+ box.innerHTML="";
+
+ if(!data || data.length===0){
+  box.innerText="No notifications yet.";
+  return;
+ }
+
+ data.forEach(n=>{
+
+  const p=document.createElement("p");
+
+  p.textContent=
+   "🔔 "+n.notification_type+
+   " — "+new Date(n.created_at).toLocaleString();
+
+  box.appendChild(p);
+ });
+}
+
+
+// START ADMIN
+
+startAdmin();
+
+</script>
+</body>
+</html>
