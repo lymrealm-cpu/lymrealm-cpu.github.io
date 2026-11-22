@@ -89,7 +89,7 @@ input{
 .sender{font-size:12px;font-weight:bold;color:#ffd76a;margin-bottom:6px}
 .msg.mine .sender{color:#aaffd2}
 .time{font-size:10px;color:#c1d8cf;text-align:right;margin-top:7px}
-.msg audio{display:block;width: min(270px, 65vw);max-width:100%;margin-top:8px}
+.msg audio{display:block;width:min(270px,65vw);max-width:100%;margin-top:8px}
 .system-message{text-align:center;color:#9bb6ad;font-size:12px;margin:15px}
 .composer{
  display:flex;gap:9px;padding:12px;background:#09221c;align-items:center
@@ -213,12 +213,16 @@ let audioChunks=[];
 let isRecording=false;
 let isSendingVoice=false;
 
+// Current login session ka start time
+let chatStartedAt=null;
+let appStarting=false;
+
 function showStatus(message){
  document.getElementById("status").textContent=message;
 }
 
 
-// LOGIN
+// LOGIN - Har naye login par fresh chat
 
 async function login(){
  const email=document.getElementById("email").value.trim();
@@ -233,7 +237,7 @@ async function login(){
   return;
  }
 
- await startApp(data.user);
+ await startApp(data.user,true);
 }
 
 
@@ -258,7 +262,7 @@ async function signup(){
  }
 
  if(data.session){
-  await startApp(data.user);
+  await startApp(data.user,true);
  }else{
   showStatus("Account created. Confirm your email, then login.");
  }
@@ -267,44 +271,93 @@ async function signup(){
 
 // START APP
 
-async function startApp(user){
- currentUser=user;
+async function startApp(user,isNewLogin=false){
+ if(appStarting)return;
+ appStarting=true;
 
- const username="user_"+
- user.id.replaceAll("-","").substring(0,8);
+ try{
+  currentUser=user;
 
- const {error}=await db.from("profiles").upsert(
-  {id:user.id,username:username},
-  {onConflict:"id",ignoreDuplicates:true}
- );
+  // Naye login par naya chat start time
+  if(isNewLogin){
+   const {data,error}=await db.rpc("start_fresh_chat");
 
- if(error){
-  showStatus("Profile error: "+error.message);
-  return;
- }
+   if(error){
+    showStatus("Chat start error: "+error.message);
+    await db.auth.signOut();
+    currentUser=null;
+    return;
+   }
 
- document.getElementById("auth").style.display="none";
- document.getElementById("app").style.display="grid";
- document.getElementById("logoutBtn").style.display="block";
+   chatStartedAt=data;
 
- await loadMembers();
- await loadMessages();
+  }else{
+   // Refresh par purana session time hi use hoga
+   const {data,error}=await db.rpc("get_my_chat_started_at");
 
- if(liveChannel){
-  await db.removeChannel(liveChannel);
- }
+   if(error){
+    showStatus("Chat session error: "+error.message);
+    return;
+   }
 
- liveChannel=db.channel("lym-public-group-chat")
- .on("postgres_changes",{
-  event:"INSERT",
-  schema:"public",
-  table:"messages"
- },payload=>{
-  if(payload.new.receiver_id===null){
-   loadMessages();
+   chatStartedAt=data;
+
+   // Purane users ke liye first time session create
+   if(!chatStartedAt){
+    const result=await db.rpc("start_fresh_chat");
+
+    if(result.error){
+     showStatus("Chat start error: "+result.error.message);
+     return;
+    }
+
+    chatStartedAt=result.data;
+   }
   }
- })
- .subscribe();
+
+  const username="user_"+
+   user.id.replaceAll("-","").substring(0,8);
+
+  const {error}=await db.from("profiles").upsert(
+   {id:user.id,username:username},
+   {onConflict:"id",ignoreDuplicates:true}
+  );
+
+  if(error){
+   showStatus("Profile error: "+error.message);
+   return;
+  }
+
+  document.getElementById("auth").style.display="none";
+  document.getElementById("app").style.display="grid";
+  document.getElementById("logoutBtn").style.display="block";
+
+  // Har login par message area fresh load hoga
+  document.getElementById("messages").innerHTML=
+   '<div class="system-message">Welcome to your fresh LYM REALM chat!</div>';
+
+  await loadMembers();
+  await loadMessages();
+
+  if(liveChannel){
+   await db.removeChannel(liveChannel);
+  }
+
+  liveChannel=db.channel("lym-public-group-chat")
+  .on("postgres_changes",{
+   event:"INSERT",
+   schema:"public",
+   table:"messages"
+  },payload=>{
+   if(payload.new.receiver_id===null){
+    loadMessages();
+   }
+  })
+  .subscribe();
+
+ }finally{
+  appStarting=false;
+ }
 }
 
 
@@ -426,14 +479,21 @@ async function changeUsername(){
 }
 
 
-// LOAD GROUP MESSAGES
+// LOAD ONLY CURRENT SESSION MESSAGES
 
 async function loadMessages(){
  const box=document.getElementById("messages");
 
+ if(!chatStartedAt){
+  box.innerHTML=
+   '<div class="system-message">Chat session not ready.</div>';
+  return;
+ }
+
  const {data,error}=await db.from("messages")
  .select("id,sender_id,receiver_id,message,created_at,message_type,audio_path")
  .is("receiver_id",null)
+ .gte("created_at",chatStartedAt)
  .order("created_at",{ascending:true})
  .limit(300);
 
@@ -446,7 +506,8 @@ async function loadMessages(){
  box.innerHTML="";
 
  if(!data||data.length===0){
-  box.innerHTML='<div class="system-message">No messages yet. Start the conversation!</div>';
+  box.innerHTML=
+   '<div class="system-message">No new messages. Start your fresh conversation!</div>';
   return;
  }
 
@@ -699,30 +760,45 @@ async function uploadVoice(blob){
 
 async function logout(){
  if(isRecording){
-  stopRecording();
+  // Logout par recording ko send nahi karna
+  if(mediaRecorder&&mediaRecorder.state!=="inactive"){
+   mediaRecorder.onstop=null;
+   mediaRecorder.stop();
+  }
+
+  isRecording=false;
+  audioChunks=[];
  }
 
  stopAudioTracks();
 
  if(liveChannel){
   await db.removeChannel(liveChannel);
+  liveChannel=null;
  }
 
  await db.auth.signOut();
+
+ currentUser=null;
+ chatStartedAt=null;
+ profilesMap={};
+ rolesMap={};
+
  location.reload();
 }
 
 
 // SESSION CHECK
+// Refresh par naya session create nahi hoga
 
-db.auth.getSession().then(({data,error})=>{
+db.auth.getSession().then(async({data,error})=>{
  if(error){
   showStatus(error.message);
   return;
  }
 
  if(data.session){
-  startApp(data.session.user);
+  await startApp(data.session.user,false);
  }
 });
 </script>
