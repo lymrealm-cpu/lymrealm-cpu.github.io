@@ -205,6 +205,8 @@ const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let currentUser=null;
 let liveChannel=null;
+let presenceChannel=null;
+let onlineUserIds=[];
 let profilesMap={};
 let rolesMap={};
 let mediaRecorder=null;
@@ -213,7 +215,6 @@ let audioChunks=[];
 let isRecording=false;
 let isSendingVoice=false;
 
-// Current login session ka start time
 let chatStartedAt=null;
 let appStarting=false;
 
@@ -222,7 +223,7 @@ function showStatus(message){
 }
 
 
-// LOGIN - Har naye login par fresh chat
+// LOGIN
 
 async function login(){
  const email=document.getElementById("email").value.trim();
@@ -269,6 +270,74 @@ async function signup(){
 }
 
 
+// ONLINE PRESENCE
+
+async function setupPresence(){
+ if(!currentUser)return;
+
+ if(presenceChannel){
+  await db.removeChannel(presenceChannel);
+  presenceChannel=null;
+ }
+
+ onlineUserIds=[currentUser.id];
+
+ presenceChannel=db.channel("lym-online-members",{
+  config:{
+   presence:{key:currentUser.id}
+  }
+ });
+
+ presenceChannel.on("presence",{
+  event:"sync"
+ },()=>{
+  const state=presenceChannel.presenceState();
+
+  const ids=Object.values(state)
+   .flat()
+   .map(item=>item.user_id)
+   .filter(Boolean);
+
+  onlineUserIds=[...new Set(ids)];
+
+  if(currentUser && document.getElementById("app").style.display==="grid"){
+   loadMembers();
+  }
+ });
+
+ await new Promise(resolve=>{
+  let finished=false;
+
+  const finish=()=>{
+   if(finished)return;
+   finished=true;
+   resolve();
+  };
+
+  setTimeout(finish,8000);
+
+  presenceChannel.subscribe(async status=>{
+   if(status==="SUBSCRIBED"){
+    const {error}=await presenceChannel.track({
+     user_id:currentUser.id
+    });
+
+    if(error){
+     showStatus("Online status error: "+error.message);
+    }
+
+    finish();
+   }
+
+   if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"||status==="CLOSED"){
+    showStatus("Online status connection problem. Please refresh.");
+    finish();
+   }
+  });
+ });
+}
+
+
 // START APP
 
 async function startApp(user,isNewLogin=false){
@@ -278,7 +347,6 @@ async function startApp(user,isNewLogin=false){
  try{
   currentUser=user;
 
-  // Naye login par naya chat start time
   if(isNewLogin){
    const {data,error}=await db.rpc("start_fresh_chat");
 
@@ -292,7 +360,6 @@ async function startApp(user,isNewLogin=false){
    chatStartedAt=data;
 
   }else{
-   // Refresh par purana session time hi use hoga
    const {data,error}=await db.rpc("get_my_chat_started_at");
 
    if(error){
@@ -302,7 +369,6 @@ async function startApp(user,isNewLogin=false){
 
    chatStartedAt=data;
 
-   // Purane users ke liye first time session create
    if(!chatStartedAt){
     const result=await db.rpc("start_fresh_chat");
 
@@ -332,9 +398,11 @@ async function startApp(user,isNewLogin=false){
   document.getElementById("app").style.display="grid";
   document.getElementById("logoutBtn").style.display="block";
 
-  // Har login par message area fresh load hoga
   document.getElementById("messages").innerHTML=
    '<div class="system-message">Welcome to your fresh LYM REALM chat!</div>';
+
+  // Presence start: current user online hoga
+  await setupPresence();
 
   await loadMembers();
   await loadMessages();
@@ -361,11 +429,11 @@ async function startApp(user,isNewLogin=false){
 }
 
 
-// LOAD MEMBERS
+// LOAD MEMBERS - ONLY ONLINE USERS
 
 async function loadMembers(){
  const box=document.getElementById("users");
- box.textContent="Loading members...";
+ box.textContent="Loading online members...";
 
  const {data:profiles,error}=await db.from("profiles")
  .select("id,username");
@@ -391,7 +459,12 @@ async function loadMembers(){
 
  const priority={super_admin:1,moderator:2,vip:3,member:4};
 
- profiles.sort((a,b)=>{
+ // Sirf online users display honge
+ const onlineProfiles=(profiles||[]).filter(p=>
+  onlineUserIds.includes(p.id)
+ );
+
+ onlineProfiles.sort((a,b)=>{
   const roleA=priority[rolesMap[a.id]||"member"]||4;
   const roleB=priority[rolesMap[b.id]||"member"]||4;
   return roleA-roleB||(a.username||"").localeCompare(b.username||"");
@@ -408,12 +481,12 @@ async function loadMembers(){
 
  box.innerHTML="";
 
- if(!profiles.length){
-  box.textContent="No members found.";
+ if(!onlineProfiles.length){
+  box.textContent="No online members.";
   return;
  }
 
- profiles.forEach(p=>{
+ onlineProfiles.forEach(p=>{
   const role=rolesMap[p.id]||"member";
   const b=document.createElement("div");
   b.className="member"+(p.id===currentUser.id?" me":"");
@@ -479,7 +552,7 @@ async function changeUsername(){
 }
 
 
-// LOAD ONLY CURRENT SESSION MESSAGES
+// LOAD CURRENT SESSION MESSAGES
 
 async function loadMessages(){
  const box=document.getElementById("messages");
@@ -760,7 +833,6 @@ async function uploadVoice(blob){
 
 async function logout(){
  if(isRecording){
-  // Logout par recording ko send nahi karna
   if(mediaRecorder&&mediaRecorder.state!=="inactive"){
    mediaRecorder.onstop=null;
    mediaRecorder.stop();
@@ -771,6 +843,14 @@ async function logout(){
  }
 
  stopAudioTracks();
+
+ // Logout par online presence remove hogi
+ if(presenceChannel){
+  await db.removeChannel(presenceChannel);
+  presenceChannel=null;
+ }
+
+ onlineUserIds=[];
 
  if(liveChannel){
   await db.removeChannel(liveChannel);
@@ -789,7 +869,6 @@ async function logout(){
 
 
 // SESSION CHECK
-// Refresh par naya session create nahi hoga
 
 db.auth.getSession().then(async({data,error})=>{
  if(error){
