@@ -17,6 +17,7 @@ justify-content:space-between;padding:15px 25px;border-bottom:2px solid #00d98b}
 button{cursor:pointer;border:0;border-radius:10px;padding:12px 18px;
 background:#00a96b;color:white;font-weight:bold}
 button:hover{background:#00c982}
+button:disabled{opacity:.5;cursor:not-allowed}
 #auth{max-width:420px;margin:70px auto;padding:25px;background:#102b25;border-radius:18px}
 input{width:100%;padding:14px;border:1px solid #28584a;border-radius:10px;
 background:#10251f;color:white;margin:7px 0;outline:none}
@@ -116,15 +117,22 @@ padding:12px 15px;margin:10px 0;white-space:pre-wrap;overflow-wrap:anywhere}
   <div class="composer">
    <input id="message" placeholder="Type a message..."
     onkeydown="if(event.key==='Enter')sendMessage()">
-   <button onclick="sendMessage()">Send</button>
+   <button id="sendBtn" onclick="sendMessage()">Send</button>
   </div>
  </main>
 </div>
 
 <script>
-const SUPABASE_URL = "https://probxnzduietjivnqrac.supabase.co";
-const SUPABASE_KEY = "sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
-const db = supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const SUPABASE_URL =
+"https://probxnzduietjivnqrac.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
+
+const db = supabase.createClient(
+ SUPABASE_URL,
+ SUPABASE_KEY
+);
 
 let currentUser=null;
 let selectedUser=null;
@@ -134,35 +142,73 @@ function showStatus(message){
  document.getElementById("status").textContent=message;
 }
 
+
+// LOGIN
+
 async function login(){
+
  const email=document.getElementById("email").value.trim();
  const password=document.getElementById("password").value;
+
  showStatus("Logging in...");
- const {data,error}=await db.auth.signInWithPassword({email,password});
- if(error){showStatus(error.message);return;}
+
+ const {data,error}=await db.auth.signInWithPassword({
+  email,password
+ });
+
+ if(error){
+  showStatus(error.message);
+  return;
+ }
+
  await startApp(data.user);
 }
 
+
+// SIGNUP
+
 async function signup(){
+
  const email=document.getElementById("email").value.trim();
  const password=document.getElementById("password").value;
+
  showStatus("Creating account...");
- const {data,error}=await db.auth.signUp({email,password});
- if(error){showStatus(error.message);return;}
- if(data.session) await startApp(data.user);
- else showStatus("Account created. Confirm your email, then login.");
+
+ const {data,error}=await db.auth.signUp({
+  email,password
+ });
+
+ if(error){
+  showStatus(error.message);
+  return;
+ }
+
+ if(data.session){
+  await startApp(data.user);
+ }else{
+  showStatus("Account created. Confirm your email, then login.");
+ }
 }
 
+
+// START APP
+
 async function startApp(user){
+
  currentUser=user;
- const username="user_"+user.id.replaceAll("-","").substring(0,8);
+
+ const username="user_"+
+ user.id.replaceAll("-","").substring(0,8);
 
  const {error}=await db.from("profiles").upsert(
   {id:user.id,username:username},
   {onConflict:"id",ignoreDuplicates:true}
  );
 
- if(error){showStatus("Profile error: "+error.message);return;}
+ if(error){
+  showStatus("Profile error: "+error.message);
+  return;
+ }
 
  document.getElementById("auth").style.display="none";
  document.getElementById("app").style.display="grid";
@@ -171,21 +217,39 @@ async function startApp(user){
 
  await loadUsers();
 
- if(liveChannel) await db.removeChannel(liveChannel);
+ if(liveChannel){
+  await db.removeChannel(liveChannel);
+ }
+
  liveChannel=db.channel("lym-live-chat")
  .on("postgres_changes",
- {event:"INSERT",schema:"public",table:"messages"},
+ {
+  event:"INSERT",
+  schema:"public",
+  table:"messages"
+ },
  payload=>{
+
   const m=payload.new;
+
   if(selectedUser &&
-    ((m.sender_id===currentUser.id && m.receiver_id===selectedUser.id) ||
-     (m.sender_id===selectedUser.id && m.receiver_id===currentUser.id))){
+    (
+     (m.sender_id===currentUser.id &&
+      m.receiver_id===selectedUser.id) ||
+     (m.sender_id===selectedUser.id &&
+      m.receiver_id===currentUser.id)
+    )){
        loadMessages();
   }
+
  }).subscribe();
 }
 
+
+// LOAD USERS
+
 async function loadUsers(){
+
  const box=document.getElementById("users");
  box.textContent="Loading...";
 
@@ -222,6 +286,7 @@ async function loadUsers(){
  }
 
  data.forEach(u=>{
+
   const b=document.createElement("button");
   b.className="user";
 
@@ -249,20 +314,33 @@ async function loadUsers(){
 
   b.append(avatar,name,role);
   b.onclick=()=>openChat(u);
+
   box.appendChild(b);
  });
 }
 
+
+// OPEN CHAT
+
 async function openChat(user){
+
  selectedUser=user;
+
  document.getElementById("chatTitle").textContent=user.username;
+
  await loadUsers();
  await loadMessages();
 }
 
+
+// LOAD MESSAGES
+
 async function loadMessages(){
+
  if(!selectedUser)return;
+
  const box=document.getElementById("messages");
+
  const {data,error}=await db.from("messages")
  .select("id,sender_id,receiver_id,message,created_at")
  .or(
@@ -271,59 +349,44 @@ async function loadMessages(){
  .order("created_at",{ascending:true});
 
  box.innerHTML="";
- if(error){box.textContent=error.message;return;}
+
+ if(error){
+  box.textContent=error.message;
+  return;
+ }
 
  data.forEach(m=>{
+
   const div=document.createElement("div");
-  div.className="msg "+(m.sender_id===currentUser.id?"mine":"");
+
+  div.className="msg "+
+   (m.sender_id===currentUser.id?"mine":"");
+
   const content=document.createElement("div");
   content.textContent=m.message;
+
   const time=document.createElement("div");
   time.className="time";
+
   time.textContent=new Date(m.created_at).toLocaleTimeString([],{
-   hour:"2-digit",minute:"2-digit"
+   hour:"2-digit",
+   minute:"2-digit"
   });
+
   div.append(content,time);
   box.appendChild(div);
  });
+
  box.scrollTop=box.scrollHeight;
 }
 
+
+// SEND MESSAGE - SECURE RPC
+
 async function sendMessage(){
+
  if(!selectedUser){
   alert("Please select a user first.");
-  return;
- }
-
- const {data:mute,error:muteError}=await db
-  .from("member_mutes")
-  .select("reason, muted_until")
-  .eq("user_id",currentUser.id)
-  .is("unmuted_at",null)
-  .gt("muted_until",new Date().toISOString())
-  .order("created_at",{ascending:false})
-  .limit(1)
-  .maybeSingle();
-
- if(muteError){
-  alert("Mute status check failed: "+muteError.message);
-  return;
- }
-
- if(mute){
-  const remaining=Math.max(
-   0,
-   Math.ceil((new Date(mute.muted_until)-Date.now())/60000)
-  );
-
-  const hours=Math.floor(remaining/60);
-  const minutes=remaining%60;
-
-  alert(
-   "You are muted!\n"+
-   "Reason: "+mute.reason+"\n"+
-   "Time remaining: "+hours+"h "+minutes+"m"
-  );
   return;
  }
 
@@ -332,31 +395,63 @@ async function sendMessage(){
 
  if(!message)return;
 
- const {error}=await db.from("messages").insert({
-  sender_id:currentUser.id,
-  receiver_id:selectedUser.id,
-  message:message
- });
+ const sendButton=document.getElementById("sendBtn");
+ sendButton.disabled=true;
 
- if(error){
-  alert(error.message);
-  return;
+ try{
+
+  const {error}=await db.rpc("send_chat_message",{
+   p_receiver_id:selectedUser.id,
+   p_message:message
+  });
+
+  if(error){
+   alert(error.message);
+   return;
+  }
+
+  input.value="";
+  await loadMessages();
+
+ }catch(error){
+
+  alert("Message error: "+error.message);
+
+ }finally{
+
+  sendButton.disabled=false;
  }
-
- input.value="";
- await loadMessages();
 }
 
+
+// LOGOUT
+
 async function logout(){
- if(liveChannel)await db.removeChannel(liveChannel);
+
+ if(liveChannel){
+  await db.removeChannel(liveChannel);
+ }
+
  await db.auth.signOut();
  location.reload();
 }
 
+
+// SESSION CHECK
+
 db.auth.getSession().then(({data,error})=>{
- if(error){showStatus(error.message);return;}
- if(data.session)startApp(data.session.user);
+
+ if(error){
+  showStatus(error.message);
+  return;
+ }
+
+ if(data.session){
+  startApp(data.session.user);
+ }
+
 });
+
 </script>
 </body>
 </html>
