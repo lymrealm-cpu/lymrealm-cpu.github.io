@@ -137,7 +137,73 @@ async function sendPasswordReset(){const email=document.getElementById("email").
 async function saveNewPassword(){const password=document.getElementById("newPassword").value,confirmPassword=document.getElementById("confirmNewPassword").value;if(password.length<6){showStatus("Password must be at least 6 characters.");return}if(password!==confirmPassword){showStatus("Passwords do not match.");return}showStatus("Updating password...");const {error}=await db.auth.updateUser({password});if(error){showStatus("Password update error: "+error.message);return}showStatus("Password updated. Please login with your new password.");await db.auth.signOut();isPasswordRecovery=false;document.getElementById("passwordRecoveryPanel").style.display="none";document.getElementById("loginPanel").style.display="block";document.getElementById("newPassword").value="";document.getElementById("confirmNewPassword").value="";document.getElementById("password").value=""}
 async function login(){const email=document.getElementById("email").value.trim(),password=document.getElementById("password").value;if(!email||!password){showStatus("Enter email and password.");return}showStatus("Logging in...");const {data,error}=await db.auth.signInWithPassword({email,password});if(error){showStatus(error.message);return}await startApp(data.user,true)}
 async function signup(){const email=document.getElementById("email").value.trim(),password=document.getElementById("password").value;if(!email||!password){showStatus("Enter email and password.");return}showStatus("Creating account...");const {data,error}=await db.auth.signUp({email,password});if(error){showStatus(error.message);return}if(data.session)await startApp(data.user,true);else showStatus("Account created. Confirm your email, then login.")}
-async function setupPresence(){if(!currentUser)return;if(presenceChannel){await db.removeChannel(presenceChannel);presenceChannel=null}onlineUserIds=[currentUser.id];presenceChannel=db.channel("lym-online-members",{config:{presence:{key:currentUser.id}}});presenceChannel.on("presence",{event:"sync"},()=>{const state=presenceChannel.presenceState(),ids=Object.values(state).flat().map(x=>x.user_id).filter(Boolean);onlineUserIds=[...new Set(ids)];if(currentUser&&document.getElementById("app").style.display==="grid")loadMembers()});await new Promise(resolve=>{let finished=false;const finish=()=>{if(finished)return;finished=true;resolve()};const timeout=setTimeout(finish,8000);presenceChannel.subscribe(async status=>{if(status==="SUBSCRIBED"){const {error}=await presenceChannel.track({user_id:currentUser.id});if(error)showStatus("Online status error: "+error.message);clearTimeout(timeout);finish()}if(["CHANNEL_ERROR","TIMED_OUT","CLOSED"].includes(status)){showStatus("Online status connection problem. Please refresh.");clearTimeout(timeout);finish()}})})}
+async function setupPresence(){
+  if(!currentUser)return;
+  if(presenceChannel){
+    await db.removeChannel(presenceChannel);
+    presenceChannel=null;
+  }
+
+  let previousOnlineIds=new Set();
+  let presenceInitialized=false;
+
+  onlineUserIds=[currentUser.id];
+
+  presenceChannel=db.channel("lym-online-members",{
+    config:{presence:{key:currentUser.id}}
+  });
+
+  presenceChannel.on("presence",{event:"sync"},async()=>{
+    const state=presenceChannel.presenceState();
+    const ids=[...new Set(
+      Object.values(state).flat().map(x=>x.user_id).filter(Boolean)
+    )];
+
+    const newlyJoined=presenceInitialized
+      ?ids.filter(id=>!previousOnlineIds.has(id)&&id!==currentUser.id)
+      :[];
+
+    previousOnlineIds=new Set(ids);
+    presenceInitialized=true;
+    onlineUserIds=ids;
+
+    if(currentUser&&document.getElementById("app").style.display==="grid"){
+      await loadMembers();
+
+      newlyJoined.forEach(id=>{
+        const name=profilesMap[id]||"Member";
+        speakAnnouncement(name+" joined the room");
+      });
+    }
+  });
+
+  await new Promise(resolve=>{
+    let finished=false;
+    const finish=()=>{
+      if(finished)return;
+      finished=true;
+      resolve();
+    };
+    const timeout=setTimeout(finish,8000);
+
+    presenceChannel.subscribe(async status=>{
+      if(status==="SUBSCRIBED"){
+        const {error}=await presenceChannel.track({
+          user_id:currentUser.id
+        });
+        if(error)showStatus("Online status error: "+error.message);
+        clearTimeout(timeout);
+        finish();
+      }
+
+      if(["CHANNEL_ERROR","TIMED_OUT","CLOSED"].includes(status)){
+        showStatus("Online status connection problem. Please refresh.");
+        clearTimeout(timeout);
+        finish();
+      }
+    });
+  });
+}
 async function checkBanStatus(){const {data,error}=await db.rpc("is_my_account_banned");if(error){await showAuthMessage("Account verification failed. Please try again. "+error.message);return false}if(data===true){await showAuthMessage("Your account is banned by Admin. Contact Super Admin.");return false}return true}
 async function handleKicked(){if(kickBeingHandled)return;kickBeingHandled=true;await showAuthMessage("You were kicked by Super Admin. You may log in again.");kickBeingHandled=false}
 async function checkKickStatus(){if(!currentUser||!chatStartedAt||kickBeingHandled)return;const userId=currentUser.id,originalTime=timeValue(chatStartedAt);const {data,error}=await db.rpc("get_my_chat_started_at");if(error||!currentUser||currentUser.id!==userId)return;const serverTime=timeValue(data);if(serverTime===null||originalTime===null)return;if(serverTime!==originalTime)await handleKicked()}
