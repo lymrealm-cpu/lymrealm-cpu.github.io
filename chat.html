@@ -73,7 +73,53 @@ let voiceStateChannel=null,voiceSignalChannel=null,voiceRequestChannel=null;
 let currentSpeakerId=null,voiceRequests=[],voicePeers=new Map(),liveMicStream=null;
 let voiceRoomStarted=false,voiceStarting=false;
 const rtcConfig={iceServers:[{urls:"stun:stun.l.google.com:19302"}]};
-function enterChat(){document.getElementById("welcomeScreen").style.display="none"}
+let soundUnlocked=false;
+let pendingAnnouncements=[];
+let notificationAudioContext=null;
+
+function unlockChatSounds(){
+  soundUnlocked=true;
+  try{
+    notificationAudioContext=new (window.AudioContext||window.webkitAudioContext)();
+    notificationAudioContext.resume();
+  }catch(e){}
+  if("speechSynthesis" in window){
+    speechSynthesis.getVoices();
+  }
+  pendingAnnouncements.splice(0).forEach(speakAnnouncement);
+}
+
+function speakAnnouncement(message){
+  if(!("speechSynthesis" in window))return;
+  if(!soundUnlocked){
+    pendingAnnouncements.push(message);
+    return;
+  }
+  const voice=new SpeechSynthesisUtterance(message);
+  voice.lang="en-US";
+  voice.rate=1;
+  speechSynthesis.speak(voice);
+}
+
+function playMessageTone(){
+  if(!soundUnlocked||!notificationAudioContext)return;
+  const ctx=notificationAudioContext;
+  const oscillator=ctx.createOscillator();
+  const gain=ctx.createGain();
+  const now=ctx.currentTime;
+  oscillator.frequency.value=660;
+  gain.gain.setValueAtTime(0.08,now);
+  gain.gain.exponentialRampToValueAtTime(0.001,now+0.2);
+  oscillator.connect(gain);
+  gain.connect(ctx.destination);
+  oscillator.start(now);
+  oscillator.stop(now+0.2);
+}
+
+function enterChat(){
+  document.getElementById("welcomeScreen").style.display="none";
+  unlockChatSounds();
+}
 function showStatus(message){document.getElementById("status").textContent=message}
 function sessionStorageKey(userId){return "lym_chat_started_at_"+userId}
 function timeValue(value){if(!value)return null;const result=new Date(value).getTime();return Number.isFinite(result)?result:null}
