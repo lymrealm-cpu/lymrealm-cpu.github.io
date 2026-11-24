@@ -131,8 +131,10 @@ async function startMyCamera(){
     preview.srcObject=myCameraStream;
     preview.style.display="block";
 
-    
-
+  }catch(error){
+    alert("Camera error: "+error.message);
+  }
+}
 async function stopMyCamera(){
   if(myCameraStream){
     myCameraStream.getTracks().forEach(track=>track.stop());
