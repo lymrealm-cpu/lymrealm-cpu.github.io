@@ -309,9 +309,10 @@ function selectVideoRoom(room){
 
   document.getElementById("videoRoomStatus").textContent=
     "Selected Video Room: "+room;
+  loadVideoCameras();
+loadIncomingVideoRequests();
 
- loadVideoCameras();
- loadIncomingVideoRequests();
+ 
   document.getElementById("videoRoomStatus").textContent=
   "Selected Video Room: "+room;
 
