@@ -255,6 +255,40 @@ let videoStarting=false;
 let myCameraStream=null;
 
 async function startMyCamera(){
+// Drag camera preview with finger or mouse
+(function(){
+  const video=document.getElementById("myCameraPreview");
+  if(!video)return;
+
+  let dragging=false,startX=0,startY=0,left=0,top=0;
+
+  video.addEventListener("pointerdown",e=>{
+    const rect=video.getBoundingClientRect();
+    if(e.clientY>rect.top+35)return;
+
+    dragging=true;
+    startX=e.clientX;
+    startY=e.clientY;
+    left=rect.left;
+    top=rect.top;
+    video.setPointerCapture(e.pointerId);
+  });
+
+  video.addEventListener("pointermove",e=>{
+    if(!dragging)return;
+
+    const x=Math.max(0,Math.min(innerWidth-video.offsetWidth,left+e.clientX-startX));
+    const y=Math.max(0,Math.min(innerHeight-video.offsetHeight,top+e.clientY-startY));
+
+    video.style.left=x+"px";
+    video.style.top=y+"px";
+    video.style.right="auto";
+    video.style.bottom="auto";
+  });
+
+  video.addEventListener("pointerup",()=>dragging=false);
+  video.addEventListener("pointercancel",()=>dragging=false);
+})();
   if(!currentUser){alert("Please login first.");return}
   if(!navigator.mediaDevices?.getUserMedia){alert("Camera requires HTTPS and Chrome.");return}
   try{
