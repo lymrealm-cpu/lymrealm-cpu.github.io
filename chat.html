@@ -335,7 +335,21 @@ async function rejectVideoRequest(requestId){
   loadIncomingVideoRequests();
 }
 
+// Revoke camera permission
 async function revokeVideoPermission(requestId){
+  const {error}=await db.rpc(
+    "revoke_video_view_request",
+    {p_request_id:requestId}
+  );
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  alert("Camera permission revoked.");
+}
+
 // VIDEO WEBRTC: send secure signaling
 async function sendVideoSignal(to,signal,ownerId){
   if(!currentUser || !to || !ownerId)return;
@@ -352,17 +366,54 @@ async function sendVideoSignal(to,signal,ownerId){
     console.warn("Video signal:",error.message);
   }
 }
-  const {error}=await db.rpc(
-    "revoke_video_view_request",
-    {p_request_id:requestId}
-  );
 
-  if(error){
-    alert(error.message);
-    return;
-  }
+// VIDEO WEBRTC: create peer connection
+function getVideoPeer(peerId,ownerId){
+  let pc=videoPeers.get(peerId);
+  if(pc)return pc;
 
-  alert("Camera permission revoked.");
+  pc=new RTCPeerConnection(rtcConfig);
+  videoPeers.set(peerId,pc);
+
+  pc.onicecandidate=async e=>{
+    if(e.candidate){
+      await sendVideoSignal(
+        peerId,
+        {type:"ice",candidate:e.candidate},
+        ownerId
+      );
+    }
+  };
+
+  pc.ontrack=e=>{
+    let video=document.getElementById("remote-video-"+peerId);
+
+    if(!video){
+      video=document.createElement("video");
+      video.id="remote-video-"+peerId;
+      video.autoplay=true;
+      video.playsInline=true;
+      video.controls=true;
+      video.style.cssText="width:100%;max-width:320px;border-radius:12px;margin:8px;";
+
+      document.getElementById("videoRemoteStreams").appendChild(video);
+    }
+
+    video.srcObject=e.streams[0];
+    video.play().catch(()=>{});
+  };
+
+  pc.onconnectionstatechange=()=>{
+    if(["failed","closed","disconnected"].includes(pc.connectionState)){
+      pc.close();
+      videoPeers.delete(peerId);
+
+      const video=document.getElementById("remote-video-"+peerId);
+      if(video)video.remove();
+    }
+  };
+
+  return pc;
 }
 
 function selectVideoRoom(room){
