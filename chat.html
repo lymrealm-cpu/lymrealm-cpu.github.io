@@ -173,6 +173,78 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 const SUPABASE_URL="https://probxnzduietjivnqrac.supabase.co";
 const SUPABASE_KEY="sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+// Arrange LYM REALM professional chat layout
+(function arrangeChatLayout(){
+  const app=document.getElementById("app");
+  const oldSide=app.querySelector(":scope > .sidebar");
+  const chat=app.querySelector(":scope > .chat");
+  if(!app||!oldSide||!chat)return;
+
+  const left=document.createElement("aside");
+  left.className="sidebar rooms-sidebar";
+
+  const right=document.createElement("aside");
+  right.className="sidebar users-sidebar";
+
+  const mic=chat.querySelector(".voice-room");
+  const video=chat.querySelector(".video-room");
+  const videoRooms=video.querySelector("#videoRooms");
+  const controls=video.querySelector(".video-controls");
+  const preview=video.querySelector("#myCameraPreview");
+
+  const profile=oldSide.querySelector(".profile");
+  const title=oldSide.querySelector(".section-title");
+  const users=oldSide.querySelector("#users");
+
+  const cameraMembers=chat.querySelector("#videoCameraMembers");
+  const incoming=chat.querySelector("#videoIncomingRequests");
+
+  const micPanel=document.createElement("section");
+  micPanel.className="side-panel";
+  micPanel.innerHTML='<div class="side-heading">🎙 MIC SETTINGS</div>';
+  micPanel.appendChild(mic);
+
+  const roomsPanel=document.createElement("section");
+  roomsPanel.className="side-panel";
+  roomsPanel.innerHTML='<div class="side-heading">🏠 ROOMS</div>';
+
+  [
+    ["Home","🏠 Home"],
+    ["Islamic","☪ Islamic"],
+    ["Help","❓ Help"],
+    ["Music","🎵 Music"],
+    ["One by One","👤 One by One"]
+  ].forEach(([room,label],index)=>{
+    const button=document.createElement("button");
+    button.className="room-link"+(index===0?" active":"");
+    button.textContent=label;
+    button.dataset.room=room;
+    button.onclick=()=>{
+      selectVideoRoom(room);
+      roomsPanel.querySelectorAll(".room-link").forEach(b=>{
+        b.classList.toggle("active",b.dataset.room===room);
+      });
+    };
+    roomsPanel.appendChild(button);
+  });
+
+  left.append(micPanel,roomsPanel);
+
+  videoRooms.remove();
+
+  const cameraPanel=document.createElement("section");
+  cameraPanel.className="side-panel camera-panel";
+  cameraPanel.innerHTML='<div class="side-heading">📷 CAMERA SETTINGS</div>';
+
+  cameraPanel.append(controls,preview);
+  if(cameraMembers)cameraPanel.appendChild(cameraMembers);
+  if(incoming)cameraPanel.appendChild(incoming);
+
+  right.append(cameraPanel,profile,title,users);
+
+  oldSide.remove();
+  app.replaceChildren(left,chat,right);
+})();
 let isPasswordRecovery=false;
 let selectedVideoRoom="Home";
 let videoPeers=new Map();
