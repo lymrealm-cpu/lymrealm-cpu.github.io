@@ -336,6 +336,22 @@ async function rejectVideoRequest(requestId){
 }
 
 async function revokeVideoPermission(requestId){
+// VIDEO WEBRTC: send secure signaling
+async function sendVideoSignal(to,signal,ownerId){
+  if(!currentUser || !to || !ownerId)return;
+
+  const {error}=await db.from("video_signals").insert({
+    sender_id:currentUser.id,
+    receiver_id:to,
+    camera_owner_id:ownerId,
+    room_name:selectedVideoRoom,
+    signal:signal
+  });
+
+  if(error){
+    console.warn("Video signal:",error.message);
+  }
+}
   const {error}=await db.rpc(
     "revoke_video_view_request",
     {p_request_id:requestId}
