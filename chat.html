@@ -209,6 +209,43 @@ async function loadVideoCameras(){
 }
 
 async function requestVideoAccess(ownerId){
+  if(!currentUser || !ownerId)return;
+
+  const {data:existing,error:checkError}=await db
+    .from("video_view_requests")
+    .select("id,status")
+    .eq("requester_id",currentUser.id)
+    .eq("camera_owner_id",ownerId)
+    .eq("room_name",selectedVideoRoom)
+    .in("status",["pending","approved"])
+    .limit(1);
+
+  if(checkError){
+    alert("Request check error: "+checkError.message);
+    return;
+  }
+
+  if(existing?.length){
+    alert(existing[0].status==="approved"
+      ?"Permission already approved!"
+      :"Your request is already pending.");
+    return;
+  }
+
+  const {error}=await db.from("video_view_requests").insert({
+    requester_id:currentUser.id,
+    camera_owner_id:ownerId,
+    room_name:selectedVideoRoom
+  });
+
+  if(error){
+    alert("Request error: "+error.message);
+    return;
+  }
+
+  alert("Camera permission request sent!");
+  loadIncomingVideoRequests();
+}
   const {error}=await db.from("video_view_requests").insert({
     requester_id:currentUser.id,
     camera_owner_id:ownerId,
