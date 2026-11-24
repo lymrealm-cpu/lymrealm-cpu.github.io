@@ -255,6 +255,13 @@ async function loadIncomingVideoRequests(){
     box.appendChild(item);
   });
 }
+  
+ setInterval(()=>{
+  if(currentUser){
+    loadVideoCameras();
+    loadIncomingVideoRequests();
+  }
+},5000); 
 
 async function approveVideoRequest(requestId){
   const {error}=await db.rpc(
