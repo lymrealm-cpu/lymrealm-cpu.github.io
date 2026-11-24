@@ -168,6 +168,138 @@ async function stopMyCamera(){
   const status=document.getElementById("videoRoomStatus");
   if(status)status.textContent="Camera OFF";
 }
+
+async function loadVideoCameras(){
+  if(!currentUser)return;
+
+  const box=document.getElementById("videoCameraMembers");
+  if(!box)return;
+
+  const {data,error}=await db
+    .from("video_room_cameras")
+    .select("user_id,room_name,camera_on")
+    .eq("room_name",selectedVideoRoom)
+    .eq("camera_on",true);
+
+  if(error){
+    console.warn(error.message);
+    return;
+  }
+
+  box.innerHTML="<h4>📹 Cameras in "+selectedVideoRoom+"</h4>";
+
+  (data||[]).forEach(camera=>{
+    if(camera.user_id===currentUser.id)return;
+
+    const item=document.createElement("div");
+    item.textContent="Member: "+camera.user_id.slice(0,8);
+
+    const btn=document.createElement("button");
+    btn.textContent="Request to View";
+    btn.onclick=()=>requestVideoAccess(camera.user_id);
+
+    item.appendChild(btn);
+    box.appendChild(item);
+  });
+}
+
+async function requestVideoAccess(ownerId){
+  const {error}=await db.from("video_view_requests").insert({
+    requester_id:currentUser.id,
+    camera_owner_id:ownerId,
+    room_name:selectedVideoRoom
+  });
+
+  if(error){
+    alert("Request error: "+error.message);
+    return;
+  }
+
+  alert("Camera permission request sent!");
+}
+
+async function loadIncomingVideoRequests(){
+  if(!currentUser)return;
+
+  const box=document.getElementById("videoIncomingRequests");
+  if(!box)return;
+
+  const {data,error}=await db
+    .from("video_view_requests")
+    .select("id,requester_id,room_name")
+    .eq("camera_owner_id",currentUser.id)
+    .eq("room_name",selectedVideoRoom)
+    .eq("status","pending");
+
+  if(error){
+    console.warn(error.message);
+    return;
+  }
+
+  box.innerHTML="<h4>Incoming Camera Requests</h4>";
+
+  (data||[]).forEach(req=>{
+    const item=document.createElement("div");
+    item.textContent="Member: "+req.requester_id.slice(0,8);
+
+    const approve=document.createElement("button");
+    approve.textContent="Approve";
+    approve.onclick=()=>approveVideoRequest(req.id);
+
+    const reject=document.createElement("button");
+    reject.textContent="Reject";
+    reject.onclick=()=>rejectVideoRequest(req.id);
+
+    item.appendChild(approve);
+    item.appendChild(reject);
+    box.appendChild(item);
+  });
+}
+
+async function approveVideoRequest(requestId){
+  const {error}=await db.rpc(
+    "approve_video_view_request",
+    {p_request_id:requestId}
+  );
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  alert("Permission approved!");
+  loadIncomingVideoRequests();
+}
+
+async function rejectVideoRequest(requestId){
+  const {error}=await db.rpc(
+    "revoke_video_view_request",
+    {p_request_id:requestId}
+  );
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  alert("Request rejected.");
+  loadIncomingVideoRequests();
+}
+
+async function revokeVideoPermission(requestId){
+  const {error}=await db.rpc(
+    "revoke_video_view_request",
+    {p_request_id:requestId}
+  );
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  alert("Camera permission revoked.");
+}
+
 function selectVideoRoom(room){
   const rooms=["Home","Islamic","Help","Music","One by One"];
 
