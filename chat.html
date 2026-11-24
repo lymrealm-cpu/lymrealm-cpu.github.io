@@ -131,23 +131,7 @@ async function startMyCamera(){
     preview.srcObject=myCameraStream;
     preview.style.display="block";
 
-    const {error}=await db.from("video_room_cameras").upsert({
-      user_id:currentUser.id,
-      room_name:selectedVideoRoom,
-      camera_on:true,
-      updated_at:new Date().toISOString()
-    });
-
-    if(error)throw error;
-
-    document.getElementById("videoRoomStatus").textContent=
-      "Camera ON — "+selectedVideoRoom;
-
-  }catch(e){
-    stopMyCamera();
-    alert("Camera error: "+e.message);
-  }
-}
+    
 
 async function stopMyCamera(){
   if(myCameraStream){
@@ -417,7 +401,6 @@ function getVideoPeer(peerId,ownerId){
 }
 
 function selectVideoRoom(room){
-  function selectVideoRoom(room){
   const rooms=["Home","Islamic","Help","Music","One by One"];
 
   if(!rooms.includes(room))return;
