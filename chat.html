@@ -350,11 +350,19 @@ async function loadMembers(){
 
   info.append(name,roleText);
   b.append(avatar,info);
-
   if(myRole==="super_admin"&&p.id!==currentUser.id){
-   b.style.cursor="pointer";
-   b.addEventListener("click",()=>manageMember(p));
-  }
+ const manageBtn=document.createElement("button");
+ manageBtn.textContent="⚙️ Manage";
+ manageBtn.style.cssText="background:#00b978;color:#000;border:0;border-radius:6px;padding:6px;font-size:11px;margin-top:6px;cursor:pointer;";
+ manageBtn.onclick=(e)=>{
+  e.stopPropagation();
+  manageMember(p);
+ };
+ info.appendChild(manageBtn);
+} 
+   
+
+
 
   box.appendChild(b);
  });
