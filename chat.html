@@ -309,8 +309,16 @@ function selectVideoRoom(room){
 
   document.getElementById("videoRoomStatus").textContent=
     "Selected Video Room: "+room;
+
+ loadVideoCameras();
+ loadIncomingVideoRequests();
+  document.getElementById("videoRoomStatus").textContent=
+  "Selected Video Room: "+room;
+
+loadVideoCameras();
+loadIncomingVideoRequests();
 }
-db.auth.onAuthStateChange((event)=>{
+  db.auth.onAuthStateChange((event)=>{
   if(event==="PASSWORD_RECOVERY"){
     isPasswordRecovery=true;
     document.getElementById("app").style.display="none";
