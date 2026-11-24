@@ -43,6 +43,100 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 #videoRooms{display:flex;gap:7px;flex-wrap:wrap}
 #videoRooms button{padding:8px 12px;font-size:12px}
 #videoRoomStatus{color:#aaffd2;font-size:12px;margin:10px 0 0}
+/* LYM REALM PROFESSIONAL 3-COLUMN DESIGN */
+#app{
+  grid-template-columns:220px minmax(0,1fr) 245px;
+  gap:0;
+  min-height:0;
+}
+#app>.sidebar{
+  min-width:0;
+  overflow:auto;
+  background:#061f18;
+  padding:10px;
+  border-color:#087b55;
+}
+.rooms-sidebar{border-right:1px solid #087b55}
+.users-sidebar{border-left:1px solid #087b55}
+.side-panel{
+  background:#0b3024;
+  border:1px solid #087b55;
+  border-radius:12px;
+  padding:10px;
+  margin-bottom:12px;
+  box-shadow:0 0 10px #003d2b;
+}
+.side-heading{
+  color:#f5d477;
+  font-weight:bold;
+  font-size:15px;
+  margin-bottom:10px;
+}
+.room-link{
+  display:block;
+  width:100%;
+  text-align:left;
+  margin:6px 0;
+  background:#123c2d;
+  border:1px solid #28654c;
+  border-radius:9px;
+}
+.room-link.active{
+  background:#00a96b;
+  border-color:#f5d477;
+  color:white;
+}
+.chat{min-width:0;min-height:0}
+.chathead{border-bottom:1px solid #00a96b}
+#messages{min-height:0}
+.users-sidebar .profile{border:1px solid #28654c}
+.camera-panel button{width:100%;margin:4px 0}
+.camera-panel video{max-width:100%!important}
+#videoCameraMembers,#videoIncomingRequests{
+  overflow-wrap:anywhere;
+  font-size:12px;
+}
+@media(max-width:650px){
+  #app{
+    grid-template-columns:76px minmax(0,1fr) 94px;
+  }
+  #app>.sidebar{padding:5px}
+  .side-panel{padding:5px;margin-bottom:7px}
+  .side-heading{font-size:10px;text-align:center}
+  .room-link{
+    font-size:9px;
+    padding:8px 2px;
+    text-align:center;
+    overflow-wrap:anywhere;
+  }
+  .rooms-sidebar .voice-room{padding:4px}
+  .rooms-sidebar .voice-title{font-size:9px}
+  .rooms-sidebar .voice-state{font-size:9px;min-width:0}
+  .rooms-sidebar .voice-actions{display:flex;flex-direction:column}
+  .rooms-sidebar .voice-actions button{
+    font-size:8px;
+    padding:7px 2px;
+  }
+  .users-sidebar .profile{padding:5px}
+  .users-sidebar .myrow{display:block;text-align:center}
+  .users-sidebar .profile .avatar{
+    width:28px;height:28px;margin:auto;font-size:14px;
+  }
+  .users-sidebar .muted{font-size:8px}
+  .users-sidebar #myname{font-size:9px}
+  .users-sidebar .editbox input{font-size:8px;padding:5px}
+  .users-sidebar .editbox button{font-size:8px;padding:6px 2px}
+  .users-sidebar .section-title{font-size:9px}
+  .users-sidebar #onlineCount{font-size:8px;margin:0}
+  .users-sidebar .member{display:block;text-align:center;padding:4px 1px}
+  .users-sidebar .member .avatar{
+    width:24px;height:24px;margin:auto;font-size:12px;
+  }
+  .users-sidebar .member-name{font-size:8px}
+  .users-sidebar .member-role{font-size:7px}
+  .camera-panel button{font-size:8px;padding:7px 2px}
+  .camera-panel video{width:100%!important}
+}
 </style>
 </head>
 <body>
