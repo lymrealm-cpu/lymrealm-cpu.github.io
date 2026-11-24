@@ -226,7 +226,139 @@ await setupPresence();if(!currentUser)return;await loadMembers();await loadMessa
   }
 }).subscribe();startKickChecker();await setupLiveVoice();
 }finally{appStarting=false}}
-async function loadMembers(){if(!currentUser)return;const box=document.getElementById("users");box.textContent="Loading online members...";const {data:profiles,error}=await db.from("profiles").select("id,username");if(error){box.textContent="Profile error: "+error.message;return}const {data:roles,error:roleError}=await db.from("user_roles").select("user_id,role");if(roleError){box.textContent="Role error: "+roleError.message;return}profilesMap={};rolesMap={};(profiles||[]).forEach(p=>profilesMap[p.id]=p.username);(roles||[]).forEach(r=>rolesMap[r.user_id]=r.role);const priority={super_admin:1,moderator:2,vip:3,member:4};const onlineProfiles=(profiles||[]).filter(p=>onlineUserIds.includes(p.id));onlineProfiles.sort((a,b)=>(priority[rolesMap[a.id]||"member"]||4)-(priority[rolesMap[b.id]||"member"]||4)||(a.username||"").localeCompare(b.username||""));const myUsername=profilesMap[currentUser.id]||"Member",myRole=rolesMap[currentUser.id]||"member";document.getElementById("myname").textContent=myUsername;document.getElementById("myrole").textContent=myRole==="super_admin"?"👑 SUPER ADMIN":myRole==="moderator"?"🛡️ MODERATOR":myRole==="vip"?"⭐ VIP MEMBER":"MEMBER";box.innerHTML="";document.getElementById("onlineCount").textContent=onlineProfiles.length+" Online";if(!onlineProfiles.length){box.textContent="No online members.";return}onlineProfiles.forEach(p=>{const role=rolesMap[p.id]||"member",b=document.createElement("div");b.className="member"+(p.id===currentUser.id?" me":"");const avatar=document.createElement("div");avatar.className="avatar";avatar.textContent=role==="super_admin"?"👑":role==="moderator"?"🛡️":role==="vip"?"⭐":"👤";const info=document.createElement("div");info.className="member-info";const name=document.createElement("div");name.className="member-name";name.textContent=p.username||"Member";const dot=document.createElement("span");dot.className="online-dot";name.prepend(dot);const roleText=document.createElement("div");roleText.className="member-role";roleText.textContent=role==="super_admin"?"SUPER ADMIN":role==="moderator"?"MODERATOR":role==="vip"?"VIP MEMBER":"MEMBER";info.append(name,roleText);b.append(avatar,info);box.appendChild(b)})}
+async function loadMembers(){
+ if(!currentUser)return;
+ const box=document.getElementById("users");
+ box.textContent="Loading online members...";
+
+ const {data:profiles,error}=await db.from("profiles").select("id,username");
+ if(error){box.textContent="Profile error: "+error.message;return}
+
+ const {data:roles,error:roleError}=await db.from("user_roles").select("user_id,role");
+ if(roleError){box.textContent="Role error: "+roleError.message;return}
+
+ profilesMap={};rolesMap={};
+ (profiles||[]).forEach(p=>profilesMap[p.id]=p.username);
+ (roles||[]).forEach(r=>rolesMap[r.user_id]=r.role);
+
+ const priority={super_admin:1,moderator:2,vip:3,member:4};
+ const onlineProfiles=(profiles||[]).filter(p=>onlineUserIds.includes(p.id));
+
+ onlineProfiles.sort((a,b)=>
+  (priority[rolesMap[a.id]||"member"]||4)-
+  (priority[rolesMap[b.id]||"member"]||4)||
+  (a.username||"").localeCompare(b.username||"")
+ );
+
+ const myUsername=profilesMap[currentUser.id]||"Member";
+ const myRole=rolesMap[currentUser.id]||"member";
+
+ document.getElementById("myname").textContent=myUsername;
+ document.getElementById("myrole").textContent=
+  myRole==="super_admin"?"👑 SUPER ADMIN":
+  myRole==="moderator"?"🛡️ MODERATOR":
+  myRole==="vip"?"⭐ VIP MEMBER":"MEMBER";
+
+ box.innerHTML="";
+ document.getElementById("onlineCount").textContent=onlineProfiles.length+" Online";
+
+ if(!onlineProfiles.length){box.textContent="No online members.";return}
+
+ async function manageMember(p){
+  if(myRole!=="super_admin")return;
+  if(p.id===currentUser.id)return;
+  if(rolesMap[p.id]==="super_admin"){
+   alert("Super Admin ko manage nahi kar sakte.");
+   return;
+  }
+
+  const choice=prompt(
+   "User: "+(p.username||"Member")+
+   "\n\n1 = Kick User"+
+   "\n2 = Ban User"+
+   "\n3 = Block User"+
+   "\n\nNumber likhein:"
+  );
+
+  if(!choice)return;
+
+  let result;
+
+  if(choice==="1"){
+   if(!confirm("Is user ko Kick karna hai?"))return;
+   result=await db.rpc("admin_kick_member",{p_user_id:p.id});
+  }
+  else if(choice==="2"){
+   const reason=prompt("Ban ki wajah likhein:")||"";
+   if(!confirm("Is user ko Ban karna hai?"))return;
+   result=await db.rpc("admin_ban_member",{
+    p_user_id:p.id,
+    p_reason:reason.trim()||null
+   });
+  }
+  else if(choice==="3"){
+   const reason=prompt("Block ki wajah likhein:")||"";
+   if(!confirm("Is user ko Block karna hai?"))return;
+   result=await db.rpc("admin_block_member",{
+    p_user_id:p.id,
+    p_reason:reason.trim()||null
+   });
+  }
+  else{
+   alert("Ghalat option.");
+   return;
+  }
+
+  if(result.error){
+   alert("Error: "+result.error.message);
+   return;
+  }
+
+  alert("Action successful!");
+  await loadMembers();
+ }
+
+ onlineProfiles.forEach(p=>{
+  const role=rolesMap[p.id]||"member";
+  const b=document.createElement("div");
+  b.className="member"+(p.id===currentUser.id?" me":"");
+
+  const avatar=document.createElement("div");
+  avatar.className="avatar";
+  avatar.textContent=
+   role==="super_admin"?"👑":
+   role==="moderator"?"🛡️":
+   role==="vip"?"⭐":"👤";
+
+  const info=document.createElement("div");
+  info.className="member-info";
+
+  const name=document.createElement("div");
+  name.className="member-name";
+  name.textContent=p.username||"Member";
+
+  const dot=document.createElement("span");
+  dot.className="online-dot";
+  name.prepend(dot);
+
+  const roleText=document.createElement("div");
+  roleText.className="member-role";
+  roleText.textContent=
+   role==="super_admin"?"SUPER ADMIN":
+   role==="moderator"?"MODERATOR":
+   role==="vip"?"VIP MEMBER":"MEMBER";
+
+  info.append(name,roleText);
+  b.append(avatar,info);
+
+  if(myRole==="super_admin"&&p.id!==currentUser.id){
+   b.style.cursor="pointer";
+   b.addEventListener("click",()=>manageMember(p));
+  }
+
+  box.appendChild(b);
+ });
+}
 async function changeUsername(){const input=document.getElementById("newUsername"),username=input.value.trim();if(username.length<3||username.length>20){alert("Username must be 3 to 20 characters.");return}if(!/^[A-Za-z0-9_]+$/.test(username)){alert("Use only letters, numbers and underscores.");return}const {error}=await db.rpc("update_my_username",{p_username:username});if(error){alert(error.message);return}input.value="";alert("Username updated successfully!");await loadMembers();await loadMessages()}
 async function loadMessages(){const box=document.getElementById("messages");if(!chatStartedAt||!currentUser)return;const {data,error}=await db.from("messages").select("id,sender_id,receiver_id,message,created_at,message_type,audio_path").is("receiver_id",null).gte("created_at",chatStartedAt).order("created_at",{ascending:true}).limit(300);if(error){box.innerHTML="";box.textContent="Message error: "+error.message;return}box.innerHTML="";if(!data||data.length===0){box.innerHTML='<div class="system-message">No new messages. Start your fresh conversation!</div>';return}for(const m of data){if(!currentUser)return;const div=document.createElement("div");div.className="msg "+(m.sender_id===currentUser.id?"mine":"");const sender=document.createElement("div");sender.className="sender";const senderRole=rolesMap[m.sender_id]||"member",senderName=profilesMap[m.sender_id]||"Member";sender.textContent=(senderRole==="super_admin"?"👑 ":senderRole==="moderator"?"🛡️ ":senderRole==="vip"?"⭐ ":"")+senderName;div.appendChild(sender);if(m.message_type==="voice"&&m.audio_path){const audio=document.createElement("audio");audio.controls=true;audio.preload="none";const {data:urlData,error:urlError}=await db.storage.from("voice-messages").createSignedUrl(m.audio_path,3600);if(urlError){const t=document.createElement("div");t.textContent="Voice unavailable";div.appendChild(t)}else{audio.src=urlData.signedUrl;div.appendChild(audio)}}else{const content=document.createElement("div");content.textContent=m.message;div.appendChild(content)}const time=document.createElement("div");time.className="time";time.textContent=new Date(m.created_at).toLocaleString([],{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});div.appendChild(time);box.appendChild(div)}box.scrollTop=box.scrollHeight}
 async function sendMessage(){const input=document.getElementById("message"),message=input.value.trim();if(!message||!currentUser)return;const sendButton=document.getElementById("sendBtn");sendButton.disabled=true;try{const {error}=await db.rpc("send_group_message",{p_message:message});if(error){if(error.message.toLowerCase().includes("banned"))await showAuthMessage("Your account is banned by Admin. Contact Super Admin.");else alert(error.message);return}input.value="";await loadMessages()}catch(error){alert("Message error: "+error.message)}finally{sendButton.disabled=false}}
