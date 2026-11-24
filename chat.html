@@ -90,6 +90,18 @@ const SUPABASE_URL="https://probxnzduietjivnqrac.supabase.co";
 const SUPABASE_KEY="sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let isPasswordRecovery=false;
+let selectedVideoRoom="Home";
+
+function selectVideoRoom(room){
+  const rooms=["Home","Islamic","Help","Music","One by One"];
+
+  if(!rooms.includes(room))return;
+
+  selectedVideoRoom=room;
+
+  document.getElementById("videoRoomStatus").textContent=
+    "Selected Video Room: "+room;
+}
 db.auth.onAuthStateChange((event)=>{
   if(event==="PASSWORD_RECOVERY"){
     isPasswordRecovery=true;
