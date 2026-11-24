@@ -50,6 +50,17 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 <main class="chat"><div class="chathead"><div class="avatar">🌍</div><div><strong>🌍 MAIN PUBLIC CHAT</strong><div class="muted">Everyone is connected here</div></div></div>
 <section class="voice-room"><div class="voice-top"><span class="voice-title">🎙️ LIVE VOICE ROOM</span><span id="voiceRoomState" class="voice-state">Connecting voice room...</span></div>
 <div class="voice-actions"><button id="requestMicBtn" onclick="requestMic()">🙋 Request Mic</button><button id="cancelRequestBtn" class="danger" onclick="cancelMicRequest()" style="display:none">Cancel Request</button><button id="startSpeakingBtn" class="gold" onclick="startSpeaking()" style="display:none">▶ Start Speaking</button><button id="releaseMicBtn" class="danger" onclick="releaseMic()" style="display:none">Release Mic</button><button id="giveMicBtn" onclick="giveMicPrompt()" style="display:none">Pass Mic</button></div><div id="micRequests"></div></section>
+<section class="video-room">
+  <h3>📹 LIVE VIDEO CHAT</h3>
+  <div id="videoRooms">
+    <button onclick="selectVideoRoom('Home')">Home</button>
+    <button onclick="selectVideoRoom('Islamic')">Islamic</button>
+    <button onclick="selectVideoRoom('Help')">Help</button>
+    <button onclick="selectVideoRoom('Music')">Music</button>
+    <button onclick="selectVideoRoom('One by One')">One by One</button>
+  </div>
+  <p id="videoRoomStatus">Select a video room</p>
+</section>
 <div id="messages"><div class="system-message">Welcome to LYM REALM PUBLIC CHAT</div></div><div id="voiceStatus"></div><div class="composer"><input id="message" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()"><button id="recordBtn" onclick="toggleRecording()">🎙️</button><button id="sendBtn" onclick="sendMessage()">Send</button></div></main></div>
 <script>
 const SUPABASE_URL="https://probxnzduietjivnqrac.supabase.co";
