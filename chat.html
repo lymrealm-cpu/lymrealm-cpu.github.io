@@ -417,6 +417,7 @@ function getVideoPeer(peerId,ownerId){
 }
 
 function selectVideoRoom(room){
+  function selectVideoRoom(room){
   const rooms=["Home","Islamic","Help","Music","One by One"];
 
   if(!rooms.includes(room))return;
@@ -425,15 +426,9 @@ function selectVideoRoom(room){
 
   document.getElementById("videoRoomStatus").textContent=
     "Selected Video Room: "+room;
+
   loadVideoCameras();
-loadIncomingVideoRequests();
-
- 
-  document.getElementById("videoRoomStatus").textContent=
-  "Selected Video Room: "+room;
-
-loadVideoCameras();
-loadIncomingVideoRequests();
+  loadIncomingVideoRequests();
 }
   db.auth.onAuthStateChange((event)=>{
   if(event==="PASSWORD_RECOVERY"){
