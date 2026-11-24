@@ -83,6 +83,13 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
     <button onclick="selectVideoRoom('One by One')">One by One</button>
   </div>
   <p id="videoRoomStatus">Select a video room</p>
+  <div class="video-controls">
+  <button id="cameraOnBtn" onclick="startMyCamera()">📷 Camera ON</button>
+  <button id="cameraOffBtn" onclick="stopMyCamera()" class="danger">Camera OFF</button>
+</div>
+<video id="myCameraPreview" autoplay muted playsinline
+  style="display:none;width:100%;max-width:320px;border-radius:12px;margin-top:10px;">
+</video>
 </section>
 <div id="messages"><div class="system-message">Welcome to LYM REALM PUBLIC CHAT</div></div><div id="voiceStatus"></div><div class="composer"><input id="message" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()"><button id="recordBtn" onclick="toggleRecording()">🎙️</button><button id="sendBtn" onclick="sendMessage()">Send</button></div></main></div>
 <script>
