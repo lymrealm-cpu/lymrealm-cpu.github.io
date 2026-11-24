@@ -405,6 +405,11 @@ function selectVideoRoom(room){
 
   if(!rooms.includes(room))return;
 
+  
+  const rooms=["Home","Islamic","Help","Music","One by One"];
+
+  if(!rooms.includes(room))return;
+
   selectedVideoRoom=room;
 
   document.getElementById("videoRoomStatus").textContent=
