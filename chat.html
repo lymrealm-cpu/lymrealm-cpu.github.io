@@ -103,6 +103,11 @@ const SUPABASE_KEY="sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let isPasswordRecovery=false;
 let selectedVideoRoom="Home";
+// LIVE VIDEO: separate WebRTC connections
+let videoPeers = new Map();
+let videoSignalChannel = null;
+let videoSeenSignals = new Set();
+let videoStarting = false;
 let myCameraStream=null;
 
 async function startMyCamera(){
