@@ -98,7 +98,71 @@ const SUPABASE_KEY="sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let isPasswordRecovery=false;
 let selectedVideoRoom="Home";
+let myCameraStream=null;
 
+async function startMyCamera(){
+  if(!currentUser){
+    alert("Please login first.");
+    return;
+  }
+
+  if(!navigator.mediaDevices?.getUserMedia){
+    alert("Camera requires HTTPS and Chrome.");
+    return;
+  }
+
+  try{
+    myCameraStream=await navigator.mediaDevices.getUserMedia({
+      video:true,
+      audio:false
+    });
+
+    const preview=document.getElementById("myCameraPreview");
+    preview.srcObject=myCameraStream;
+    preview.style.display="block";
+
+    const {error}=await db.from("video_room_cameras").upsert({
+      user_id:currentUser.id,
+      room_name:selectedVideoRoom,
+      camera_on:true,
+      updated_at:new Date().toISOString()
+    });
+
+    if(error)throw error;
+
+    document.getElementById("videoRoomStatus").textContent=
+      "Camera ON — "+selectedVideoRoom;
+
+  }catch(e){
+    stopMyCamera();
+    alert("Camera error: "+e.message);
+  }
+}
+
+async function stopMyCamera(){
+  if(myCameraStream){
+    myCameraStream.getTracks().forEach(track=>track.stop());
+    myCameraStream=null;
+  }
+
+  const preview=document.getElementById("myCameraPreview");
+  if(preview){
+    preview.srcObject=null;
+    preview.style.display="none";
+  }
+
+  if(currentUser){
+    const {error}=await db.from("video_room_cameras")
+      .update({camera_on:false,updated_at:new Date().toISOString()})
+      .eq("user_id",currentUser.id)
+      .eq("room_name",selectedVideoRoom);
+
+    if(error)console.warn("Camera status:",error.message);
+  }
+
+  const status=document.getElementById("videoRoomStatus");
+  if(status)status.textContent="Camera OFF";
+}
 function selectVideoRoom(room){
   const rooms=["Home","Islamic","Help","Music","One by One"];
 
