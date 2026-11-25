@@ -275,6 +275,7 @@ let myCameraStream=null;
 
   const cameraMembers=chat.querySelector("#videoCameraMembers");
   const incoming=chat.querySelector("#videoIncomingRequests");
+  const remoteStreams=chat.querySelector("#videoRemoteStreams");
 
   const micPanel=document.createElement("section");
   micPanel.className="side-panel";
@@ -316,6 +317,7 @@ let myCameraStream=null;
   cameraPanel.append(controls,preview);
   if(cameraMembers)cameraPanel.appendChild(cameraMembers);
   if(incoming)cameraPanel.appendChild(incoming);
+  if(remoteStreams)cameraPanel.appendChild(remoteStreams);
 
   right.append(cameraPanel,profile,title,users);
 
@@ -328,6 +330,62 @@ let videoPeers=new Map();
 let videoSignalChannel=null;
 let videoSeenSignals=new Set();
 let videoStarting=false;
+let videoPendingIce=new Map();
+
+function videoPeerKey(peerId,roomName=selectedVideoRoom){return roomName+"|"+peerId}
+function removeRemoteVideo(peerId){
+  const video=document.getElementById("remote-video-"+peerId);
+  if(video){video.srcObject=null;video.remove()}
+}
+function closeVideoPeer(peerId,roomName=selectedVideoRoom){
+  const key=videoPeerKey(peerId,roomName),pc=videoPeers.get(key);
+  if(pc){try{pc.close()}catch(e){}videoPeers.delete(key)}
+  videoPendingIce.delete(key);
+  removeRemoteVideo(peerId);
+}
+async function closeAllVideoPeers(notify=false){
+  const entries=[...videoPeers.entries()];
+  for(const [key,pc] of entries){
+    const split=key.indexOf("|"),roomName=key.slice(0,split),peerId=key.slice(split+1);
+    if(notify&&currentUser)await sendVideoSignal(peerId,{type:"bye"},currentUser.id,roomName);
+    try{pc.close()}catch(e){}
+    removeRemoteVideo(peerId);
+  }
+  videoPeers.clear();videoPendingIce.clear();
+}
+async function setupVideoChat(){
+  if(!currentUser)return;
+  if(videoSignalChannel){try{await db.removeChannel(videoSignalChannel)}catch(e){}videoSignalChannel=null}
+  videoSeenSignals.clear();
+  videoSignalChannel=db.channel("lym-video-signals-"+currentUser.id)
+    .on("postgres_changes",{event:"INSERT",schema:"public",table:"video_signals",filter:"receiver_id=eq."+currentUser.id},payload=>{
+      const row=payload.new;
+      if(!row||videoSeenSignals.has(row.id))return;
+      videoSeenSignals.add(row.id);
+      handleVideoSignal(row);
+    }).subscribe();
+  await loadVideoCameras();
+  await loadIncomingVideoRequests();
+}
+async function syncApprovedVideoPeers(){
+  if(!currentUser)return;
+  const {data,error}=await db.from("video_view_requests").select("requester_id,room_name")
+    .eq("camera_owner_id",currentUser.id).eq("room_name",selectedVideoRoom).eq("status","approved");
+  if(error){console.warn("Approved video requests:",error.message);return}
+  if(!myCameraStream)return;
+  for(const request of data||[]){
+    if(request.requester_id===currentUser.id)continue;
+    const key=videoPeerKey(request.requester_id,request.room_name);
+    if(videoPeers.has(key))continue;
+    try{
+      const pc=getVideoPeer(request.requester_id,currentUser.id,request.room_name);
+      myCameraStream.getTracks().forEach(track=>pc.addTrack(track,myCameraStream));
+      const offer=await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      await sendVideoSignal(request.requester_id,{type:"offer",description:pc.localDescription},currentUser.id,request.room_name);
+    }catch(error){console.warn("Video offer failed:",error.message);closeVideoPeer(request.requester_id,request.room_name)}
+  }
+}
 
 async function startMyCamera(){
 // Drag camera preview with finger or mouse
@@ -372,19 +430,36 @@ async function startMyCamera(){
     const preview=document.getElementById("myCameraPreview");
     preview.srcObject=myCameraStream;
     preview.style.display="block";
-  }catch(error){alert("Camera error: "+error.message)}
+    const {error:statusError}=await db.from("video_room_cameras").upsert({
+      user_id:currentUser.id,room_name:selectedVideoRoom,camera_on:true,updated_at:new Date().toISOString()
+    },{onConflict:"user_id,room_name"});
+    if(statusError)throw new Error("Camera status could not be published: "+statusError.message);
+    const status=document.getElementById("videoRoomStatus");
+    if(status)status.textContent="Camera ON • "+selectedVideoRoom+" • Waiting for view requests";
+    await loadVideoCameras();
+    await syncApprovedVideoPeers();
+  }catch(error){
+    if(myCameraStream){myCameraStream.getTracks().forEach(track=>track.stop());myCameraStream=null}
+    const preview=document.getElementById("myCameraPreview");
+    if(preview){preview.srcObject=null;preview.style.display="none"}
+    alert("Camera error: "+error.message);
+  }
 }
 
 async function stopMyCamera(){
+  if(currentUser&&myCameraStream)await closeAllVideoPeers(true);
   if(myCameraStream){myCameraStream.getTracks().forEach(track=>track.stop());myCameraStream=null}
   const preview=document.getElementById("myCameraPreview");
   if(preview){preview.srcObject=null;preview.style.display="none"}
   if(currentUser){
-    const {error}=await db.from("video_room_cameras").update({camera_on:false,updated_at:new Date().toISOString()}).eq("user_id",currentUser.id).eq("room_name",selectedVideoRoom);
+    const {error}=await db.from("video_room_cameras").upsert({
+      user_id:currentUser.id,room_name:selectedVideoRoom,camera_on:false,updated_at:new Date().toISOString()
+    },{onConflict:"user_id,room_name"});
     if(error)console.warn("Camera status:",error.message);
   }
   const status=document.getElementById("videoRoomStatus");
   if(status)status.textContent="Camera OFF";
+  await loadVideoCameras();
 }
 
 async function loadVideoCameras(){
@@ -397,7 +472,7 @@ async function loadVideoCameras(){
   (data||[]).forEach(camera=>{
     if(camera.user_id===currentUser.id)return;
     const item=document.createElement("div");
-    item.textContent="Member: "+camera.user_id.slice(0,8);
+    item.textContent="Member: "+(profilesMap[camera.user_id]||camera.user_id.slice(0,8));
     const btn=document.createElement("button");
     btn.textContent="Request to View";
     btn.onclick=()=>requestVideoAccess(camera.user_id);
@@ -453,7 +528,7 @@ async function loadIncomingVideoRequests(){
 }
 
 setInterval(()=>{
-  if(currentUser){loadVideoCameras();loadIncomingVideoRequests()}
+  if(currentUser){loadVideoCameras();loadIncomingVideoRequests();syncApprovedVideoPeers()}
 },5000);
 
 async function approveVideoRequest(requestId,requesterId){
@@ -470,6 +545,7 @@ async function approveVideoRequest(requestId,requesterId){
     if(error){alert("Approve error: "+error.message);await loadIncomingVideoRequests();return}
   }
   await loadIncomingVideoRequests();
+  await syncApprovedVideoPeers();
 }
 
 async function rejectVideoRequest(requestId,requesterId){
@@ -494,58 +570,84 @@ async function revokeVideoPermission(requestId){
   alert("Camera permission revoked.");
 }
 
-async function sendVideoSignal(to,signal,ownerId){
+async function sendVideoSignal(to,signal,ownerId,roomName=selectedVideoRoom){
   if(!currentUser||!to||!ownerId)return;
   const {error}=await db.from("video_signals").insert({
-    sender_id:currentUser.id,
-    receiver_id:to,
-    camera_owner_id:ownerId,
-    room_name:selectedVideoRoom,
-    signal:signal
+    sender_id:currentUser.id,receiver_id:to,camera_owner_id:ownerId,room_name:roomName,signal:signal
   });
   if(error)console.warn("Video signal:",error.message);
 }
 
-function getVideoPeer(peerId,ownerId){
-  let pc=videoPeers.get(peerId);
+function getVideoPeer(peerId,ownerId,roomName=selectedVideoRoom){
+  const key=videoPeerKey(peerId,roomName);
+  let pc=videoPeers.get(key);
   if(pc)return pc;
   pc=new RTCPeerConnection(rtcConfig);
-  videoPeers.set(peerId,pc);
+  videoPeers.set(key,pc);
   pc.onicecandidate=async e=>{
-    if(e.candidate)await sendVideoSignal(peerId,{type:"ice",candidate:e.candidate},ownerId);
+    if(e.candidate)await sendVideoSignal(peerId,{type:"ice",candidate:e.candidate},ownerId,roomName);
   };
   pc.ontrack=e=>{
     let video=document.getElementById("remote-video-"+peerId);
     if(!video){
       video=document.createElement("video");
-      video.id="remote-video-"+peerId;
-      video.autoplay=true;
-      video.playsInline=true;
-      video.controls=true;
-      video.style.cssText="width:100%;max-width:320px;border-radius:12px;margin:8px;";
-      document.getElementById("videoRemoteStreams").appendChild(video);
+      video.id="remote-video-"+peerId;video.autoplay=true;video.playsInline=true;video.controls=true;
+      video.style.cssText="width:100%;max-width:180px;border-radius:10px;margin:5px;";
+      document.getElementById("videoRemoteStreams")?.appendChild(video);
     }
-    video.srcObject=e.streams[0];
-    video.play().catch(()=>{});
+    video.srcObject=e.streams[0];video.play().catch(()=>{});
   };
   pc.onconnectionstatechange=()=>{
-    if(["failed","closed","disconnected"].includes(pc.connectionState)){
-      pc.close();
-      videoPeers.delete(peerId);
-      const video=document.getElementById("remote-video-"+peerId);
-      if(video)video.remove();
-    }
+    if(["failed","closed","disconnected"].includes(pc.connectionState))closeVideoPeer(peerId,roomName);
   };
   return pc;
 }
 
-function selectVideoRoom(room){
+async function handleVideoSignal(row){
+  if(!currentUser||!row||row.sender_id===currentUser.id||row.room_name!==selectedVideoRoom)return;
+  const sig=row.signal||{},ownerId=row.camera_owner_id,roomName=row.room_name;
+  const key=videoPeerKey(row.sender_id,roomName);
+  if(sig.type==="offer"){
+    if(ownerId!==row.sender_id||row.receiver_id!==currentUser.id)return;
+    try{
+      const pc=getVideoPeer(row.sender_id,ownerId,roomName);
+      await pc.setRemoteDescription(new RTCSessionDescription(sig.description));
+      const queued=videoPendingIce.get(key)||[];
+      for(const candidate of queued){try{await pc.addIceCandidate(new RTCIceCandidate(candidate))}catch(e){}}
+      videoPendingIce.delete(key);
+      const answer=await pc.createAnswer();await pc.setLocalDescription(answer);
+      await sendVideoSignal(row.sender_id,{type:"answer",description:pc.localDescription},ownerId,roomName);
+    }catch(error){console.warn("Video answer failed:",error.message);closeVideoPeer(row.sender_id,roomName)}
+  }else if(sig.type==="answer"){
+    const pc=videoPeers.get(key);
+    if(!pc||ownerId!==currentUser.id)return;
+    try{await pc.setRemoteDescription(new RTCSessionDescription(sig.description))}catch(error){console.warn("Video answer:",error.message)}
+  }else if(sig.type==="ice"){
+    const pc=videoPeers.get(key);
+    if(pc&&pc.remoteDescription){try{await pc.addIceCandidate(new RTCIceCandidate(sig.candidate))}catch(e){}}
+    else{const pending=videoPendingIce.get(key)||[];pending.push(sig.candidate);videoPendingIce.set(key,pending)}
+  }else if(sig.type==="bye"){
+    closeVideoPeer(row.sender_id,roomName);
+  }
+}
+
+async function selectVideoRoom(room){
   const rooms=["Home","Islamic","Help","Music","One by One"];
-  if(!rooms.includes(room))return;
+  if(!rooms.includes(room)||room===selectedVideoRoom)return;
+  const previousRoom=selectedVideoRoom,wasCameraOn=!!myCameraStream;
+  await closeAllVideoPeers(true);
+  if(currentUser){
+    await db.from("video_room_cameras").upsert({user_id:currentUser.id,room_name:previousRoom,camera_on:false,updated_at:new Date().toISOString()},{onConflict:"user_id,room_name"});
+  }
   selectedVideoRoom=room;
-  document.getElementById("videoRoomStatus").textContent="Selected Video Room: "+room;
-  loadVideoCameras();
-  loadIncomingVideoRequests();
+  if(wasCameraOn&&currentUser){
+    const {error}=await db.from("video_room_cameras").upsert({user_id:currentUser.id,room_name:room,camera_on:true,updated_at:new Date().toISOString()},{onConflict:"user_id,room_name"});
+    if(error)console.warn("New room camera status:",error.message);
+  }
+  document.getElementById("videoRoomStatus").textContent=(wasCameraOn?"Camera ON • ":"")+"Selected Video Room: "+room;
+  await loadVideoCameras();
+  await loadIncomingVideoRequests();
+  await syncApprovedVideoPeers();
 }
 
 db.auth.onAuthStateChange((event)=>{
@@ -601,7 +703,15 @@ function stopLiveMic(){if(liveMicStream){liveMicStream.getTracks().forEach(t=>t.
 function closeVoicePeers(){for(const pc of voicePeers.values()){try{pc.close()}catch(e){}}voicePeers.clear()}
 function stopLiveVoice(){voiceStarting=false;voiceRoomStarted=false;stopLiveMic();closeVoicePeers();const audioEls=document.querySelectorAll("[data-live-voice='1']");audioEls.forEach(a=>{a.srcObject=null;a.remove()})}
 async function removeVoiceChannels(){for(const ch of [voiceStateChannel,voiceSignalChannel,voiceRequestChannel]){if(ch){try{await db.removeChannel(ch)}catch(e){}}}voiceStateChannel=voiceSignalChannel=voiceRequestChannel=null;stopLiveVoice()}
-async function removeChatChannels(){if(presenceChannel){const c=presenceChannel;presenceChannel=null;try{await db.removeChannel(c)}catch(e){}}if(liveChannel){const c=liveChannel;liveChannel=null;try{await db.removeChannel(c)}catch(e){}}await removeVoiceChannels();onlineUserIds=[]}
+async function removeChatChannels(){
+  if(presenceChannel){const c=presenceChannel;presenceChannel=null;try{await db.removeChannel(c)}catch(e){}}
+  if(liveChannel){const c=liveChannel;liveChannel=null;try{await db.removeChannel(c)}catch(e){}}
+  if(videoSignalChannel){const c=videoSignalChannel;videoSignalChannel=null;try{await db.removeChannel(c)}catch(e){}}
+  await closeAllVideoPeers(false);
+  if(myCameraStream){myCameraStream.getTracks().forEach(t=>t.stop());myCameraStream=null}
+  const preview=document.getElementById("myCameraPreview");if(preview){preview.srcObject=null;preview.style.display="none"}
+  await removeVoiceChannels();onlineUserIds=[];
+}
 function stopRecordingWithoutSending(){
   if(mediaRecorder&&mediaRecorder.state!=="inactive"){mediaRecorder.onstop=null;try{mediaRecorder.stop()}catch(e){}}
   mediaRecorder=null;isRecording=false;audioChunks=[];stopAudioTracks();
@@ -779,6 +889,7 @@ async function startApp(user,isNewLogin=false){
       }).subscribe();
     startKickChecker();
     await setupLiveVoice();
+    await setupVideoChat();
   }finally{window.appStarting=false}
 }
 async function loadMembers(){
