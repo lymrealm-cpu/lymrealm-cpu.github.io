@@ -424,6 +424,7 @@ async function startMyCamera(){
   }
 })();
   if(!currentUser){alert("Please login first.");return}
+  if(myCameraStream){alert("Your camera is already ON.");return}
   if(!navigator.mediaDevices?.getUserMedia){alert("Camera requires HTTPS and Chrome.");return}
   try{
     myCameraStream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
