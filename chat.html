@@ -996,6 +996,34 @@ db.auth.getSession().then(async({data,error})=>{
   if(error){showStatus(error.message);return}
   if(data.session&&!isPasswordRecovery)await startApp(data.session.user,false);
 });
+async function giveMicPrompt(){
+  if(!currentUser)return;
+  let candidates;
+  if(isSuperAdmin())candidates=onlineUserIds.filter(id=>id!==currentUser.id).map(id=>({user_id:id}));
+  else candidates=voiceRequests.filter(r=>r.user_id!==currentUser.id);
+  if(!candidates.length){alert(isSuperAdmin()?"No other members are online.":"No member is waiting for the microphone.");return}
+  const choices=candidates.map((r,i)=>(i+1)+". "+(profilesMap[r.user_id]||r.user_id)).join("\n");
+  const answer=prompt("Enter the number of the member to receive the mic:\n"+choices);
+  if(answer===null)return;
+  const n=Number(answer)-1;
+  if(!Number.isInteger(n)||!candidates[n]){alert("Invalid selection.");return}
+  await adminOrSpeakerGiveMic(candidates[n].user_id);
+}
+async function adminOrSpeakerGiveMic(userId){
+  try{
+    const rpc=isSuperAdmin()?"admin_take_voice_mic":"give_voice_mic";
+    const args=isSuperAdmin()?{p_user_id:userId}:{p_next_user_id:userId};
+    const {error}=await db.rpc(rpc,args);
+    if(error)throw error;
+    await db.from("voice_mic_requests").delete().eq("user_id",userId);
+    await refreshVoiceData();
+  }catch(e){alert("Mic transfer failed: "+e.message)}
+}
+async function sendSignal(to,signal){
+  if(!currentUser||!to)return;
+  const {error}=await db.from("voice_signals").insert({room_id:"main",sender_id:currentUser.id,receiver_id:to,signal});
+  if(error)console.warn("Voice signal:",error.message);
+}
 </script>
 </body>
 </html>
