@@ -202,6 +202,45 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 
 /* LYM REALM IMAGE-MATCH LAYOUT: Rooms/Mic | Text Chat | Camera/Online Users */
 #app{
+  grid-template-rows:minmax(0,1fr) auto;
+}
+#app>.rooms-sidebar,#app>.chat,#app>.users-sidebar{
+  grid-row:1;
+  min-height:0;
+}
+#app>.text-chat-board{
+  grid-column:1 / -1;
+  grid-row:2;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding:8px 12px;
+  background:#061f18;
+  border:1px solid #d7b65c;
+  border-radius:12px;
+  box-shadow:0 0 12px #8a6a20;
+  z-index:3;
+}
+.text-chat-title{
+  color:#f5d477;
+  font-weight:bold;
+  font-size:15px;
+  padding:0 4px;
+}
+.text-chat-board .composer{
+  width:100%;
+  border:1px solid #28654c;
+  border-radius:12px;
+  background:#092b21;
+}
+.text-chat-board .composer input{
+  min-width:0;
+  flex:1 1 auto;
+  margin:0;
+}
+
+#app{
   grid-template-columns:minmax(150px,220px) minmax(0,1fr) minmax(160px,245px);
   grid-template-rows:minmax(0,1fr);
   gap:0;
@@ -214,12 +253,16 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 @media(max-width:650px){
   #app{
     grid-template-columns:minmax(76px,22vw) minmax(0,1fr) minmax(76px,24vw);
-    grid-template-rows:minmax(0,1fr);
+    grid-template-rows:minmax(0,1fr) auto;
     height:calc(100vh - 70px);
     overflow:hidden;
   }
   #app>.rooms-sidebar,#app>.users-sidebar{min-width:0;min-height:0;overflow-y:auto}
   #app>.chat{min-width:0;min-height:0;grid-column:2;grid-row:1}
+  #app>.text-chat-board{grid-column:1 / -1;grid-row:2;padding:6px;gap:4px}
+  .text-chat-title{font-size:12px}
+  .text-chat-board .composer{padding:6px;gap:5px}
+  .text-chat-board .composer input{font-size:13px}
 }
 </style>
 </head>
@@ -344,7 +387,14 @@ let myCameraStream=null;
   right.append(cameraPanel,profile,title,users);
 
   oldSide.remove();
-  app.replaceChildren(left,chat,right);
+
+  const composer=chat.querySelector(".composer");
+  const textBoard=document.createElement("section");
+  textBoard.className="text-chat-board";
+  textBoard.innerHTML='<div class="text-chat-title">💬 Text Chat Board</div>';
+  if(composer)textBoard.appendChild(composer);
+
+  app.replaceChildren(left,chat,right,textBoard);
 })();
 let isPasswordRecovery=false;
 let selectedVideoRoom="Home";
