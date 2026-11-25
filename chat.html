@@ -196,6 +196,9 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 #videoIncomingRequests button{font-size:10px;padding:6px 8px;margin:4px 3px 0 0}
  
 #voiceRoomState{display:none!important}
+.chat{height:100%;min-height:0}
+#messages{flex:1 1 0;min-height:140px;overflow-y:auto;display:block}
+.composer{flex-shrink:0}
 </style>
 </head>
 <body>
@@ -208,7 +211,7 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 <main class="chat"><div class="chathead"><div class="avatar">🌍</div><div><strong>🌍 MAIN PUBLIC CHAT</strong><div class="muted">Everyone is connected here</div></div></div>
 
 <section class="voice-room">
-  <div class="voice-top"><span class="voice-title">🎙️ LIVE VOICE ROOM</span><span id="voiceRoomState" class="voice-state">Connecting to voice room...</span></div>
+  <div class="voice-top"><span id="voiceRoomState" class="voice-state">Connecting to voice room...</span></div>
   <div class="voice-actions">
     <button id="requestMicBtn" onclick="requestMic()">Request Mic</button>
     <button id="cancelRequestBtn" onclick="cancelMicRequest()" style="display:none">Cancel Request</button>
@@ -275,7 +278,7 @@ let myCameraStream=null;
 
   const micPanel=document.createElement("section");
   micPanel.className="side-panel";
-  micPanel.innerHTML='<div class="side-heading">🎙 MIC SETTINGS</div>';
+  micPanel.innerHTML='';
   micPanel.appendChild(mic);
 
   const roomsPanel=document.createElement("section");
