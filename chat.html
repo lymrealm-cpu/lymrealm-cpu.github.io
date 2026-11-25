@@ -335,6 +335,23 @@ const SUPABASE_KEY="sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let currentUser=null;
 let chatStartedAt=null;
+let securityHeartbeatTimer=null;
+
+async function sendSecurityHeartbeat(){
+  if(!currentUser)return;
+  try{
+    await db.functions.invoke("security-monitor",{
+      body:{action:"heartbeat",path:window.location.pathname||"/chat.html"}
+    });
+  }catch(error){
+    console.warn("Security monitor heartbeat:",error?.message||error);
+  }
+}
+function startSecurityHeartbeat(){
+  if(securityHeartbeatTimer)clearInterval(securityHeartbeatTimer);
+  sendSecurityHeartbeat();
+  securityHeartbeatTimer=setInterval(sendSecurityHeartbeat,5*60*1000);
+}
 let myCameraStream=null;
 // Arrange LYM REALM professional chat layout
 (function arrangeChatLayout(){
@@ -978,6 +995,7 @@ async function startApp(user,isNewLogin=false){
     const allowed=await checkBanStatus();
     if(!allowed)return;
     currentUser=user;
+    startSecurityHeartbeat();
     if(isNewLogin){
       const {data,error}=await db.rpc("start_fresh_chat");
       if(error){await showAuthMessage("Chat start error: "+error.message);return}
@@ -1317,6 +1335,7 @@ async function handleVoiceSignal(row){
   }
 }
 async function logout(){
+  if(securityHeartbeatTimer){clearInterval(securityHeartbeatTimer);securityHeartbeatTimer=null;}
   const userId=currentUser?.id;
   if(myCameraStream)await stopMyCamera();
   stopKickChecker();await removeChatChannels();
