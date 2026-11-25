@@ -1062,11 +1062,11 @@ async function loadMembers(){
       name.style.cursor="pointer";
       name.style.textDecoration="underline";
       name.onclick=async()=>{
-        const next=prompt("Enter your new username (3-20 letters, numbers or underscores):",p.username||"");
+        const next=prompt("Enter your new username (3-10 letters, numbers or underscores):",p.username||"");
         if(next===null)return;
         const username=next.trim();
-        if(username.length<3||username.length>20||!/^[A-Za-z0-9_]+$/.test(username)){
-          alert("Username must be 3 to 20 characters and use only letters, numbers or underscores.");
+        if(username.length<3||username.length>10||!/^[A-Za-z0-9_]+$/.test(username)){
+          alert("Username must be 3 to 10 characters and use only letters, numbers or underscores.");
           return;
         }
         const {error}=await db.rpc("update_my_username",{p_username:username});
