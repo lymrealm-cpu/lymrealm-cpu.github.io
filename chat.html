@@ -829,6 +829,30 @@ function isSuperAdmin(){return rolesMap[currentUser?.id]==="super_admin"}
 function voiceStatus(text){const el=document.getElementById("voiceRoomState");if(el)el.textContent=text}
 function updateVoiceButtons(){
   if(!currentUser)return;
+
+  const mine=currentSpeakerId===currentUser.id;
+  const admin=isSuperAdmin();
+  const alreadyRequested=voiceRequests.some(r=>r.user_id===currentUser.id);
+
+  // مائیک خالی ہو تو Request Mic چھپا رہے گا
+  // کوئی دوسرا ممبر مائیک پر ہو تو Request Mic نظر آئے گا
+  document.getElementById("requestMicBtn").style.display=
+    (currentSpeakerId!==null && !mine && !alreadyRequested)
+      ? "inline-block" : "none";
+
+  document.getElementById("cancelRequestBtn").style.display=
+    alreadyRequested ? "inline-block" : "none";
+
+  document.getElementById("startSpeakingBtn").style.display=
+    mine && !voiceRoomStarted ? "inline-block" : "none";
+
+  document.getElementById("releaseMicBtn").style.display=
+    mine && voiceRoomStarted ? "inline-block" : "none";
+
+  document.getElementById("giveMicBtn").style.display=
+    mine || admin ? "inline-block" : "none";
+}
+  if(!currentUser)return;
   const mine=currentSpeakerId===currentUser.id,admin=isSuperAdmin();
   document.getElementById("requestMicBtn").style.display=(!mine&&!voiceRequests.some(r=>r.user_id===currentUser.id))?"inline-block":"none";
   document.getElementById("cancelRequestBtn").style.display=voiceRequests.some(r=>r.user_id===currentUser.id)?"inline-block":"none";
