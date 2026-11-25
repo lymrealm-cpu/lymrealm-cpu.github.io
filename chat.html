@@ -384,7 +384,7 @@ let myCameraStream=null;
   if(incoming)cameraPanel.appendChild(incoming);
   if(remoteStreams)cameraPanel.appendChild(remoteStreams);
 
-  right.append(cameraPanel,profile,title,users);
+  right.append(cameraPanel,title,users);
 
   oldSide.remove();
 
@@ -1018,8 +1018,10 @@ async function loadMembers(){
   onlineProfiles.sort((a,b)=>(priority[rolesMap[a.id]||"member"]||4)-(priority[rolesMap[b.id]||"member"]||4)||(a.username||"").localeCompare(b.username||""));
   const myUsername=profilesMap[currentUser.id]||"Member";
   const myRole=rolesMap[currentUser.id]||"member";
-  document.getElementById("myname").textContent=myUsername;
-  document.getElementById("myrole").textContent=myRole==="super_admin"?"👑 SUPER ADMIN":myRole==="moderator"?"🛡️ MODERATOR":myRole==="vip"?"⭐ VIP MEMBER":"MEMBER";
+  const myNameLabel=document.getElementById("myname");
+  const myRoleLabel=document.getElementById("myrole");
+  if(myNameLabel)myNameLabel.textContent=myUsername;
+  if(myRoleLabel)myRoleLabel.textContent=myRole==="super_admin"?"👑 SUPER ADMIN":myRole==="moderator"?"🛡️ MODERATOR":myRole==="vip"?"⭐ VIP MEMBER":"MEMBER";
   box.innerHTML="";
   document.getElementById("onlineCount").textContent=onlineProfiles.length+" Online";
   if(!onlineProfiles.length){box.textContent="No online members.";return}
@@ -1055,6 +1057,25 @@ async function loadMembers(){
     avatar.textContent=role==="super_admin"?"👑":role==="moderator"?"🛡️":role==="vip"?"⭐":"👤";
     const info=document.createElement("div");info.className="member-info";
     const name=document.createElement("div");name.className="member-name";name.textContent=p.username||"Member";
+    if(p.id===currentUser.id){
+      name.title="Click to change your username";
+      name.style.cursor="pointer";
+      name.style.textDecoration="underline";
+      name.onclick=async()=>{
+        const next=prompt("Enter your new username (3-20 letters, numbers or underscores):",p.username||"");
+        if(next===null)return;
+        const username=next.trim();
+        if(username.length<3||username.length>20||!/^[A-Za-z0-9_]+$/.test(username)){
+          alert("Username must be 3 to 20 characters and use only letters, numbers or underscores.");
+          return;
+        }
+        const {error}=await db.rpc("update_my_username",{p_username:username});
+        if(error){alert(error.message);return;}
+        await loadMembers();
+        await loadMessages();
+        alert("Username updated successfully!");
+      };
+    }
     const dot=document.createElement("span");dot.className="online-dot";name.prepend(dot);
     const roleText=document.createElement("div");roleText.className="member-role";
     roleText.textContent=role==="super_admin"?"SUPER ADMIN":role==="moderator"?"MODERATOR":role==="vip"?"VIP MEMBER":"MEMBER";
