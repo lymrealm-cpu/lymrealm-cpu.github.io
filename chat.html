@@ -196,8 +196,8 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 #voiceRoomState{display:none!important}
 .chat{display:flex;flex-direction:column;height:100%;min-height:0;min-width:0;overflow:hidden}
 .chathead{flex:0 0 auto}
-#messages{display:block;flex:1 1 auto;min-height:0;min-width:0;overflow-y:auto;overscroll-behavior:contain}
-.composer{display:flex;flex:0 0 auto;min-width:0;position:relative;z-index:2}
+.composer{display:flex;flex:0 0 auto;min-width:0;position:relative;z-index:2;order:1}
+#messages{display:block;flex:1 1 auto;min-height:120px;min-width:0;overflow-y:auto;overscroll-behavior:contain;order:2}
 .composer input{display:block;flex:1 1 auto;min-width:0;width:0}
 </style>
 </head>
@@ -209,6 +209,8 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 <div id="app"><aside class="sidebar"><div class="profile"><div class="myrow"><div class="avatar">👑</div><div><div class="muted">YOUR USERNAME</div><strong id="myname" class="green">Loading...</strong><div id="myrole" class="muted"></div></div></div><div class="editbox"><div class="muted">Change Username</div><input id="newUsername" maxlength="20" placeholder="New username"><button onclick="changeUsername()">Save Username</button></div></div>
 <div class="section-title">♛ COMMUNITY MEMBERS <span id="onlineCount">0 Online</span></div><div id="users">Loading members...</div></aside>
 <main class="chat"><div class="chathead"><div class="avatar">🌍</div><div><strong>🌍 MAIN PUBLIC CHAT</strong><div class="muted">Everyone is connected here</div></div></div>
+<div class="composer"><input id="message" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()"><button id="sendBtn" onclick="sendMessage()">Send</button></div>
+<div id="messages"><div class="system-message">Welcome to LYM REALM PUBLIC CHAT</div></div>
 
 <section class="voice-room">
   <div class="voice-top"><span id="voiceRoomState" class="voice-state">Connecting to voice room...</span></div>
@@ -240,9 +242,7 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 <div id="videoRemoteStreams"></div>
 <div id="videoCameraMembers"></div>
 <div id="videoIncomingRequests"></div>
-<div id="messages"><div class="system-message">Welcome to LYM REALM PUBLIC CHAT</div></div>
-
-<div class="composer"><input id="message" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()"><button id="sendBtn" onclick="sendMessage()">Send</button></div></main></div>
+</main></div>
 <script>
 const SUPABASE_URL="https://probxnzduietjivnqrac.supabase.co";
 const SUPABASE_KEY="sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
