@@ -101,13 +101,14 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
     width:100%;
     min-width:0;
     overflow-x:auto;
-    grid-template-columns:150px minmax(260px,1fr) 155px;
+    grid-template-columns:100px minmax(0,1fr) 110px;
+    overflow-x:hidden;
     height:calc(100vh - 70px);
   }
   #app>.sidebar{padding:8px}
   .side-panel{padding:8px;margin-bottom:9px}
   .side-heading{font-size:12px;text-align:center}
-  .room-link{font-size:11px;padding:9px 5px;text-align:left;overflow-wrap:anywhere}
+  .room-link{font-size:9px;padding:8px 2px;text-align:center;overflow-wrap:anywhere;line-height:1.2}
   .rooms-sidebar .voice-room{padding:6px}
   .rooms-sidebar .voice-title{font-size:11px}
   .rooms-sidebar .voice-state{font-size:10px;min-width:0}
@@ -127,7 +128,7 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
   .users-sidebar .member-name{font-size:9px}
   .users-sidebar .member-role{font-size:8px}
   .camera-panel button{font-size:10px;padding:8px 4px}
-  .camera-panel video{width:100%!important}
+  .camera-panel video{position:relative!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;width:100%!important;max-width:100px!important;height:auto!important;margin:6px auto!important;display:block!important}
   .chathead{padding:8px}
   #messages{padding:10px}
   .composer{padding:8px;gap:6px}
@@ -151,6 +152,44 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 #micRequests:empty{
   display:none;
 }
+
+/* Compact camera preview and remote video tiles */
+.camera-panel #myCameraPreview{
+  position:relative!important;
+  left:auto!important;
+  top:auto!important;
+  right:auto!important;
+  bottom:auto!important;
+  display:block;
+  width:100%!important;
+  max-width:150px!important;
+  height:auto!important;
+  margin:8px auto!important;
+}
+#videoRemoteStreams{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-start;
+  gap:8px;
+  max-width:100%;
+  overflow:hidden;
+}
+#videoRemoteStreams video{
+  width:100%!important;
+  max-width:180px!important;
+  height:auto!important;
+  border-radius:10px;
+}
+#videoIncomingRequests:empty,
+#videoCameraMembers:empty{display:none}
+#videoIncomingRequests>div{
+  background:#123c2d;
+  border:1px solid #28654c;
+  border-radius:8px;
+  padding:7px;
+  margin:6px 0;
+}
+#videoIncomingRequests button{font-size:10px;padding:6px 8px;margin:4px 3px 0 0}
  
 </style>
 </head>
@@ -382,8 +421,9 @@ async function loadIncomingVideoRequests(){
   if(!box)return;
   const {data,error}=await db.from("video_view_requests").select("id,requester_id,room_name").eq("camera_owner_id",currentUser.id).eq("room_name",selectedVideoRoom).eq("status","pending");
   if(error){console.warn(error.message);return}
+  if(!data||data.length===0){box.innerHTML="";return}
   box.innerHTML="<h4>Incoming Camera Requests</h4>";
-  (data||[]).forEach(req=>{
+  data.forEach(req=>{
     const item=document.createElement("div");
     item.textContent="Member: "+req.requester_id.slice(0,8);
     const approve=document.createElement("button");
@@ -406,7 +446,7 @@ async function approveVideoRequest(requestId){
   const {error}=await db.rpc("approve_video_view_request",{p_request_id:requestId});
   if(error){alert(error.message);return}
   alert("Permission approved!");
-  loadIncomingVideoRequests();
+  await loadIncomingVideoRequests();
 }
 
 async function rejectVideoRequest(requestId){
