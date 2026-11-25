@@ -328,6 +328,7 @@ let isPasswordRecovery=false;
 let selectedVideoRoom="Home";
 let videoPeers=new Map();
 let videoSignalChannel=null;
+let videoRequestChannel=null;
 let videoSeenSignals=new Set();
 let videoStarting=false;
 let videoPendingIce=new Map();
@@ -364,6 +365,13 @@ async function setupVideoChat(){
       videoSeenSignals.add(row.id);
       handleVideoSignal(row);
     }).subscribe();
+  if(videoRequestChannel){try{await db.removeChannel(videoRequestChannel)}catch(e){}videoRequestChannel=null}
+  videoRequestChannel=db.channel("lym-video-requests-"+currentUser.id)
+    .on("postgres_changes",{event:"*",schema:"public",table:"video_view_requests",filter:"camera_owner_id=eq."+currentUser.id},()=>{
+      loadIncomingVideoRequests();
+    }).subscribe(status=>{
+      if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")console.warn("Video request realtime:",status);
+    });
   await loadVideoCameras();
   await loadIncomingVideoRequests();
 }
@@ -505,7 +513,14 @@ async function loadIncomingVideoRequests(){
   const box=document.getElementById("videoIncomingRequests");
   if(!box)return;
   const {data,error}=await db.from("video_view_requests").select("id,requester_id,room_name").eq("camera_owner_id",currentUser.id).eq("room_name",selectedVideoRoom).eq("status","pending");
-  if(error){console.warn(error.message);return}
+  if(error){
+    console.warn("Incoming camera requests:",error.message);
+    box.replaceChildren();
+    const errorItem=document.createElement("div");
+    errorItem.textContent="Camera request error: "+error.message;
+    box.appendChild(errorItem);
+    return;
+  }
   if(!data||data.length===0){box.innerHTML="";return}
   box.innerHTML="<h4>Incoming Camera Requests</h4>";
   const uniqueRequests=new Map();
@@ -725,6 +740,7 @@ async function removeChatChannels(){
   if(presenceChannel){const c=presenceChannel;presenceChannel=null;try{await db.removeChannel(c)}catch(e){}}
   if(liveChannel){const c=liveChannel;liveChannel=null;try{await db.removeChannel(c)}catch(e){}}
   if(videoSignalChannel){const c=videoSignalChannel;videoSignalChannel=null;try{await db.removeChannel(c)}catch(e){}}
+  if(videoRequestChannel){const c=videoRequestChannel;videoRequestChannel=null;try{await db.removeChannel(c)}catch(e){}}
   await closeAllVideoPeers(false);
   if(currentUser&&myCameraStream){
     const {error}=await db.from("video_room_cameras").upsert({user_id:currentUser.id,room_name:selectedVideoRoom,camera_on:false,updated_at:new Date().toISOString()},{onConflict:"user_id,room_name"});
