@@ -199,6 +199,12 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 .composer{display:flex;flex:0 0 auto;min-width:0;position:relative;z-index:2;order:1}
 #messages{display:block;flex:1 1 auto;min-height:120px;min-width:0;overflow-y:auto;overscroll-behavior:contain;order:2}
 .composer input{display:block;flex:1 1 auto;min-width:0;width:0}
+
+/* Text Chat sits below both the Rooms and Online Members panels. */
+#app{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(150px,0.85fr) minmax(220px,1.15fr);gap:0;min-height:0}
+#app>.rooms-sidebar{grid-column:1;grid-row:1;min-height:0}
+#app>.users-sidebar{grid-column:2;grid-row:1;min-height:0}
+#app>.chat{grid-column:1 / -1;grid-row:2;min-height:0;border-top:2px solid #087b55}
 </style>
 </head>
 <body>
