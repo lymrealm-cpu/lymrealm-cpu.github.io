@@ -200,11 +200,27 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 #messages{display:block;flex:1 1 auto;min-height:120px;min-width:0;overflow-y:auto;overscroll-behavior:contain;order:2}
 .composer input{display:block;flex:1 1 auto;min-width:0;width:0}
 
-/* Text Chat sits below both the Rooms and Online Members panels. */
-#app{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(150px,0.85fr) minmax(220px,1.15fr);gap:0;min-height:0}
+/* LYM REALM IMAGE-MATCH LAYOUT: Rooms/Mic | Text Chat | Camera/Online Users */
+#app{
+  grid-template-columns:minmax(150px,220px) minmax(0,1fr) minmax(160px,245px);
+  grid-template-rows:minmax(0,1fr);
+  gap:0;
+  min-height:0;
+  overflow:hidden;
+}
 #app>.rooms-sidebar{grid-column:1;grid-row:1;min-height:0}
-#app>.users-sidebar{grid-column:2;grid-row:1;min-height:0}
-#app>.chat{grid-column:1 / -1;grid-row:2;min-height:0;border-top:2px solid #087b55}
+#app>.chat{grid-column:2;grid-row:1;min-height:0;border-left:1px solid #087b55;border-right:1px solid #087b55}
+#app>.users-sidebar{grid-column:3;grid-row:1;min-height:0}
+@media(max-width:650px){
+  #app{
+    grid-template-columns:minmax(76px,22vw) minmax(0,1fr) minmax(76px,24vw);
+    grid-template-rows:minmax(0,1fr);
+    height:calc(100vh - 70px);
+    overflow:hidden;
+  }
+  #app>.rooms-sidebar,#app>.users-sidebar{min-width:0;min-height:0;overflow-y:auto}
+  #app>.chat{min-width:0;min-height:0;grid-column:2;grid-row:1}
+}
 </style>
 </head>
 <body>
