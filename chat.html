@@ -98,45 +98,42 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 }
 @media(max-width:650px){
   #app{
-    grid-template-columns:76px minmax(0,1fr) 94px;
+    width:100%;
+    min-width:0;
+    overflow-x:auto;
+    grid-template-columns:150px minmax(260px,1fr) 155px;
+    height:calc(100vh - 70px);
   }
-  #app>.sidebar{padding:5px}
-  .side-panel{padding:5px;margin-bottom:7px}
-  .side-heading{font-size:10px;text-align:center}
-  .room-link{
-    font-size:9px;
-    padding:8px 2px;
-    text-align:center;
-    overflow-wrap:anywhere;
-  }
-  .rooms-sidebar .voice-room{padding:4px}
-  .rooms-sidebar .voice-title{font-size:9px}
-  .rooms-sidebar .voice-state{font-size:9px;min-width:0}
+  #app>.sidebar{padding:8px}
+  .side-panel{padding:8px;margin-bottom:9px}
+  .side-heading{font-size:12px;text-align:center}
+  .room-link{font-size:11px;padding:9px 5px;text-align:left;overflow-wrap:anywhere}
+  .rooms-sidebar .voice-room{padding:6px}
+  .rooms-sidebar .voice-title{font-size:11px}
+  .rooms-sidebar .voice-state{font-size:10px;min-width:0}
   .rooms-sidebar .voice-actions{display:flex;flex-direction:column}
-  .rooms-sidebar .voice-actions button{
-    font-size:8px;
-    padding:7px 2px;
-  }
-  .users-sidebar .profile{padding:5px}
+  .rooms-sidebar .voice-actions button{font-size:10px;padding:8px 4px}
+  .users-sidebar .profile{padding:7px}
   .users-sidebar .myrow{display:block;text-align:center}
-  .users-sidebar .profile .avatar{
-    width:28px;height:28px;margin:auto;font-size:14px;
-  }
-  .users-sidebar .muted{font-size:8px}
-  .users-sidebar #myname{font-size:9px}
-  .users-sidebar .editbox input{font-size:8px;padding:5px}
-  .users-sidebar .editbox button{font-size:8px;padding:6px 2px}
-  .users-sidebar .section-title{font-size:9px}
-  .users-sidebar #onlineCount{font-size:8px;margin:0}
-  .users-sidebar .member{display:block;text-align:center;padding:4px 1px}
-  .users-sidebar .member .avatar{
-    width:24px;height:24px;margin:auto;font-size:12px;
-  }
-  .users-sidebar .member-name{font-size:8px}
-  .users-sidebar .member-role{font-size:7px}
-  .camera-panel button{font-size:8px;padding:7px 2px}
+  .users-sidebar .profile .avatar{width:32px;height:32px;margin:auto;font-size:16px}
+  .users-sidebar .muted{font-size:9px}
+  .users-sidebar #myname{font-size:11px}
+  .users-sidebar .editbox input{font-size:10px;padding:7px}
+  .users-sidebar .editbox button{font-size:10px;padding:7px 3px}
+  .users-sidebar .section-title{font-size:10px}
+  .users-sidebar #onlineCount{font-size:9px;margin:0}
+  .users-sidebar .member{display:block;text-align:center;padding:5px 2px}
+  .users-sidebar .member .avatar{width:27px;height:27px;margin:auto;font-size:13px}
+  .users-sidebar .member-name{font-size:9px}
+  .users-sidebar .member-role{font-size:8px}
+  .camera-panel button{font-size:10px;padding:8px 4px}
   .camera-panel video{width:100%!important}
-  }#micRequests{
+  .chathead{padding:8px}
+  #messages{padding:10px}
+  .composer{padding:8px;gap:6px}
+  .composer button{padding:10px 7px;min-width:45px}
+}
+#micRequests{
   position:fixed;
   top:85px;
   left:50%;
@@ -166,6 +163,17 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 <div class="section-title">♛ COMMUNITY MEMBERS <span id="onlineCount">0 Online</span></div><div id="users">Loading members...</div></aside>
 <main class="chat"><div class="chathead"><div class="avatar">🌍</div><div><strong>🌍 MAIN PUBLIC CHAT</strong><div class="muted">Everyone is connected here</div></div></div>
 
+<section class="voice-room">
+  <div class="voice-top"><span class="voice-title">🎙️ LIVE VOICE ROOM</span><span id="voiceRoomState" class="voice-state">Connecting to voice room...</span></div>
+  <div class="voice-actions">
+    <button id="requestMicBtn" onclick="requestMic()">Request Mic</button>
+    <button id="cancelRequestBtn" onclick="cancelMicRequest()" style="display:none">Cancel Request</button>
+    <button id="startSpeakingBtn" onclick="startSpeaking()" style="display:none">Start Speaking</button>
+    <button id="releaseMicBtn" onclick="releaseMic()" style="display:none" class="danger">Release Mic</button>
+    <button id="giveMicBtn" onclick="giveMicPrompt()" style="display:none" class="gold">Pass Mic</button>
+  </div>
+  <div id="micRequests"></div>
+</section>
 <section class="video-room">
 <h3>📹 LIVE VIDEO CHAT</h3>
 <div id="videoRooms">
@@ -183,16 +191,11 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 <video id="myCameraPreview" autoplay muted playsinline style="display:none;position:fixed;left:10px;top:100px;width:220px;max-width:65vw;border:2px solid #f5d477;border-radius:12px;z-index:9998;touch-action:none;cursor:move;"></video>
 </section>
 <div id="videoRemoteStreams"></div>
-<div id="messages">
 <div id="videoCameraMembers"></div>
 <div id="videoIncomingRequests"></div>
-
- <div id="videoRemoteStreams"></div>
-<div id="messages">
-<div id="videoCameraMembers"></div>
-<div id="videoIncomingRequests"></div>
-<div id="videoRemoteStreams"></div>
-<div id="messages"><div class="system-message">Welcome to LYM REALM PUBLIC CHAT</div></div><div id="voiceStatus"></div><div class="composer"><input id="message" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()"><button id="recordBtn" onclick="toggleRecording()">🎙️</button><button id="sendBtn" onclick="sendMessage()">Send</button></div></main></div>
+<div id="messages"><div class="system-message">Welcome to LYM REALM PUBLIC CHAT</div></div>
+<div id="voiceStatus"></div>
+<div class="composer"><input id="message" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()"><button id="recordBtn" onclick="toggleRecording()">🎙️</button><button id="sendBtn" onclick="sendMessage()">Send</button></div></main></div>
 <script>
 const SUPABASE_URL="https://probxnzduietjivnqrac.supabase.co";
 const SUPABASE_KEY="sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
