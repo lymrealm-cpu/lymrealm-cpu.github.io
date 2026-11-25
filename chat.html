@@ -828,6 +828,7 @@ async function uploadVoice(blob){
 function isSuperAdmin(){return rolesMap[currentUser?.id]==="super_admin"}
 function voiceStatus(text){const el=document.getElementById("voiceRoomState");if(el)el.textContent=text}
 function updateVoiceButtons(){
+function updateVoiceButtons(){
   if(!currentUser)return;
 
   const mine=currentSpeakerId===currentUser.id;
