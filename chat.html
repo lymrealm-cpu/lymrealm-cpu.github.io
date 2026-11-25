@@ -264,6 +264,27 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
   .text-chat-board .composer{padding:6px;gap:5px}
   .text-chat-board .composer input{font-size:13px}
 }
+
+/* Keep the bottom Text Chat Board visible without page scrolling */
+@media(max-width:650px){
+  html,body{height:100%;overflow:hidden}
+  #app{
+    height:calc(100dvh - 70px);
+    max-height:calc(100dvh - 70px);
+    grid-template-rows:minmax(0,1fr) auto;
+    overflow:hidden;
+  }
+  #app>.text-chat-board{
+    grid-row:2;
+    align-self:end;
+    padding:4px 7px;
+    gap:3px;
+    margin:0 4px 4px;
+  }
+  .text-chat-title{line-height:1.2;padding:0 3px}
+  .text-chat-board .composer{padding:5px;gap:4px}
+}
+
 </style>
 </head>
 <body>
