@@ -41,6 +41,14 @@ audio{width:100%;max-width:420px;margin-top:8px}
 <p>Banned Members: <b id="bannedCount">0</b></p>
 </div>
 
+<div class="card" id="securityMonitorCard">
+<h2 class="section-title">🛡️ Security Monitor</h2>
+<p class="small">Authenticated member activity pings received in the last 24 hours. This is monitoring data, not a complete count of API requests or proof of a DDoS attack.</p>
+<button onclick="loadSecurityMonitor()">🔄 Refresh Monitor</button>
+<div id="securityMonitorStatus" class="small">Loading security activity...</div>
+<div id="securityMonitorEvents"></div>
+</div>
+
 <div class="card">
 <h2>👥 Member Management</h2>
 <div id="members">Loading members...</div>
@@ -101,6 +109,7 @@ async function startAdmin(){
  await loadMembers();
  await loadNotifications();
  await loadChatRecords();
+ await loadSecurityMonitor();
 }
 
 async function loadMembers(){
@@ -340,6 +349,46 @@ async function loadMembers(){
 
   div.append(kickBtn);
   box.appendChild(div);
+ });
+}
+
+// SECURITY MONITOR — report access is enforced again by the Edge Function.
+async function loadSecurityMonitor(){
+ const status=document.getElementById("securityMonitorStatus");
+ const box=document.getElementById("securityMonitorEvents");
+ if(!status||!box)return;
+ status.textContent="Loading activity from the last 24 hours...";
+ box.innerHTML="";
+ const {data,error}=await db.functions.invoke("security-monitor",{body:{action:"report"}});
+ if(error){
+  status.textContent="Security monitor error: "+error.message;
+  return;
+ }
+ if(!data||!Array.isArray(data.events)){
+  status.textContent="No security activity report is available.";
+  return;
+ }
+ status.textContent="Updated: "+new Date(data.generated_at).toLocaleString()+" • Last 24 hours • IP addresses visible to Super Admin only.";
+ if(!data.events.length){
+  box.textContent="No activity recorded yet. Members' next heartbeat will appear here.";
+  return;
+ }
+ data.events.forEach(item=>{
+  const card=document.createElement("div");
+  card.className="record";
+  const ip=document.createElement("b");
+  ip.textContent="🌐 IP: "+item.ip;
+  const details=document.createElement("div");
+  details.className="small";
+  details.textContent="Activity pings: "+item.events_24h+" (24h) • "+item.events_10m+" (10m) • Country: "+(item.country||"—")+" • Accounts: "+item.active_accounts;
+  const last=document.createElement("div");
+  last.className="small";
+  last.textContent="Last seen: "+new Date(item.last_seen).toLocaleString()+" • Paths: "+(item.paths||[]).join(", ");
+  const level=document.createElement("div");
+  level.className="small";
+  level.textContent="Indicator: "+(item.level==="Review"?"⚠️ Review activity":"✅ Normal activity");
+  card.append(ip,details,last,level);
+  box.appendChild(card);
  });
 }
 
