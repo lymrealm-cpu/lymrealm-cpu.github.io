@@ -165,9 +165,9 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 <div id="app"><aside class="sidebar"><div class="profile"><div class="myrow"><div class="avatar">👑</div><div><div class="muted">YOUR USERNAME</div><strong id="myname" class="green">Loading...</strong><div id="myrole" class="muted"></div></div></div><div class="editbox"><div class="muted">Change Username</div><input id="newUsername" maxlength="20" placeholder="New username"><button onclick="changeUsername()">Save Username</button></div></div>
 <div class="section-title">♛ COMMUNITY MEMBERS <span id="onlineCount">0 Online</span></div><div id="users">Loading members...</div></aside>
 <main class="chat"><div class="chathead"><div class="avatar">🌍</div><div><strong>🌍 MAIN PUBLIC CHAT</strong><div class="muted">Everyone is connected here</div></div></div>
-<section class="voice-room"><div class="voice-top"><span class="voice-title">🎙️ LIVE VOICE ROOM</span><span id="voiceRoomState" class="voice-state">Connecting voice room...</span></div>
-<div class="voice-actions"><button id="requestMicBtn" onclick="requestMic()">🙋 Request Mic</button><button id="cancelRequestBtn" class="danger" onclick="cancelMicRequest()" style="display:none">Cancel Request</button><button id="startSpeakingBtn" class="gold" onclick="startSpeaking()" style="display:none">▶ Start Speaking</button><button id="releaseMicBtn" class="danger" onclick="releaseMic()" style="display:none">Release Mic</button><button id="giveMicBtn" onclick="giveMicPrompt()" style="display:none">Pass Mic</button></div><div id="micRequests"></div></section>
-<video id="myCameraPreview" autoplay muted playsinline style="display:none;position:fixed;left:10px;top:100px;width:220px;max-width:65vw;border:2px solid #f5d477;border-radius:12px;z-index:9998;touch-action:none;cursor:move;"></video>
+
+<section class="video-room">
+<h3>📹 LIVE VIDEO CHAT</h3>
 <div id="videoRooms">
 <button onclick="selectVideoRoom('Home')">Home</button>
 <button onclick="selectVideoRoom('Islamic')">Islamic</button>
@@ -180,8 +180,11 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 <button id="cameraOnBtn" onclick="startMyCamera()">📷 Camera ON</button>
 <button id="cameraOffBtn" onclick="stopMyCamera()" class="danger">Camera OFF</button>
 </div>
-<video id="myCameraPreview" autoplay muted playsinline style="display:none;width:100%;max-width:320px;border-radius:12px;margin-top:10px;"></video>
+<video id="myCameraPreview" autoplay muted playsinline style="display:none;position:fixed;left:10px;top:100px;width:220px;max-width:65vw;border:2px solid #f5d477;border-radius:12px;z-index:9998;touch-action:none;cursor:move;"></video>
 </section>
+<div id="videoCameraMembers"></div>
+<div id="videoIncomingRequests"></div>
+
  <div id="videoRemoteStreams"></div>
 <div id="messages">
 <div id="videoCameraMembers"></div>
