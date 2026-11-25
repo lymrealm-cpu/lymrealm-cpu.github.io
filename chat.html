@@ -153,18 +153,22 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
   display:none;
 }
 
-/* Compact camera preview and remote video tiles */
+/* Floating, slightly larger draggable camera preview */
 .camera-panel #myCameraPreview{
-  position:relative!important;
-  left:auto!important;
-  top:auto!important;
+  position:fixed!important;
+  left:10px!important;
+  top:100px!important;
   right:auto!important;
   bottom:auto!important;
   display:block;
-  width:100%!important;
-  max-width:150px!important;
+  width:190px!important;
+  max-width:55vw!important;
   height:auto!important;
-  margin:8px auto!important;
+  margin:0!important;
+  z-index:9998!important;
+  touch-action:none!important;
+  cursor:move;
+  box-shadow:0 5px 20px #000b;
 }
 #videoRemoteStreams{
   display:flex;
@@ -331,8 +335,6 @@ async function startMyCamera(){
 
   video.addEventListener("pointerdown",e=>{
     const rect=video.getBoundingClientRect();
-    if(e.clientY>rect.top+35)return;
-
     dragging=true;
     startX=e.clientX;
     startY=e.clientY;
@@ -423,15 +425,20 @@ async function loadIncomingVideoRequests(){
   if(error){console.warn(error.message);return}
   if(!data||data.length===0){box.innerHTML="";return}
   box.innerHTML="<h4>Incoming Camera Requests</h4>";
+  const uniqueRequests=new Map();
   data.forEach(req=>{
+    if(!uniqueRequests.has(req.requester_id))uniqueRequests.set(req.requester_id,req);
+  });
+  uniqueRequests.forEach(req=>{
     const item=document.createElement("div");
+    item.dataset.requesterId=req.requester_id;
     item.textContent="Member: "+req.requester_id.slice(0,8);
     const approve=document.createElement("button");
     approve.textContent="Approve";
-    approve.onclick=()=>approveVideoRequest(req.id);
+    approve.onclick=()=>approveVideoRequest(req.id,req.requester_id);
     const reject=document.createElement("button");
     reject.textContent="Reject";
-    reject.onclick=()=>rejectVideoRequest(req.id);
+    reject.onclick=()=>rejectVideoRequest(req.id,req.requester_id);
     item.appendChild(approve);
     item.appendChild(reject);
     box.appendChild(item);
@@ -442,18 +449,36 @@ setInterval(()=>{
   if(currentUser){loadVideoCameras();loadIncomingVideoRequests()}
 },5000);
 
-async function approveVideoRequest(requestId){
-  const {error}=await db.rpc("approve_video_view_request",{p_request_id:requestId});
-  if(error){alert(error.message);return}
-  alert("Permission approved!");
+async function approveVideoRequest(requestId,requesterId){
+  const box=document.getElementById("videoIncomingRequests");
+  const item=box?.querySelector('[data-requester-id="'+requesterId+'"]');
+  if(item)item.remove();
+  const {data:pending,error:findError}=await db.from("video_view_requests")
+    .select("id").eq("camera_owner_id",currentUser.id).eq("requester_id",requesterId)
+    .eq("room_name",selectedVideoRoom).eq("status","pending");
+  if(findError){alert("Request lookup error: "+findError.message);await loadIncomingVideoRequests();return}
+  const ids=[...new Set([requestId,...(pending||[]).map(x=>x.id)])];
+  for(const id of ids){
+    const {error}=await db.rpc("approve_video_view_request",{p_request_id:id});
+    if(error){alert("Approve error: "+error.message);await loadIncomingVideoRequests();return}
+  }
   await loadIncomingVideoRequests();
 }
 
-async function rejectVideoRequest(requestId){
-  const {error}=await db.rpc("revoke_video_view_request",{p_request_id:requestId});
-  if(error){alert(error.message);return}
-  alert("Request rejected.");
-  loadIncomingVideoRequests();
+async function rejectVideoRequest(requestId,requesterId){
+  const box=document.getElementById("videoIncomingRequests");
+  const item=box?.querySelector('[data-requester-id="'+requesterId+'"]');
+  if(item)item.remove();
+  const {data:pending,error:findError}=await db.from("video_view_requests")
+    .select("id").eq("camera_owner_id",currentUser.id).eq("requester_id",requesterId)
+    .eq("room_name",selectedVideoRoom).eq("status","pending");
+  if(findError){alert("Request lookup error: "+findError.message);await loadIncomingVideoRequests();return}
+  const ids=[...new Set([requestId,...(pending||[]).map(x=>x.id)])];
+  for(const id of ids){
+    const {error}=await db.rpc("revoke_video_view_request",{p_request_id:id});
+    if(error){alert("Reject error: "+error.message);await loadIncomingVideoRequests();return}
+  }
+  await loadIncomingVideoRequests();
 }
 
 async function revokeVideoPermission(requestId){
