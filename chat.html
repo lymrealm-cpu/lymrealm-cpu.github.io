@@ -27,8 +27,6 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 .sender{font-size:12px;font-weight:bold;color:#ffd76a;margin-bottom:6px}.msg.mine .sender{color:#aaffd2}.time{font-size:10px;color:#c1d8cf;text-align:right;margin-top:7px}
 .msg audio{display:block;width:min(270px,65vw);max-width:100%;margin-top:8px}.system-message{text-align:center;color:#9bb6ad;font-size:12px;margin:15px}
 .composer{display:flex;gap:9px;padding:12px;background:#09221c;align-items:center}.composer input{margin:0;flex:1;min-width:0}.composer button{min-width:65px}
-#recordBtn{background:#a52e38}#recordBtn.recording{background:#e00035;animation:pulse 1s infinite}#voiceStatus{font-size:11px;color:#aaffd2;padding:0 12px 8px;background:#09221c}
-@keyframes pulse{50%{opacity:.55}}
 #welcomeScreen{display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(145deg,#061713,#0b3024);align-items:center;justify-content:center;padding:15px;overflow-y:auto}
 .welcome-card{width:100%;max-width:520px;background:#102b25;border:1px solid #00a96b;border-radius:20px;padding:24px;box-shadow:0 0 30px #003d2b}
 .welcome-logo{text-align:center;color:#f5d477;font-size:30px;font-weight:bold}.welcome-sub{text-align:center;color:#a8d8c5;font-size:11px;margin-top:7px}
@@ -101,7 +99,7 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
     width:100%;
     min-width:0;
     overflow-x:auto;
-    grid-template-columns:100px minmax(0,1fr) 110px;
+    grid-template-columns:minmax(76px,22vw) minmax(0,1fr) minmax(76px,24vw);
     overflow-x:hidden;
     height:calc(100vh - 70px);
   }
@@ -196,9 +194,11 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 #videoIncomingRequests button{font-size:10px;padding:6px 8px;margin:4px 3px 0 0}
  
 #voiceRoomState{display:none!important}
-.chat{height:100%;min-height:0}
-#messages{flex:1 1 0;min-height:140px;overflow-y:auto;display:block}
-.composer{flex-shrink:0}
+.chat{display:flex;flex-direction:column;height:100%;min-height:0;min-width:0;overflow:hidden}
+.chathead{flex:0 0 auto}
+#messages{display:block;flex:1 1 auto;min-height:0;min-width:0;overflow-y:auto;overscroll-behavior:contain}
+.composer{display:flex;flex:0 0 auto;min-width:0;position:relative;z-index:2}
+.composer input{display:block;flex:1 1 auto;min-width:0;width:0}
 </style>
 </head>
 <body>
@@ -241,8 +241,8 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 <div id="videoCameraMembers"></div>
 <div id="videoIncomingRequests"></div>
 <div id="messages"><div class="system-message">Welcome to LYM REALM PUBLIC CHAT</div></div>
-<div id="voiceStatus"></div>
-<div class="composer"><input id="message" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()"><button id="recordBtn" onclick="toggleRecording()">🎙️</button><button id="sendBtn" onclick="sendMessage()">Send</button></div></main></div>
+
+<div class="composer"><input id="message" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()"><button id="sendBtn" onclick="sendMessage()">Send</button></div></main></div>
 <script>
 const SUPABASE_URL="https://probxnzduietjivnqrac.supabase.co";
 const SUPABASE_KEY="sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
@@ -704,7 +704,7 @@ db.auth.onAuthStateChange((event)=>{
 });
 
 window.appStarting=false;
-let liveChannel=null,presenceChannel=null,onlineUserIds=[],profilesMap={},rolesMap={},mediaRecorder=null,audioStream=null,audioChunks=[],isRecording=false,isSendingVoice=false,kickCheckInterval=null,kickBeingHandled=false;
+let liveChannel=null,presenceChannel=null,onlineUserIds=[],profilesMap={},rolesMap={},kickCheckInterval=null,kickBeingHandled=false;
 let voiceStateChannel=null,voiceSignalChannel=null,voiceRequestChannel=null;
 let currentSpeakerId=null,voiceRequests=[],voicePeers=new Map(),liveMicStream=null;
 let voiceRoomStarted=false,voiceStarting=false;
@@ -739,7 +739,6 @@ function sessionStorageKey(userId){return "lym_chat_started_at_"+userId}
 function timeValue(value){if(!value)return null;const result=new Date(value).getTime();return Number.isFinite(result)?result:null}
 function saveChatSession(userId,value){if(userId&&value)localStorage.setItem(sessionStorageKey(userId),String(value))}
 function stopKickChecker(){if(kickCheckInterval){clearInterval(kickCheckInterval);kickCheckInterval=null}}
-function stopAudioTracks(){if(audioStream){audioStream.getTracks().forEach(track=>track.stop());audioStream=null}}
 function stopLiveMic(){if(liveMicStream){liveMicStream.getTracks().forEach(t=>t.stop());liveMicStream=null}}
 function closeVoicePeers(){for(const pc of voicePeers.values()){try{pc.close()}catch(e){}}voicePeers.clear()}
 function stopLiveVoice(){voiceStarting=false;voiceRoomStarted=false;stopLiveMic();closeVoicePeers();const audioEls=document.querySelectorAll("[data-live-voice='1']");audioEls.forEach(a=>{a.srcObject=null;a.remove()})}
@@ -758,15 +757,8 @@ async function removeChatChannels(){
   const preview=document.getElementById("myCameraPreview");if(preview){preview.srcObject=null;preview.style.display="none"}
   await removeVoiceChannels();onlineUserIds=[];
 }
-function stopRecordingWithoutSending(){
-  if(mediaRecorder&&mediaRecorder.state!=="inactive"){mediaRecorder.onstop=null;try{mediaRecorder.stop()}catch(e){}}
-  mediaRecorder=null;isRecording=false;audioChunks=[];stopAudioTracks();
-  const btn=document.getElementById("recordBtn");
-  if(btn){btn.textContent="🎙️";btn.classList.remove("recording");btn.disabled=false}
-  const s=document.getElementById("voiceStatus");if(s)s.textContent="";
-}
 async function showAuthMessage(message){
-  stopKickChecker();stopRecordingWithoutSending();await removeChatChannels();
+  stopKickChecker();await removeChatChannels();
   try{await db.auth.signOut()}catch(e){}
   currentUser=null;chatStartedAt=null;profilesMap={};rolesMap={};
   document.getElementById("app").style.display="none";
@@ -1027,12 +1019,7 @@ async function loadMessages(){
     const senderRole=rolesMap[m.sender_id]||"member",senderName=profilesMap[m.sender_id]||"Member";
     sender.textContent=(senderRole==="super_admin"?"👑 ":senderRole==="moderator"?"🛡️ ":senderRole==="vip"?"⭐ ":"")+senderName;
     div.appendChild(sender);
-    if(m.message_type==="voice"&&m.audio_path){
-      const audio=document.createElement("audio");audio.controls=true;audio.preload="none";
-      const {data:urlData,error:urlError}=await db.storage.from("voice-messages").createSignedUrl(m.audio_path,3600);
-      if(urlError){const t=document.createElement("div");t.textContent="Voice unavailable";div.appendChild(t)}
-      else{audio.src=urlData.signedUrl;div.appendChild(audio)}
-    }else{const content=document.createElement("div");content.textContent=m.message;div.appendChild(content)}
+    const content=document.createElement("div");content.textContent=m.message_type==="voice"?"Voice messages are no longer supported.":m.message;div.appendChild(content)
     const time=document.createElement("div");time.className="time";
     time.textContent=new Date(m.created_at).toLocaleString([],{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
     div.appendChild(time);box.appendChild(div);
@@ -1054,54 +1041,6 @@ async function sendMessage(){
   }catch(error){alert("Message error: "+error.message)}
   finally{sendButton.disabled=false}
 }
-async function startRecording(){
-  if(!currentUser)return;
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){alert("Microphone is not supported. Open the website in Chrome using HTTPS.");return}
-  if(!window.MediaRecorder){alert("Voice recording is not supported in this browser.");return}
-  try{
-    audioStream=await navigator.mediaDevices.getUserMedia({audio:true});
-    let options={};
-    if(MediaRecorder.isTypeSupported("audio/webm;codecs=opus"))options.mimeType="audio/webm;codecs=opus";
-    else if(MediaRecorder.isTypeSupported("audio/webm"))options.mimeType="audio/webm";
-    mediaRecorder=new MediaRecorder(audioStream,options);audioChunks=[];
-    mediaRecorder.ondataavailable=event=>{if(event.data&&event.data.size>0)audioChunks.push(event.data)};
-    mediaRecorder.onstop=async()=>{
-      const blob=new Blob(audioChunks,{type:mediaRecorder.mimeType||"audio/webm"});
-      stopAudioTracks();
-      if(blob.size>0&&currentUser)await uploadVoice(blob);
-    };
-    mediaRecorder.start();isRecording=true;
-    const btn=document.getElementById("recordBtn");btn.textContent="⏹ Stop";btn.classList.add("recording");
-    document.getElementById("voiceStatus").textContent="🔴 Recording... Press Stop to send your voice.";
-  }catch(error){stopAudioTracks();alert("Microphone error: "+error.message)}
-}
-function stopRecording(){
-  if(mediaRecorder&&isRecording){
-    isRecording=false;mediaRecorder.stop();
-    const btn=document.getElementById("recordBtn");btn.textContent="🎙️";btn.classList.remove("recording");
-    document.getElementById("voiceStatus").textContent="Uploading voice message...";
-  }
-}
-async function toggleRecording(){if(isSendingVoice)return;if(isRecording)stopRecording();else await startRecording()}
-async function uploadVoice(blob){
-  if(isSendingVoice||!currentUser)return;
-  isSendingVoice=true;
-  const status=document.getElementById("voiceStatus"),btn=document.getElementById("recordBtn");btn.disabled=true;
-  try{
-    const path=currentUser.id+"/"+Date.now()+".webm";
-    const {error:uploadError}=await db.storage.from("voice-messages").upload(path,blob,{contentType:"audio/webm",upsert:false});
-    if(uploadError)throw uploadError;
-    const {error:sendError}=await db.rpc("send_group_voice_message",{p_audio_path:path});
-    if(sendError){
-      await db.storage.from("voice-messages").remove([path]);
-      if(sendError.message.toLowerCase().includes("banned")){await showAuthMessage("Your account is banned by Admin. Contact Super Admin.");return}
-      throw sendError;
-    }
-    status.textContent="Voice message sent!";await loadMessages();
-  }catch(error){alert("Voice upload error: "+error.message);status.textContent="Voice message failed."}
-  finally{isSendingVoice=false;btn.disabled=false;setTimeout(()=>{if(!isRecording)status.textContent=""},3000)}
-}
-
 // LIVE VOICE: requests, mic ownership, and WebRTC audio mesh
 function isSuperAdmin(){return rolesMap[currentUser?.id]==="super_admin"}
 function voiceStatus(text){const el=document.getElementById("voiceRoomState");if(el)el.textContent=text}
@@ -1266,7 +1205,7 @@ async function handleVoiceSignal(row){
 async function logout(){
   const userId=currentUser?.id;
   if(myCameraStream)await stopMyCamera();
-  stopKickChecker();stopRecordingWithoutSending();await removeChatChannels();
+  stopKickChecker();await removeChatChannels();
   if(userId)localStorage.removeItem(sessionStorageKey(userId));
   try{await db.auth.signOut()}catch(e){}
   currentUser=null;chatStartedAt=null;profilesMap={};rolesMap={};location.reload();
