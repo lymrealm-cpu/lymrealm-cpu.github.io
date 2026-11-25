@@ -455,6 +455,12 @@ async function startMyCamera(){
   }
 }
 
+async function expireApprovedVideoRequests(roomName){
+  if(!currentUser||!roomName)return;
+  const {error}=await db.from("video_view_requests").update({status:"rejected"})
+    .eq("camera_owner_id",currentUser.id).eq("room_name",roomName).eq("status","approved");
+  if(error){console.warn("Could not expire camera approvals:",error.message);alert("Camera approval reset error: "+error.message)}
+}
 async function stopMyCamera(){
   if(currentUser&&myCameraStream)await closeAllVideoPeers(true);
   if(myCameraStream){myCameraStream.getTracks().forEach(track=>track.stop());myCameraStream=null}
@@ -465,6 +471,7 @@ async function stopMyCamera(){
       user_id:currentUser.id,room_name:selectedVideoRoom,camera_on:false,updated_at:new Date().toISOString()
     },{onConflict:"user_id,room_name"});
     if(error)console.warn("Camera status:",error.message);
+    await expireApprovedVideoRequests(selectedVideoRoom);
   }
   const status=document.getElementById("videoRoomStatus");
   if(status)status.textContent="Camera OFF";
@@ -671,6 +678,7 @@ async function selectVideoRoom(room){
   await closeAllVideoPeers(true);
   if(currentUser){
     await db.from("video_room_cameras").upsert({user_id:currentUser.id,room_name:previousRoom,camera_on:false,updated_at:new Date().toISOString()},{onConflict:"user_id,room_name"});
+    await expireApprovedVideoRequests(previousRoom);
   }
   selectedVideoRoom=room;
   if(wasCameraOn&&currentUser){
@@ -1257,6 +1265,7 @@ async function handleVoiceSignal(row){
 }
 async function logout(){
   const userId=currentUser?.id;
+  if(myCameraStream)await stopMyCamera();
   stopKickChecker();stopRecordingWithoutSending();await removeChatChannels();
   if(userId)localStorage.removeItem(sessionStorageKey(userId));
   try{await db.auth.signOut()}catch(e){}
