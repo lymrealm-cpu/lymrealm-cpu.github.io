@@ -1303,6 +1303,24 @@ async function sendSignal(to,signal){
   const {error}=await db.from("voice_signals").insert({room_id:"main",sender_id:currentUser.id,receiver_id:to,signal});
   if(error)console.warn("Voice signal:",error.message);
 } 
+
+// LYM_REALM_SOURCE_DETERRENCE: discourage casual context-menu and source shortcuts.
+document.addEventListener("contextmenu", function(event) {
+  const target = event.target;
+  if (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
+  event.preventDefault();
+});
+document.addEventListener("keydown", function(event) {
+  const key = (event.key || "").toLowerCase();
+  const ctrlOrMeta = event.ctrlKey || event.metaKey;
+  const sourceShortcut = ctrlOrMeta && key === "u";
+  const devtoolsShortcut = (event.key === "F12") ||
+    (ctrlOrMeta && event.shiftKey && ["i", "j", "c"].includes(key));
+  if (sourceShortcut || devtoolsShortcut) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+}, true);
 </script>
 </body>
 </html>
