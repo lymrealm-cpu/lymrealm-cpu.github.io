@@ -483,7 +483,8 @@ db.auth.onAuthStateChange((event)=>{
   }
 });
 
-let currentUser=null,liveChannel=null,presenceChannel=null,onlineUserIds=[],profilesMap={},rolesMap={},mediaRecorder=null,audioStream=null,audioChunks=[],isRecording=false,isSendingVoice=false,chatStartedAt=null,appStarting=false,kickCheckInterval=null,kickBeingHandled=false;
+window.appStarting=false;
+let currentUser=null,liveChannel=null,presenceChannel=null,onlineUserIds=[],profilesMap={},rolesMap={},mediaRecorder=null,audioStream=null,audioChunks=[],isRecording=false,isSendingVoice=false,chatStartedAt=null,kickCheckInterval=null,kickBeingHandled=false;
 let voiceStateChannel=null,voiceSignalChannel=null,voiceRequestChannel=null;
 let currentSpeakerId=null,voiceRequests=[],voicePeers=new Map(),liveMicStream=null;
 let voiceRoomStarted=false,voiceStarting=false;
@@ -653,8 +654,8 @@ async function checkKickStatus(){
 }
 function startKickChecker(){stopKickChecker();kickCheckInterval=setInterval(checkKickStatus,4000)}
 async function startApp(user,isNewLogin=false){
-  if(appStarting)return;
-  appStarting=true;
+  if(window.appStarting)return;
+  window.appStarting=true;
   try{
     const allowed=await checkBanStatus();
     if(!allowed)return;
@@ -701,7 +702,7 @@ async function startApp(user,isNewLogin=false){
       }).subscribe();
     startKickChecker();
     await setupLiveVoice();
-  }finally{appStarting=false}
+  }finally{window.appStarting=false}
 }
 async function loadMembers(){
   if(!currentUser)return;
