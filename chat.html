@@ -197,6 +197,7 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 const SUPABASE_URL="https://probxnzduietjivnqrac.supabase.co";
 const SUPABASE_KEY="sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let currentUser=null;
 // Arrange LYM REALM professional chat layout
 (function arrangeChatLayout(){
   const app=document.getElementById("app");
@@ -484,7 +485,7 @@ db.auth.onAuthStateChange((event)=>{
 });
 
 window.appStarting=false;
-let currentUser=null,liveChannel=null,presenceChannel=null,onlineUserIds=[],profilesMap={},rolesMap={},mediaRecorder=null,audioStream=null,audioChunks=[],isRecording=false,isSendingVoice=false,chatStartedAt=null,kickCheckInterval=null,kickBeingHandled=false;
+let liveChannel=null,presenceChannel=null,onlineUserIds=[],profilesMap={},rolesMap={},mediaRecorder=null,audioStream=null,audioChunks=[],isRecording=false,isSendingVoice=false,chatStartedAt=null,kickCheckInterval=null,kickBeingHandled=false;
 let voiceStateChannel=null,voiceSignalChannel=null,voiceRequestChannel=null;
 let currentSpeakerId=null,voiceRequests=[],voicePeers=new Map(),liveMicStream=null;
 let voiceRoomStarted=false,voiceStarting=false;
