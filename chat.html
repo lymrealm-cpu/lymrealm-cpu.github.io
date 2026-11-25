@@ -708,6 +708,10 @@ async function removeChatChannels(){
   if(liveChannel){const c=liveChannel;liveChannel=null;try{await db.removeChannel(c)}catch(e){}}
   if(videoSignalChannel){const c=videoSignalChannel;videoSignalChannel=null;try{await db.removeChannel(c)}catch(e){}}
   await closeAllVideoPeers(false);
+  if(currentUser&&myCameraStream){
+    const {error}=await db.from("video_room_cameras").upsert({user_id:currentUser.id,room_name:selectedVideoRoom,camera_on:false,updated_at:new Date().toISOString()},{onConflict:"user_id,room_name"});
+    if(error)console.warn("Camera logout status:",error.message);
+  }
   if(myCameraStream){myCameraStream.getTracks().forEach(t=>t.stop());myCameraStream=null}
   const preview=document.getElementById("myCameraPreview");if(preview){preview.srcObject=null;preview.style.display="none"}
   await removeVoiceChannels();onlineUserIds=[];
