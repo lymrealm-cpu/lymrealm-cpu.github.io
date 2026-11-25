@@ -604,10 +604,29 @@ function getVideoPeer(peerId,ownerId,roomName=selectedVideoRoom){
   return pc;
 }
 
+async function hasApprovedVideoAccess(ownerId,requesterId,roomName){
+  if(!ownerId||!requesterId||!roomName)return false;
+  const {data,error}=await db.from("video_view_requests").select("id")
+    .eq("camera_owner_id",ownerId).eq("requester_id",requesterId)
+    .eq("room_name",roomName).eq("status","approved").limit(1).maybeSingle();
+  if(error){console.warn("Video permission check:",error.message);return false}
+  return !!data;
+}
+
 async function handleVideoSignal(row){
   if(!currentUser||!row||row.sender_id===currentUser.id||row.room_name!==selectedVideoRoom)return;
   const sig=row.signal||{},ownerId=row.camera_owner_id,roomName=row.room_name;
+  const requesterId=currentUser.id===ownerId?row.sender_id:currentUser.id;
   const key=videoPeerKey(row.sender_id,roomName);
+  if(sig.type==="bye"){
+    closeVideoPeer(row.sender_id,roomName);
+    return;
+  }
+  // Never accept or continue a video connection unless the owner approved this exact member and room.
+  if(!await hasApprovedVideoAccess(ownerId,requesterId,roomName)){
+    closeVideoPeer(row.sender_id,roomName);
+    return;
+  }
   if(sig.type==="offer"){
     if(ownerId!==row.sender_id||row.receiver_id!==currentUser.id)return;
     try{
@@ -627,8 +646,6 @@ async function handleVideoSignal(row){
     const pc=videoPeers.get(key);
     if(pc&&pc.remoteDescription){try{await pc.addIceCandidate(new RTCIceCandidate(sig.candidate))}catch(e){}}
     else{const pending=videoPendingIce.get(key)||[];pending.push(sig.candidate);videoPendingIce.set(key,pending)}
-  }else if(sig.type==="bye"){
-    closeVideoPeer(row.sender_id,roomName);
   }
 }
 
