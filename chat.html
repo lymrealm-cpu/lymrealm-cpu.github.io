@@ -199,6 +199,7 @@ const SUPABASE_KEY="sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let currentUser=null;
 let chatStartedAt=null;
+let myCameraStream=null;
 // Arrange LYM REALM professional chat layout
 (function arrangeChatLayout(){
   const app=document.getElementById("app");
@@ -277,7 +278,6 @@ let videoPeers=new Map();
 let videoSignalChannel=null;
 let videoSeenSignals=new Set();
 let videoStarting=false;
-let myCameraStream=null;
 
 async function startMyCamera(){
 // Drag camera preview with finger or mouse
