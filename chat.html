@@ -700,13 +700,21 @@ async function loadIncomingVideoRequests(){
   data.forEach(req=>{
     if(!uniqueRequests.has(req.requester_id))uniqueRequests.set(req.requester_id,req);
   });
+  const requesterIds=[...uniqueRequests.keys()];
+  const {data:requesterProfiles,error:profileError}=await db.from("profiles")
+    .select("id,username").in("id",requesterIds);
+  if(profileError)console.warn("Camera requester names:",profileError.message);
+  const requesterNames=new Map((requesterProfiles||[]).map(profile=>[
+    profile.id,(profile.username||"").trim()
+  ]));
   uniqueRequests.forEach(req=>{
     const item=document.createElement("div");
     item.className="video-request-item";
     item.dataset.requesterId=req.requester_id;
+    const requesterName=requesterNames.get(req.requester_id)||"Member "+req.requester_id.slice(0,8);
     const label=document.createElement("span");
     label.className="request-label";
-    label.textContent="Member "+req.requester_id.slice(0,8)+" wants to view your camera • "+req.room_name;
+    label.textContent=requesterName+" wants to view your camera • "+req.room_name;
     const approve=document.createElement("button");
     approve.className="approve-video";
     approve.textContent="✅ Approve";
