@@ -1,0 +1,1398 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="LYM REALM - Explore Text Chat, Voice Chat, Video Chat and VisiChat in one online chat community.">
+<title>LYM REALM - Voice Chat, Video Chat, Text Chat & VisiChat</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#061713;color:white;font-family:Arial,sans-serif}button,input{font:inherit}
+header{height:80px;background:#006b43;display:flex;align-items:center;justify-content:space-between;padding:12px 22px;border-bottom:2px solid #00d98b}
+.logo{font-size:25px;font-weight:bold}.sub{font-size:12px;color:#c8ffe6;margin-top:5px}
+button{cursor:pointer;border:0;border-radius:9px;padding:11px 15px;background:#00a96b;color:white;font-weight:bold}button:hover{background:#00c982}button:disabled{opacity:.5;cursor:not-allowed}
+input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;background:#10251f;color:white;margin:6px 0;outline:none}
+#auth{max-width:420px;margin:60px auto;padding:25px;background:#102b25;border-radius:18px}#auth button{width:100%;margin-top:8px}#status{color:#aaffd2;font-size:13px}
+#app{display:none;height:calc(100vh - 80px);grid-template-columns:290px 1fr}.sidebar{background:#09221c;padding:14px;border-right:1px solid #087b55;overflow:auto}
+.profile{padding:12px;background:#102e25;border-radius:12px;margin-bottom:12px}.avatar{width:48px;height:48px;border-radius:50%;background:#087c53;display:grid;place-items:center;font-size:23px;border:2px solid #00e995;flex-shrink:0}
+.myrow{display:flex;align-items:center;gap:12px}.green{color:#00ed87}.muted{color:#9bb6ad;font-size:12px}.editbox{margin-top:12px;padding-top:10px;border-top:1px solid #31564a}.editbox button{width:100%}
+.section-title{font-size:14px;color:#00ed87;margin:17px 4px 8px}#onlineCount{color:#00ed87;font-size:11px;margin-left:5px}
+.online-dot{display:inline-block;width:8px;height:8px;background:#00ed87;border-radius:50%;margin-right:6px;box-shadow:0 0 7px #00ed87;vertical-align:middle}
+.member{width:100%;display:flex;align-items:center;gap:9px;text-align:left;background:#142e28;margin:5px 0;padding:9px;border:1px solid transparent;border-radius:9px}.member.me{border-color:#00b978}.member .avatar{width:36px;height:36px;font-size:17px}
+.member-info{min-width:0;flex:1}.member-name{font-size:13px;font-weight:bold;overflow-wrap:anywhere}.member-role{font-size:10px;color:#ffd76a;margin-top:3px}
+.chat{display:flex;flex-direction:column;min-width:0}.chathead{min-height:70px;background:#09221c;display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #087b55}.chathead .avatar{width:43px;height:43px}
+#messages{flex:1;overflow:auto;padding:18px;background-color:#071c17;background-image:radial-gradient(#173b30 1px,transparent 1px);background-size:22px 22px}
+.msg{max-width:75%;width:fit-content;background:#263c38;border-radius:14px;padding:10px 13px;margin:10px 0;white-space:pre-wrap;overflow-wrap:anywhere}.msg.mine{margin-left:auto;background:#007e50}
+.sender{font-size:12px;font-weight:bold;color:#ffd76a;margin-bottom:6px}.msg.mine .sender{color:#aaffd2}.time{font-size:10px;color:#c1d8cf;text-align:right;margin-top:7px}
+.msg audio{display:block;width:min(270px,65vw);max-width:100%;margin-top:8px}.system-message{text-align:center;color:#9bb6ad;font-size:12px;margin:15px}
+.composer{display:flex;gap:9px;padding:12px;background:#09221c;align-items:center}.composer input{margin:0;flex:1;min-width:0}.composer button{min-width:65px}
+#welcomeScreen{display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(145deg,#061713,#0b3024);align-items:center;justify-content:center;padding:15px;overflow-y:auto}
+.welcome-card{width:100%;max-width:520px;background:#102b25;border:1px solid #00a96b;border-radius:20px;padding:24px;box-shadow:0 0 30px #003d2b}
+.welcome-logo{text-align:center;color:#f5d477;font-size:30px;font-weight:bold}.welcome-sub{text-align:center;color:#a8d8c5;font-size:11px;margin-top:7px}
+.rules-title{color:#f5d477;font-size:19px;margin:22px 0 13px}.rule{display:flex;gap:10px;margin:12px 0;color:white;font-size:14px;line-height:1.5}.rule-number{color:#f5d477;font-weight:bold;min-width:20px}
+.welcome-footer{text-align:center;color:#a8d8c5;font-size:12px;margin:20px 0}#enterChatBtn{width:100%;padding:15px;border-radius:12px;background:#d7b65c;color:#10251d;font-size:17px;font-weight:bold}#enterChatBtn:hover{background:#f5d477}
+.voice-room{background:#0b2b22;border-bottom:1px solid #087b55;padding:10px 14px}.voice-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.voice-title{font-weight:bold;color:#f5d477}.voice-state{font-size:12px;color:#aaffd2;flex:1;min-width:130px}
+.voice-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.voice-actions button{padding:8px 10px;font-size:12px}.voice-actions .danger{background:#a52e38}.voice-actions .gold{background:#a78328;color:#fff}
+#micRequests{font-size:12px;color:#d8eee5;margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}.request-item{background:#173d30;border:1px solid #287b59;border-radius:8px;padding:6px 8px;display:flex;gap:7px;align-items:center}.request-item button{padding:5px 8px;font-size:11px}
+@media(max-width:650px){header{height:70px;padding:10px}.logo{font-size:18px}#app{height:calc(100vh - 70px);grid-template-columns:112px 1fr}.sidebar{padding:6px}.profile{padding:7px}.myrow{display:block;text-align:center}.profile .avatar{margin:auto;width:38px;height:38px;font-size:18px}.profile .muted{font-size:9px;margin-top:5px}#myname{font-size:11px;overflow-wrap:anywhere}.editbox{padding-top:6px}.editbox input{padding:7px;font-size:10px}.editbox button{padding:7px 2px;font-size:10px}.section-title{font-size:11px;margin:12px 2px 6px}#onlineCount{font-size:9px;margin-left:2px}.member{display:block;text-align:center;padding:7px 2px}.member .avatar{width:30px;height:30px;margin:auto;font-size:15px}.member-name{font-size:10px;margin-top:4px}.member-role{font-size:8px;overflow-wrap:anywhere}.chathead{min-height:60px;padding:8px}.chathead .avatar{width:36px;height:36px}#messages{padding:8px}.msg{max-width:92%;font-size:13px;padding:9px}.composer{padding:7px;gap:5px}.composer button{padding:10px 7px;min-width:45px;font-size:12px}.composer input{font-size:13px}.welcome-card{padding:19px}.welcome-logo{font-size:26px}.rule{font-size:13px;margin:11px 0}.voice-room{padding:8px}.voice-actions button{font-size:10px;padding:7px}.voice-state{font-size:11px}}
+.video-room{background:#092b21;padding:12px;border-bottom:1px solid #087b55}
+.video-room h3{color:#f5d477;margin:0 0 10px}
+#videoRooms{display:flex;gap:7px;flex-wrap:wrap}
+#videoRooms button{padding:8px 12px;font-size:12px}
+#videoRoomStatus{color:#aaffd2;font-size:12px;margin:10px 0 0}
+/* LYM REALM PROFESSIONAL 3-COLUMN DESIGN */
+#app{
+  grid-template-columns:220px minmax(0,1fr) 245px;
+  gap:0;
+  min-height:0;
+}
+#app>.sidebar{
+  min-width:0;
+  overflow:auto;
+  background:#061f18;
+  padding:10px;
+  border-color:#087b55;
+}
+.rooms-sidebar{border-right:1px solid #087b55}
+.users-sidebar{border-left:1px solid #087b55}
+.side-panel{
+  background:#0b3024;
+  border:1px solid #087b55;
+  border-radius:12px;
+  padding:10px;
+  margin-bottom:12px;
+  box-shadow:0 0 10px #003d2b;
+}
+.side-heading{
+  color:#f5d477;
+  font-weight:bold;
+  font-size:15px;
+  margin-bottom:10px;
+}
+.room-link{
+  display:block;
+  width:100%;
+  text-align:left;
+  margin:6px 0;
+  background:#123c2d;
+  border:1px solid #28654c;
+  border-radius:9px;
+}
+.room-link.active{
+  background:#00a96b;
+  border-color:#f5d477;
+  color:white;
+}
+.chat{min-width:0;min-height:0}
+.chathead{border-bottom:1px solid #00a96b}
+#messages{min-height:0}
+.users-sidebar .profile{border:1px solid #28654c}
+.camera-panel button{width:100%;margin:4px 0}
+.camera-panel video{max-width:100%!important}
+#videoCameraMembers,#videoIncomingRequests{
+  overflow-wrap:anywhere;
+  font-size:12px;
+}
+@media(max-width:650px){
+  #app{
+    width:100%;
+    min-width:0;
+    overflow-x:auto;
+    grid-template-columns:minmax(76px,22vw) minmax(0,1fr) minmax(76px,24vw);
+    overflow-x:hidden;
+    height:calc(100vh - 70px);
+  }
+  #app>.sidebar{padding:8px}
+  .side-panel{padding:8px;margin-bottom:9px}
+  .side-heading{font-size:12px;text-align:center}
+  .room-link{font-size:9px;padding:8px 2px;text-align:center;overflow-wrap:anywhere;line-height:1.2}
+  .rooms-sidebar .voice-room{padding:6px}
+  .rooms-sidebar .voice-title{font-size:11px}
+  .rooms-sidebar .voice-state{font-size:10px;min-width:0}
+  .rooms-sidebar .voice-actions{display:flex;flex-direction:column}
+  .rooms-sidebar .voice-actions button{font-size:10px;padding:8px 4px}
+  .users-sidebar .profile{padding:7px}
+  .users-sidebar .myrow{display:block;text-align:center}
+  .users-sidebar .profile .avatar{width:32px;height:32px;margin:auto;font-size:16px}
+  .users-sidebar .muted{font-size:9px}
+  .users-sidebar #myname{font-size:11px}
+  .users-sidebar .editbox input{font-size:10px;padding:7px}
+  .users-sidebar .editbox button{font-size:10px;padding:7px 3px}
+  .users-sidebar .section-title{font-size:10px}
+  .users-sidebar #onlineCount{font-size:9px;margin:0}
+  .users-sidebar .member{display:block;text-align:center;padding:5px 2px}
+  .users-sidebar .member .avatar{width:27px;height:27px;margin:auto;font-size:13px}
+  .users-sidebar .member-name{font-size:9px}
+  .users-sidebar .member-role{font-size:8px}
+  .camera-panel button{font-size:10px;padding:8px 4px}
+  .camera-panel #myCameraPreview{position:fixed!important;left:10px;top:100px;right:auto;bottom:auto;width:135px!important;max-width:48vw!important;height:auto!important;margin:0!important;display:block;z-index:9998!important;touch-action:none!important}
+  .chathead{padding:8px}
+  #messages{padding:10px}
+  .composer{padding:8px;gap:6px}
+  .composer button{padding:10px 7px;min-width:45px}
+}
+#micRequests{
+  position:fixed;
+  top:85px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:10000;
+  max-width:calc(100vw - 16px);
+  width:max-content;
+  background:#092b21;
+  border:1px solid #f5d477;
+  border-radius:12px;
+  padding:8px;
+  box-shadow:0 6px 24px #0009;
+}
+
+#micRequests:empty{
+  display:none;
+}
+
+/* Floating, slightly larger draggable camera preview */
+.camera-panel #myCameraPreview{
+  position:fixed!important;
+  left:10px;
+  top:100px;
+  right:auto;
+  bottom:auto;
+  display:block;
+  width:160px!important;
+  max-width:50vw!important;
+  height:auto!important;
+  margin:0!important;
+  z-index:9998!important;
+  touch-action:none!important;
+  cursor:move;
+  box-shadow:0 5px 20px #000b;
+}
+#videoRemoteStreams{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-start;
+  gap:8px;
+  max-width:100%;
+  overflow:hidden;
+}
+#videoRemoteStreams video{
+  width:100%!important;
+  max-width:180px!important;
+  height:auto!important;
+  border-radius:10px;
+}
+#videoIncomingRequests:empty,
+#videoCameraMembers:empty{display:none}
+#videoIncomingRequests>div{
+  background:#123c2d;
+  border:1px solid #28654c;
+  border-radius:8px;
+  padding:7px;
+  margin:6px 0;
+}
+#videoIncomingRequests button{font-size:10px;padding:6px 8px;margin:4px 3px 0 0}
+ 
+#voiceRoomState{display:none!important}
+.chat{display:flex;flex-direction:column;height:100%;min-height:0;min-width:0;overflow:hidden}
+.chathead{flex:0 0 auto}
+.composer{display:flex;flex:0 0 auto;min-width:0;position:relative;z-index:2;order:1}
+#messages{display:block;flex:1 1 auto;min-height:120px;min-width:0;overflow-y:auto;overscroll-behavior:contain;order:2}
+.composer input{display:block;flex:1 1 auto;min-width:0;width:0}
+
+/* LYM REALM IMAGE-MATCH LAYOUT: Rooms/Mic | Text Chat | Camera/Online Users */
+#app{
+  grid-template-rows:minmax(0,1fr) auto;
+}
+#app>.rooms-sidebar,#app>.chat,#app>.users-sidebar{
+  grid-row:1;
+  min-height:0;
+}
+#app>.text-chat-board{
+  grid-column:1 / -1;
+  grid-row:2;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding:8px 12px;
+  background:#061f18;
+  border:1px solid #d7b65c;
+  border-radius:12px;
+  box-shadow:0 0 12px #8a6a20;
+  z-index:3;
+}
+.text-chat-title{
+  color:#f5d477;
+  font-weight:bold;
+  font-size:15px;
+  padding:0 4px;
+}
+.text-chat-board .composer{
+  width:100%;
+  border:1px solid #28654c;
+  border-radius:12px;
+  background:#092b21;
+}
+.text-chat-board .composer input{
+  min-width:0;
+  flex:1 1 auto;
+  margin:0;
+}
+
+#app{
+  grid-template-columns:minmax(150px,220px) minmax(0,1fr) minmax(160px,245px);
+  grid-template-rows:minmax(0,1fr);
+  gap:0;
+  min-height:0;
+  overflow:hidden;
+}
+#app>.rooms-sidebar{grid-column:1;grid-row:1;min-height:0}
+#app>.chat{grid-column:2;grid-row:1;min-height:0;border-left:1px solid #087b55;border-right:1px solid #087b55}
+#app>.users-sidebar{grid-column:3;grid-row:1;min-height:0}
+@media(max-width:650px){
+  #app{
+    grid-template-columns:minmax(76px,22vw) minmax(0,1fr) minmax(76px,24vw);
+    grid-template-rows:minmax(0,1fr) auto;
+    height:calc(100vh - 70px);
+    overflow:hidden;
+  }
+  #app>.rooms-sidebar,#app>.users-sidebar{min-width:0;min-height:0;overflow-y:auto}
+  #app>.chat{min-width:0;min-height:0;grid-column:2;grid-row:1}
+  #app>.text-chat-board{grid-column:1 / -1;grid-row:2;padding:6px;gap:4px}
+  .text-chat-title{font-size:12px}
+  .text-chat-board .composer{padding:6px;gap:5px}
+  .text-chat-board .composer input{font-size:13px}
+}
+
+/* Keep the bottom Text Chat Board visible without page scrolling */
+@media(max-width:650px){
+  html,body{height:100%;overflow:hidden}
+  #app{
+    height:calc(100dvh - 70px);
+    max-height:calc(100dvh - 70px);
+    grid-template-rows:minmax(0,1fr) auto;
+    overflow:hidden;
+  }
+  #app>.text-chat-board{
+    grid-row:2;
+    align-self:end;
+    padding:4px 7px;
+    gap:3px;
+    margin:0 4px 4px;
+  }
+  .text-chat-title{line-height:1.2;padding:0 3px}
+  .text-chat-board .composer{padding:5px;gap:4px}
+}
+
+</style>
+</head>
+<body>
+<header><div><div class="logo">♛ LYM REALM CHAT</div><div class="sub">ONE REALM • ONE COMMUNITY</div></div><button id="logoutBtn" onclick="logout()" style="display:none">Logout</button></header>
+<div id="auth"><h2>Welcome to LYM REALM</h2><div id="loginPanel"><input id="email" type="email" placeholder="Email address"><input id="password" type="password" placeholder="Password"><button onclick="login()">Login</button><button onclick="signup()">Create Account</button><button onclick="sendPasswordReset()" style="background:#a78328">Forgot Password?</button></div><div id="passwordRecoveryPanel" style="display:none"><h3>Set New Password</h3><input id="newPassword" type="password" placeholder="New password (at least 6 characters)"><input id="confirmNewPassword" type="password" placeholder="Confirm new password"><button onclick="saveNewPassword()">Save New Password</button></div><p id="status"></p></div>
+<div id="welcomeScreen"><div class="welcome-card"><div class="welcome-logo">♛ LYM REALM</div><div class="welcome-sub">WELCOME TO OUR COMMUNITY</div><div class="rules-title">📜 COMMUNITY RULES</div>
+<div class="rule"><span class="rule-number">1.</span><span>سب ممبرز کی عزت کریں۔</span></div><div class="rule"><span class="rule-number">2.</span><span>گالی گلوچ اور بدتمیزی منع ہے۔</span></div><div class="rule"><span class="rule-number">3.</span><span>کسی کو دھمکی یا ہراساں نہ کریں۔</span></div><div class="rule"><span class="rule-number">4.</span><span>اسپیم اور بار بار میسج نہ کریں۔</span></div><div class="rule"><span class="rule-number">5.</span><span>بغیر اجازت لنکس شیئر نہ کریں۔</span></div><div class="rule"><span class="rule-number">6.</span><span>اپنی ذاتی معلومات شیئر نہ کریں۔</span></div><div class="rule"><span class="rule-number">7.</span><span>جعلی اکاؤنٹ اور دھوکہ دہی منع ہے۔</span></div><div class="rule"><span class="rule-number">8.</span><span>نفرت انگیز مواد منع ہے۔</span></div><div class="rule"><span class="rule-number">9.</span><span>Moderator اور Admin کا احترام کریں۔</span></div><div class="rule"><span class="rule-number">10.</span><span>قواعد توڑنے پر Mute، Kick یا Ban ہو سکتا ہے۔</span></div><div class="welcome-footer">RESPECT EVERYONE • KEEP OUR COMMUNITY SAFE ❤️</div><button id="enterChatBtn" onclick="enterChat()">ENTER CHAT</button></div></div>
+<div id="app"><aside class="sidebar"><div class="profile"><div class="myrow"><div class="avatar">👑</div><div><div class="muted">YOUR USERNAME</div><strong id="myname" class="green">Loading...</strong><div id="myrole" class="muted"></div></div></div><div class="editbox"><div class="muted">Change Username</div><input id="newUsername" maxlength="20" placeholder="New username"><button onclick="changeUsername()">Save Username</button></div></div>
+<div class="section-title">♛ COMMUNITY MEMBERS <span id="onlineCount">0 Online</span></div><div id="users">Loading members...</div></aside>
+<main class="chat"><div class="chathead"><div class="avatar">🌍</div><div><strong>🌍 MAIN PUBLIC CHAT</strong><div class="muted">Everyone is connected here</div></div></div>
+<div class="composer"><input id="message" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()"><button id="sendBtn" onclick="sendMessage()">Send</button></div>
+<div id="messages"><div class="system-message">Welcome to LYM REALM PUBLIC CHAT</div></div>
+
+<section class="voice-room">
+  <div class="voice-top"><span id="voiceRoomState" class="voice-state">Connecting to voice room...</span></div>
+  <div class="voice-actions">
+    <button id="requestMicBtn" onclick="requestMic()">Request Mic</button>
+    <button id="cancelRequestBtn" onclick="cancelMicRequest()" style="display:none">Cancel Request</button>
+    <button id="startSpeakingBtn" onclick="startSpeaking()" style="display:none">Start Speaking</button>
+    <button id="releaseMicBtn" onclick="releaseMic()" style="display:none" class="danger">Release Mic</button>
+    <button id="giveMicBtn" onclick="giveMicPrompt()" style="display:none" class="gold">Pass Mic</button>
+  </div>
+  <div id="micRequests"></div>
+</section>
+<section class="video-room">
+<h3>📹 LIVE VIDEO CHAT</h3>
+<div id="videoRooms">
+<button onclick="selectVideoRoom('Home')">Home</button>
+<button onclick="selectVideoRoom('Islamic')">Islamic</button>
+<button onclick="selectVideoRoom('Help')">Help</button>
+<button onclick="selectVideoRoom('Music')">Music</button>
+<button onclick="selectVideoRoom('One by One')">One by One</button>
+</div>
+<p id="videoRoomStatus">Select a video room</p>
+<div class="video-controls">
+<button id="cameraOnBtn" onclick="startMyCamera()">📷 Camera ON</button>
+<button id="cameraOffBtn" onclick="stopMyCamera()" class="danger">Camera OFF</button>
+</div>
+<video id="myCameraPreview" autoplay muted playsinline style="display:none;position:fixed;left:10px;top:100px;width:220px;max-width:65vw;border:2px solid #f5d477;border-radius:12px;z-index:9998;touch-action:none;cursor:move;"></video>
+</section>
+<div id="videoRemoteStreams"></div>
+<div id="videoCameraMembers"></div>
+<div id="videoIncomingRequests"></div>
+</main></div>
+<script>
+const SUPABASE_URL="https://probxnzduietjivnqrac.supabase.co";
+const SUPABASE_KEY="sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let currentUser=null;
+let chatStartedAt=null;
+let securityHeartbeatTimer=null;
+
+async function sendSecurityHeartbeat(){
+  if(!currentUser)return;
+  try{
+    await db.functions.invoke("security-monitor",{
+      body:{action:"heartbeat",path:window.location.pathname||"/chat.html"}
+    });
+  }catch(error){
+    console.warn("Security monitor heartbeat:",error?.message||error);
+  }
+}
+function startSecurityHeartbeat(){
+  if(securityHeartbeatTimer)clearInterval(securityHeartbeatTimer);
+  sendSecurityHeartbeat();
+  securityHeartbeatTimer=setInterval(sendSecurityHeartbeat,5*60*1000);
+}
+let myCameraStream=null;
+// Arrange LYM REALM professional chat layout
+(function arrangeChatLayout(){
+  const app=document.getElementById("app");
+  const oldSide=app.querySelector(":scope > .sidebar");
+  const chat=app.querySelector(":scope > .chat");
+  if(!app||!oldSide||!chat)return;
+
+  const left=document.createElement("aside");
+  left.className="sidebar rooms-sidebar";
+
+  const right=document.createElement("aside");
+  right.className="sidebar users-sidebar";
+
+  const mic=chat.querySelector(".voice-room");
+  const video=chat.querySelector(".video-room");
+  const videoRooms=video.querySelector("#videoRooms");
+  const controls=video.querySelector(".video-controls");
+  const preview=video.querySelector("#myCameraPreview");
+
+  const profile=oldSide.querySelector(".profile");
+  const title=oldSide.querySelector(".section-title");
+  const users=oldSide.querySelector("#users");
+
+  const cameraMembers=chat.querySelector("#videoCameraMembers");
+  const incoming=chat.querySelector("#videoIncomingRequests");
+  const remoteStreams=chat.querySelector("#videoRemoteStreams");
+
+  const micPanel=document.createElement("section");
+  micPanel.className="side-panel";
+  micPanel.innerHTML='';
+  micPanel.appendChild(mic);
+
+  const roomsPanel=document.createElement("section");
+  roomsPanel.className="side-panel";
+  roomsPanel.innerHTML='<div class="side-heading">🏠 ROOMS</div>';
+
+  [
+    ["Home","🏠 Home"],
+    ["Islamic","☪ Islamic"],
+    ["Help","❓ Help"],
+    ["Music","🎵 Music"],
+    ["One by One","👤 One by One"]
+  ].forEach(([room,label],index)=>{
+    const button=document.createElement("button");
+    button.className="room-link"+(index===0?" active":"");
+    button.textContent=label;
+    button.dataset.room=room;
+    button.onclick=()=>{
+      selectVideoRoom(room);
+      roomsPanel.querySelectorAll(".room-link").forEach(b=>{
+        b.classList.toggle("active",b.dataset.room===room);
+      });
+    };
+    roomsPanel.appendChild(button);
+  });
+
+  left.append(micPanel,roomsPanel);
+
+  videoRooms.remove();
+
+  const cameraPanel=document.createElement("section");
+  cameraPanel.className="side-panel camera-panel";
+  cameraPanel.innerHTML='';
+
+  cameraPanel.append(controls,preview);
+  if(cameraMembers)cameraPanel.appendChild(cameraMembers);
+  if(incoming)cameraPanel.appendChild(incoming);
+  if(remoteStreams)cameraPanel.appendChild(remoteStreams);
+
+  right.append(cameraPanel,title,users);
+
+  oldSide.remove();
+
+  const composer=chat.querySelector(".composer");
+  const textBoard=document.createElement("section");
+  textBoard.className="text-chat-board";
+  textBoard.innerHTML='<div class="text-chat-title">💬 Text Chat Board</div>';
+  if(composer)textBoard.appendChild(composer);
+
+  app.replaceChildren(left,chat,right,textBoard);
+})();
+let isPasswordRecovery=false;
+let selectedVideoRoom="Home";
+let videoPeers=new Map();
+let videoSignalChannel=null;
+let videoRequestChannel=null;
+let videoSeenSignals=new Set();
+let videoStarting=false;
+let videoPendingIce=new Map();
+
+function videoPeerKey(peerId,roomName=selectedVideoRoom){return roomName+"|"+peerId}
+function removeRemoteVideo(peerId){
+  const video=document.getElementById("remote-video-"+peerId);
+  if(video){video.srcObject=null;video.remove()}
+}
+function closeVideoPeer(peerId,roomName=selectedVideoRoom){
+  const key=videoPeerKey(peerId,roomName),pc=videoPeers.get(key);
+  if(pc){try{pc.close()}catch(e){}videoPeers.delete(key)}
+  videoPendingIce.delete(key);
+  removeRemoteVideo(peerId);
+}
+async function closeAllVideoPeers(notify=false){
+  const entries=[...videoPeers.entries()];
+  for(const [key,pc] of entries){
+    const split=key.indexOf("|"),roomName=key.slice(0,split),peerId=key.slice(split+1);
+    if(notify&&currentUser)await sendVideoSignal(peerId,{type:"bye"},currentUser.id,roomName);
+    try{pc.close()}catch(e){}
+    removeRemoteVideo(peerId);
+  }
+  videoPeers.clear();videoPendingIce.clear();
+}
+async function setupVideoChat(){
+  if(!currentUser)return;
+  if(videoSignalChannel){try{await db.removeChannel(videoSignalChannel)}catch(e){}videoSignalChannel=null}
+  videoSeenSignals.clear();
+  videoSignalChannel=db.channel("lym-video-signals-"+currentUser.id)
+    .on("postgres_changes",{event:"INSERT",schema:"public",table:"video_signals",filter:"receiver_id=eq."+currentUser.id},payload=>{
+      const row=payload.new;
+      if(!row||videoSeenSignals.has(row.id))return;
+      videoSeenSignals.add(row.id);
+      handleVideoSignal(row);
+    }).subscribe();
+  if(videoRequestChannel){try{await db.removeChannel(videoRequestChannel)}catch(e){}videoRequestChannel=null}
+  videoRequestChannel=db.channel("lym-video-requests-"+currentUser.id)
+    .on("postgres_changes",{event:"*",schema:"public",table:"video_view_requests",filter:"camera_owner_id=eq."+currentUser.id},()=>{
+      loadIncomingVideoRequests();
+    }).subscribe(status=>{
+      if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")console.warn("Video request realtime:",status);
+    });
+  await loadVideoCameras();
+  await loadIncomingVideoRequests();
+}
+async function syncApprovedVideoPeers(){
+  if(!currentUser)return;
+  const {data,error}=await db.from("video_view_requests").select("requester_id,room_name")
+    .eq("camera_owner_id",currentUser.id).eq("room_name",selectedVideoRoom).eq("status","approved");
+  if(error){console.warn("Approved video requests:",error.message);return}
+  if(!myCameraStream)return;
+  for(const request of data||[]){
+    if(request.requester_id===currentUser.id)continue;
+    const key=videoPeerKey(request.requester_id,request.room_name);
+    if(videoPeers.has(key))continue;
+    try{
+      const pc=getVideoPeer(request.requester_id,currentUser.id,request.room_name);
+      myCameraStream.getTracks().forEach(track=>pc.addTrack(track,myCameraStream));
+      const offer=await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      await sendVideoSignal(request.requester_id,{type:"offer",description:pc.localDescription},currentUser.id,request.room_name);
+    }catch(error){console.warn("Video offer failed:",error.message);closeVideoPeer(request.requester_id,request.room_name)}
+  }
+}
+
+async function startMyCamera(){
+// Drag camera preview with finger or mouse
+(function(){
+  const video=document.getElementById("myCameraPreview");
+  if(!video)return;
+
+  let dragging=false,startX=0,startY=0,left=0,top=0;
+
+  if(video.dataset.dragReady!=="1"){
+    video.dataset.dragReady="1";
+    video.addEventListener("pointerdown",e=>{
+      const rect=video.getBoundingClientRect();
+      dragging=true;
+      startX=e.clientX;
+      startY=e.clientY;
+      left=rect.left;
+      top=rect.top;
+      video.setPointerCapture(e.pointerId);
+    });
+
+  video.addEventListener("pointermove",e=>{
+    if(!dragging)return;
+
+    const x=Math.max(0,Math.min(innerWidth-video.offsetWidth,left+e.clientX-startX));
+    const y=Math.max(0,Math.min(innerHeight-video.offsetHeight,top+e.clientY-startY));
+
+    video.style.left=x+"px";
+    video.style.top=y+"px";
+    video.style.right="auto";
+    video.style.bottom="auto";
+  });
+
+    video.addEventListener("pointerup",()=>dragging=false);
+    video.addEventListener("pointercancel",()=>dragging=false);
+  }
+})();
+  if(!currentUser){alert("Please login first.");return}
+  if(myCameraStream){alert("Your camera is already ON.");return}
+  if(!navigator.mediaDevices?.getUserMedia){alert("Camera requires HTTPS and Chrome.");return}
+  try{
+    myCameraStream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+    const preview=document.getElementById("myCameraPreview");
+    preview.srcObject=myCameraStream;
+    preview.style.display="block";
+    const {error:statusError}=await db.from("video_room_cameras").upsert({
+      user_id:currentUser.id,room_name:selectedVideoRoom,camera_on:true,updated_at:new Date().toISOString()
+    },{onConflict:"user_id,room_name"});
+    if(statusError)throw new Error("Camera status could not be published: "+statusError.message);
+    const status=document.getElementById("videoRoomStatus");
+    if(status)status.textContent="Camera ON • "+selectedVideoRoom+" • Waiting for view requests";
+    await loadVideoCameras();
+    await syncApprovedVideoPeers();
+  }catch(error){
+    if(myCameraStream){myCameraStream.getTracks().forEach(track=>track.stop());myCameraStream=null}
+    const preview=document.getElementById("myCameraPreview");
+    if(preview){preview.srcObject=null;preview.style.display="none"}
+    alert("Camera error: "+error.message);
+  }
+}
+
+async function expireApprovedVideoRequests(roomName){
+  if(!currentUser||!roomName)return;
+  const {error}=await db.from("video_view_requests").update({status:"rejected"})
+    .eq("camera_owner_id",currentUser.id).eq("room_name",roomName).eq("status","approved");
+  if(error){console.warn("Could not expire camera approvals:",error.message);alert("Camera approval reset error: "+error.message)}
+}
+async function stopMyCamera(){
+  if(currentUser&&myCameraStream)await closeAllVideoPeers(true);
+  if(myCameraStream){myCameraStream.getTracks().forEach(track=>track.stop());myCameraStream=null}
+  const preview=document.getElementById("myCameraPreview");
+  if(preview){preview.srcObject=null;preview.style.display="none"}
+  if(currentUser){
+    const {error}=await db.from("video_room_cameras").upsert({
+      user_id:currentUser.id,room_name:selectedVideoRoom,camera_on:false,updated_at:new Date().toISOString()
+    },{onConflict:"user_id,room_name"});
+    if(error)console.warn("Camera status:",error.message);
+    await expireApprovedVideoRequests(selectedVideoRoom);
+  }
+  const status=document.getElementById("videoRoomStatus");
+  if(status)status.textContent="Camera OFF";
+  await loadVideoCameras();
+}
+
+async function loadVideoCameras(){
+  if(!currentUser)return;
+  const box=document.getElementById("videoCameraMembers");
+  if(!box)return;
+  const {data,error}=await db.from("video_room_cameras").select("user_id,room_name,camera_on").eq("room_name",selectedVideoRoom).eq("camera_on",true);
+  if(error){console.warn(error.message);return}
+  box.innerHTML="";
+  (data||[]).forEach(camera=>{
+    if(camera.user_id===currentUser.id)return;
+    const item=document.createElement("div");
+    item.textContent="Member: "+(profilesMap[camera.user_id]||camera.user_id.slice(0,8));
+    const btn=document.createElement("button");
+    btn.textContent="Request to View";
+    btn.onclick=()=>requestVideoAccess(camera.user_id);
+    item.appendChild(btn);
+    box.appendChild(item);
+  });
+}
+
+async function requestVideoAccess(ownerId){
+  if(!currentUser||!ownerId)return;
+  const {data:existing,error:checkError}=await db.from("video_view_requests").select("id,status").eq("requester_id",currentUser.id).eq("camera_owner_id",ownerId).eq("room_name",selectedVideoRoom).in("status",["pending","approved"]).limit(1);
+  if(checkError){alert("Request check error: "+checkError.message);return}
+  if(existing?.length){
+    alert(existing[0].status==="approved"?"Permission already approved!":"Your request is already pending.");
+    return;
+  }
+  const {error}=await db.from("video_view_requests").insert({
+    requester_id:currentUser.id,
+    camera_owner_id:ownerId,
+    room_name:selectedVideoRoom
+  });
+  if(error){alert("Request error: "+error.message);return}
+  alert("Camera permission request sent!");
+  loadIncomingVideoRequests();
+}
+
+async function loadIncomingVideoRequests(){
+  if(!currentUser)return;
+  const box=document.getElementById("videoIncomingRequests");
+  if(!box)return;
+  const {data,error}=await db.from("video_view_requests").select("id,requester_id,room_name").eq("camera_owner_id",currentUser.id).eq("room_name",selectedVideoRoom).eq("status","pending");
+  if(error){
+    console.warn("Incoming camera requests:",error.message);
+    box.replaceChildren();
+    const errorItem=document.createElement("div");
+    errorItem.textContent="Camera request error: "+error.message;
+    box.appendChild(errorItem);
+    return;
+  }
+  if(!data||data.length===0){box.innerHTML="";return}
+  box.innerHTML="<h4>Incoming Camera Requests</h4>";
+  const uniqueRequests=new Map();
+  data.forEach(req=>{
+    if(!uniqueRequests.has(req.requester_id))uniqueRequests.set(req.requester_id,req);
+  });
+  uniqueRequests.forEach(req=>{
+    const item=document.createElement("div");
+    item.dataset.requesterId=req.requester_id;
+    item.textContent="Member: "+req.requester_id.slice(0,8);
+    const approve=document.createElement("button");
+    approve.textContent="Approve";
+    approve.onclick=()=>approveVideoRequest(req.id,req.requester_id);
+    const reject=document.createElement("button");
+    reject.textContent="Reject";
+    reject.onclick=()=>rejectVideoRequest(req.id,req.requester_id);
+    item.appendChild(approve);
+    item.appendChild(reject);
+    box.appendChild(item);
+  });
+}
+
+setInterval(()=>{
+  if(currentUser){loadVideoCameras();loadIncomingVideoRequests();syncApprovedVideoPeers()}
+},5000);
+
+async function approveVideoRequest(requestId,requesterId){
+  const box=document.getElementById("videoIncomingRequests");
+  const item=box?.querySelector('[data-requester-id="'+requesterId+'"]');
+  if(item)item.remove();
+  const {data:pending,error:findError}=await db.from("video_view_requests")
+    .select("id").eq("camera_owner_id",currentUser.id).eq("requester_id",requesterId)
+    .eq("room_name",selectedVideoRoom).eq("status","pending");
+  if(findError){alert("Request lookup error: "+findError.message);await loadIncomingVideoRequests();return}
+  const ids=[...new Set([requestId,...(pending||[]).map(x=>x.id)])];
+  for(const id of ids){
+    const {error}=await db.rpc("approve_video_view_request",{p_request_id:id});
+    if(error){alert("Approve error: "+error.message);await loadIncomingVideoRequests();return}
+  }
+  await loadIncomingVideoRequests();
+  await syncApprovedVideoPeers();
+}
+
+async function rejectVideoRequest(requestId,requesterId){
+  const box=document.getElementById("videoIncomingRequests");
+  const item=box?.querySelector('[data-requester-id="'+requesterId+'"]');
+  if(item)item.remove();
+  const {data:pending,error:findError}=await db.from("video_view_requests")
+    .select("id").eq("camera_owner_id",currentUser.id).eq("requester_id",requesterId)
+    .eq("room_name",selectedVideoRoom).eq("status","pending");
+  if(findError){alert("Request lookup error: "+findError.message);await loadIncomingVideoRequests();return}
+  const ids=[...new Set([requestId,...(pending||[]).map(x=>x.id)])];
+  for(const id of ids){
+    const {error}=await db.rpc("revoke_video_view_request",{p_request_id:id});
+    if(error){alert("Reject error: "+error.message);await loadIncomingVideoRequests();return}
+  }
+  await loadIncomingVideoRequests();
+}
+
+async function revokeVideoPermission(requestId){
+  const {error}=await db.rpc("revoke_video_view_request",{p_request_id:requestId});
+  if(error){alert(error.message);return}
+  alert("Camera permission revoked.");
+}
+
+async function sendVideoSignal(to,signal,ownerId,roomName=selectedVideoRoom){
+  if(!currentUser||!to||!ownerId)return;
+  const {error}=await db.from("video_signals").insert({
+    sender_id:currentUser.id,receiver_id:to,camera_owner_id:ownerId,room_name:roomName,signal:signal
+  });
+  if(error)console.warn("Video signal:",error.message);
+}
+
+function getVideoPeer(peerId,ownerId,roomName=selectedVideoRoom){
+  const key=videoPeerKey(peerId,roomName);
+  let pc=videoPeers.get(key);
+  if(pc)return pc;
+  pc=new RTCPeerConnection(rtcConfig);
+  videoPeers.set(key,pc);
+  pc.onicecandidate=async e=>{
+    if(e.candidate)await sendVideoSignal(peerId,{type:"ice",candidate:e.candidate},ownerId,roomName);
+  };
+  pc.ontrack=e=>{
+    let video=document.getElementById("remote-video-"+peerId);
+    if(!video){
+      video=document.createElement("video");
+      video.id="remote-video-"+peerId;video.autoplay=true;video.playsInline=true;video.controls=true;
+      video.style.cssText="width:100%;max-width:180px;border-radius:10px;margin:5px;";
+      document.getElementById("videoRemoteStreams")?.appendChild(video);
+    }
+    video.srcObject=e.streams[0];video.play().catch(()=>{});
+  };
+  pc.onconnectionstatechange=()=>{
+    if(["failed","closed","disconnected"].includes(pc.connectionState))closeVideoPeer(peerId,roomName);
+  };
+  return pc;
+}
+
+async function hasApprovedVideoAccess(ownerId,requesterId,roomName){
+  if(!ownerId||!requesterId||!roomName)return false;
+  const {data,error}=await db.from("video_view_requests").select("id")
+    .eq("camera_owner_id",ownerId).eq("requester_id",requesterId)
+    .eq("room_name",roomName).eq("status","approved").limit(1).maybeSingle();
+  if(error){console.warn("Video permission check:",error.message);return false}
+  return !!data;
+}
+
+async function handleVideoSignal(row){
+  if(!currentUser||!row||row.sender_id===currentUser.id||row.room_name!==selectedVideoRoom)return;
+  const sig=row.signal||{},ownerId=row.camera_owner_id,roomName=row.room_name;
+  const requesterId=currentUser.id===ownerId?row.sender_id:currentUser.id;
+  const key=videoPeerKey(row.sender_id,roomName);
+  if(sig.type==="bye"){
+    closeVideoPeer(row.sender_id,roomName);
+    return;
+  }
+  // Never accept or continue a video connection unless the owner approved this exact member and room.
+  if(!await hasApprovedVideoAccess(ownerId,requesterId,roomName)){
+    closeVideoPeer(row.sender_id,roomName);
+    return;
+  }
+  if(sig.type==="offer"){
+    if(ownerId!==row.sender_id||row.receiver_id!==currentUser.id)return;
+    try{
+      const pc=getVideoPeer(row.sender_id,ownerId,roomName);
+      await pc.setRemoteDescription(new RTCSessionDescription(sig.description));
+      const queued=videoPendingIce.get(key)||[];
+      for(const candidate of queued){try{await pc.addIceCandidate(new RTCIceCandidate(candidate))}catch(e){}}
+      videoPendingIce.delete(key);
+      const answer=await pc.createAnswer();await pc.setLocalDescription(answer);
+      await sendVideoSignal(row.sender_id,{type:"answer",description:pc.localDescription},ownerId,roomName);
+    }catch(error){console.warn("Video answer failed:",error.message);closeVideoPeer(row.sender_id,roomName)}
+  }else if(sig.type==="answer"){
+    const pc=videoPeers.get(key);
+    if(!pc||ownerId!==currentUser.id)return;
+    try{await pc.setRemoteDescription(new RTCSessionDescription(sig.description))}catch(error){console.warn("Video answer:",error.message)}
+  }else if(sig.type==="ice"){
+    const pc=videoPeers.get(key);
+    if(pc&&pc.remoteDescription){try{await pc.addIceCandidate(new RTCIceCandidate(sig.candidate))}catch(e){}}
+    else{const pending=videoPendingIce.get(key)||[];pending.push(sig.candidate);videoPendingIce.set(key,pending)}
+  }
+}
+
+async function selectVideoRoom(room){
+  const rooms=["Home","Islamic","Help","Music","One by One"];
+  if(!rooms.includes(room)||room===selectedVideoRoom)return;
+  const previousRoom=selectedVideoRoom,wasCameraOn=!!myCameraStream;
+  await closeAllVideoPeers(true);
+  if(currentUser){
+    await db.from("video_room_cameras").upsert({user_id:currentUser.id,room_name:previousRoom,camera_on:false,updated_at:new Date().toISOString()},{onConflict:"user_id,room_name"});
+    await expireApprovedVideoRequests(previousRoom);
+  }
+  selectedVideoRoom=room;
+  if(wasCameraOn&&currentUser){
+    const {error}=await db.from("video_room_cameras").upsert({user_id:currentUser.id,room_name:room,camera_on:true,updated_at:new Date().toISOString()},{onConflict:"user_id,room_name"});
+    if(error)console.warn("New room camera status:",error.message);
+  }
+  document.getElementById("videoRoomStatus").textContent=(wasCameraOn?"Camera ON • ":"")+"Selected Video Room: "+room;
+  await loadVideoCameras();
+  await loadIncomingVideoRequests();
+  await syncApprovedVideoPeers();
+}
+
+db.auth.onAuthStateChange((event)=>{
+  if(event==="PASSWORD_RECOVERY"){
+    isPasswordRecovery=true;
+    document.getElementById("app").style.display="none";
+    document.getElementById("welcomeScreen").style.display="none";
+    document.getElementById("auth").style.display="block";
+    document.getElementById("loginPanel").style.display="none";
+    document.getElementById("passwordRecoveryPanel").style.display="block";
+    showStatus("Enter and confirm your new password.");
+  }
+});
+
+window.appStarting=false;
+let liveChannel=null,presenceChannel=null,onlineUserIds=[],profilesMap={},rolesMap={},kickCheckInterval=null,kickBeingHandled=false;
+let voiceStateChannel=null,voiceSignalChannel=null,voiceRequestChannel=null;
+let currentSpeakerId=null,voiceRequests=[],voicePeers=new Map(),liveMicStream=null;
+let voiceRoomStarted=false,voiceStarting=false;
+const rtcConfig={iceServers:[{urls:"stun:stun.l.google.com:19302"}]};
+let soundUnlocked=false;
+let pendingAnnouncements=[];
+let notificationAudioContext=null;
+
+function unlockChatSounds(){
+  soundUnlocked=true;
+  try{notificationAudioContext=new (window.AudioContext||window.webkitAudioContext)();notificationAudioContext.resume()}catch(e){}
+  if("speechSynthesis" in window)speechSynthesis.getVoices();
+  pendingAnnouncements.splice(0).forEach(speakAnnouncement);
+}
+function speakAnnouncement(message){
+  if(!("speechSynthesis" in window))return;
+  if(!soundUnlocked){pendingAnnouncements.push(message);return}
+  const voice=new SpeechSynthesisUtterance(message);
+  voice.lang="en-US";voice.rate=1;speechSynthesis.speak(voice);
+}
+function playMessageTone(){
+  if(!soundUnlocked||!notificationAudioContext)return;
+  const ctx=notificationAudioContext,oscillator=ctx.createOscillator(),gain=ctx.createGain(),now=ctx.currentTime;
+  oscillator.frequency.value=660;
+  gain.gain.setValueAtTime(0.08,now);
+  gain.gain.exponentialRampToValueAtTime(0.001,now+0.2);
+  oscillator.connect(gain);gain.connect(ctx.destination);oscillator.start(now);oscillator.stop(now+0.2);
+}
+function enterChat(){document.getElementById("welcomeScreen").style.display="none";unlockChatSounds()}
+function showStatus(message){document.getElementById("status").textContent=message}
+function sessionStorageKey(userId){return "lym_chat_started_at_"+userId}
+function timeValue(value){if(!value)return null;const result=new Date(value).getTime();return Number.isFinite(result)?result:null}
+function saveChatSession(userId,value){if(userId&&value)localStorage.setItem(sessionStorageKey(userId),String(value))}
+function stopKickChecker(){if(kickCheckInterval){clearInterval(kickCheckInterval);kickCheckInterval=null}}
+function stopLiveMic(){if(liveMicStream){liveMicStream.getTracks().forEach(t=>t.stop());liveMicStream=null}}
+function closeVoicePeers(){for(const pc of voicePeers.values()){try{pc.close()}catch(e){}}voicePeers.clear()}
+function stopLiveVoice(){voiceStarting=false;voiceRoomStarted=false;stopLiveMic();closeVoicePeers();const audioEls=document.querySelectorAll("[data-live-voice='1']");audioEls.forEach(a=>{a.srcObject=null;a.remove()})}
+async function removeVoiceChannels(){for(const ch of [voiceStateChannel,voiceSignalChannel,voiceRequestChannel]){if(ch){try{await db.removeChannel(ch)}catch(e){}}}voiceStateChannel=voiceSignalChannel=voiceRequestChannel=null;stopLiveVoice()}
+async function removeChatChannels(){
+  if(presenceChannel){const c=presenceChannel;presenceChannel=null;try{await db.removeChannel(c)}catch(e){}}
+  if(liveChannel){const c=liveChannel;liveChannel=null;try{await db.removeChannel(c)}catch(e){}}
+  if(videoSignalChannel){const c=videoSignalChannel;videoSignalChannel=null;try{await db.removeChannel(c)}catch(e){}}
+  if(videoRequestChannel){const c=videoRequestChannel;videoRequestChannel=null;try{await db.removeChannel(c)}catch(e){}}
+  await closeAllVideoPeers(false);
+  if(currentUser&&myCameraStream){
+    const {error}=await db.from("video_room_cameras").upsert({user_id:currentUser.id,room_name:selectedVideoRoom,camera_on:false,updated_at:new Date().toISOString()},{onConflict:"user_id,room_name"});
+    if(error)console.warn("Camera logout status:",error.message);
+  }
+  if(myCameraStream){myCameraStream.getTracks().forEach(t=>t.stop());myCameraStream=null}
+  const preview=document.getElementById("myCameraPreview");if(preview){preview.srcObject=null;preview.style.display="none"}
+  await removeVoiceChannels();onlineUserIds=[];
+}
+async function showAuthMessage(message){
+  stopKickChecker();await removeChatChannels();
+  try{await db.auth.signOut()}catch(e){}
+  currentUser=null;chatStartedAt=null;profilesMap={};rolesMap={};
+  document.getElementById("app").style.display="none";
+  document.getElementById("welcomeScreen").style.display="none";
+  document.getElementById("auth").style.display="block";
+  document.getElementById("logoutBtn").style.display="none";
+  document.getElementById("messages").innerHTML="";
+  showStatus(message);
+}
+async function sendPasswordReset(){
+  const email=document.getElementById("email").value.trim();
+  if(!email){showStatus("Enter your registered email address first.");return}
+  showStatus("Sending password reset email...");
+  const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo:"https://lymrealm-cpu.github.io/chat.html"});
+  if(error){showStatus("Reset email error: "+error.message);return}
+  showStatus("If this email is registered, a password reset link has been sent. Check Inbox and Spam.");
+}
+async function saveNewPassword(){
+  const password=document.getElementById("newPassword").value,confirmPassword=document.getElementById("confirmNewPassword").value;
+  if(password.length<6){showStatus("Password must be at least 6 characters.");return}
+  if(password!==confirmPassword){showStatus("Passwords do not match.");return}
+  showStatus("Updating password...");
+  const {error}=await db.auth.updateUser({password});
+  if(error){showStatus("Password update error: "+error.message);return}
+  showStatus("Password updated. Please login with your new password.");
+  await db.auth.signOut();isPasswordRecovery=false;
+  document.getElementById("passwordRecoveryPanel").style.display="none";
+  document.getElementById("loginPanel").style.display="block";
+  document.getElementById("newPassword").value="";
+  document.getElementById("confirmNewPassword").value="";
+  document.getElementById("password").value="";
+}
+
+async function login(){
+  const email=document.getElementById("email").value.trim();
+  const password=document.getElementById("password").value;
+
+  if(!email||!password){
+    showStatus("Enter email and password.");
+    return;
+  }
+
+  showStatus("Logging in...");
+
+  try{
+    const {data,error}=await db.auth.signInWithPassword({email,password});
+
+    if(error){
+      showStatus(error.message);
+      return;
+    }
+
+    showStatus("Login successful. Opening chat...");
+    await startApp(data.user,true);
+
+  }catch(error){
+    showStatus("Login error: "+error.message);
+  }
+}
+
+async function signup(){
+  const email=document.getElementById("email").value.trim(),password=document.getElementById("password").value;
+  if(!email||!password){showStatus("Enter email and password.");return}
+  showStatus("Creating account...");
+  const {data,error}=await db.auth.signUp({email,password});
+  if(error){showStatus(error.message);return}
+  if(data.session)await startApp(data.user,true);
+  else showStatus("Account created. Confirm your email, then login.");
+}
+async function setupPresence(){
+  if(!currentUser)return;
+  if(presenceChannel){await db.removeChannel(presenceChannel);presenceChannel=null}
+  let previousOnlineIds=new Set(),presenceInitialized=false;
+  onlineUserIds=[currentUser.id];
+  presenceChannel=db.channel("lym-online-members",{config:{presence:{key:currentUser.id}}});
+  presenceChannel.on("presence",{event:"sync"},async()=>{
+    const state=presenceChannel.presenceState();
+    const ids=[...new Set(Object.values(state).flat().map(x=>x.user_id).filter(Boolean))];
+    const newlyJoined=presenceInitialized?ids.filter(id=>!previousOnlineIds.has(id)&&id!==currentUser.id):[];
+    previousOnlineIds=new Set(ids);presenceInitialized=true;onlineUserIds=ids;
+    if(currentUser&&document.getElementById("app").style.display==="grid"){
+      await loadMembers();
+      newlyJoined.forEach(id=>{const name=profilesMap[id]||"Member";speakAnnouncement(name+" joined the room")});
+    }
+  });
+  await new Promise(resolve=>{
+    let finished=false;
+    const finish=()=>{if(finished)return;finished=true;resolve()};
+    const timeout=setTimeout(finish,8000);
+    presenceChannel.subscribe(async status=>{
+      if(status==="SUBSCRIBED"){
+        const {error}=await presenceChannel.track({user_id:currentUser.id});
+        if(error)showStatus("Online status error: "+error.message);
+        clearTimeout(timeout);finish();
+      }
+      if(["CHANNEL_ERROR","TIMED_OUT","CLOSED"].includes(status)){
+        showStatus("Online status connection problem. Please refresh.");
+        clearTimeout(timeout);finish();
+      }
+    });
+  });
+}
+async function checkBanStatus(){
+  const {data,error}=await db.rpc("is_my_account_banned");
+  if(error){await showAuthMessage("Account verification failed. Please try again. "+error.message);return false}
+  if(data===true){await showAuthMessage("Your account is banned by Admin. Contact Super Admin.");return false}
+  return true;
+}
+async function handleKicked(){if(kickBeingHandled)return;kickBeingHandled=true;await showAuthMessage("You were kicked by Super Admin. You may log in again.");kickBeingHandled=false}
+async function checkKickStatus(){
+  if(!currentUser||!chatStartedAt||kickBeingHandled)return;
+  const userId=currentUser.id,originalTime=timeValue(chatStartedAt);
+  const {data,error}=await db.rpc("get_my_chat_started_at");
+  if(error||!currentUser||currentUser.id!==userId)return;
+  const serverTime=timeValue(data);
+  if(serverTime===null||originalTime===null)return;
+  if(serverTime!==originalTime)await handleKicked();
+}
+function startKickChecker(){stopKickChecker();kickCheckInterval=setInterval(checkKickStatus,4000)}
+async function startApp(user,isNewLogin=false){
+  if(window.appStarting)return;
+  window.appStarting=true;
+  try{
+    const allowed=await checkBanStatus();
+    if(!allowed)return;
+    currentUser=user;
+    startSecurityHeartbeat();
+    if(isNewLogin){
+      const {data,error}=await db.rpc("start_fresh_chat");
+      if(error){await showAuthMessage("Chat start error: "+error.message);return}
+      chatStartedAt=data;saveChatSession(user.id,chatStartedAt);
+    }else{
+      const {data,error}=await db.rpc("get_my_chat_started_at");
+      if(error){await showAuthMessage("Chat session error: "+error.message);return}
+      chatStartedAt=data;
+      if(!chatStartedAt){
+        const result=await db.rpc("start_fresh_chat");
+        if(result.error){await showAuthMessage("Chat start error: "+result.error.message);return}
+        chatStartedAt=result.data;
+      }
+      const previousTime=localStorage.getItem(sessionStorageKey(user.id));
+      if(previousTime){
+        const oldValue=timeValue(previousTime),newValue=timeValue(chatStartedAt);
+        if(oldValue!==null&&newValue!==null&&oldValue!==newValue){await handleKicked();return}
+      }
+      saveChatSession(user.id,chatStartedAt);
+    }
+    if(!chatStartedAt){await showAuthMessage("Chat session could not be started. Please login again.");return}
+    const username="user_"+user.id.replaceAll("-","").substring(0,8);
+    const {error:profileError}=await db.from("profiles").upsert({id:user.id,username},{onConflict:"id",ignoreDuplicates:true});
+    if(profileError){await showAuthMessage("Profile error: "+profileError.message);return}
+    document.getElementById("auth").style.display="none";
+    document.getElementById("app").style.display="grid";
+    document.getElementById("welcomeScreen").style.display="flex";
+    document.getElementById("logoutBtn").style.display="block";
+    document.getElementById("messages").innerHTML='<div class="system-message">Welcome to your fresh LYM REALM chat!</div>';
+    await setupPresence();if(!currentUser)return;
+    await loadMembers();await loadMessages();if(!currentUser)return;
+    if(liveChannel)await db.removeChannel(liveChannel);
+    liveChannel=db.channel("lym-public-group-chat")
+      .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},payload=>{
+        const msg=payload.new;
+        if(msg.receiver_id===null&&currentUser){
+          if(msg.sender_id!==currentUser.id)playMessageTone();
+          loadMessages();
+        }
+      }).subscribe();
+    startKickChecker();
+    await setupLiveVoice();
+    await setupVideoChat();
+  }finally{window.appStarting=false}
+}
+async function loadMembers(){
+  if(!currentUser)return;
+  const box=document.getElementById("users");
+  box.textContent="Loading online members...";
+  const {data:profiles,error}=await db.from("profiles").select("id,username");
+  if(error){box.textContent="Profile error: "+error.message;return}
+  const {data:roles,error:roleError}=await db.from("user_roles").select("user_id,role");
+  if(roleError){box.textContent="Role error: "+roleError.message;return}
+  profilesMap={};rolesMap={};
+  (profiles||[]).forEach(p=>profilesMap[p.id]=p.username);
+  (roles||[]).forEach(r=>rolesMap[r.user_id]=r.role);
+  const priority={super_admin:1,moderator:2,vip:3,member:4};
+  const onlineProfiles=(profiles||[]).filter(p=>onlineUserIds.includes(p.id));
+  onlineProfiles.sort((a,b)=>(priority[rolesMap[a.id]||"member"]||4)-(priority[rolesMap[b.id]||"member"]||4)||(a.username||"").localeCompare(b.username||""));
+  const myUsername=profilesMap[currentUser.id]||"Member";
+  const myRole=rolesMap[currentUser.id]||"member";
+  const myNameLabel=document.getElementById("myname");
+  const myRoleLabel=document.getElementById("myrole");
+  if(myNameLabel)myNameLabel.textContent=myUsername;
+  if(myRoleLabel)myRoleLabel.textContent=myRole==="super_admin"?"👑 SUPER ADMIN":myRole==="moderator"?"🛡️ MODERATOR":myRole==="vip"?"⭐ VIP MEMBER":"MEMBER";
+  box.innerHTML="";
+  document.getElementById("onlineCount").textContent=onlineProfiles.length+" Online";
+  if(!onlineProfiles.length){box.textContent="No online members.";return}
+  async function manageMember(p){
+    if(myRole!=="super_admin")return;
+    if(p.id===currentUser.id)return;
+    if(rolesMap[p.id]==="super_admin"){alert("Super Admin ko manage nahi kar sakte.");return}
+    const choice=prompt("User: "+(p.username||"Member")+"\n\n1 = Kick User\n2 = Ban User\n3 = Block User\n\nNumber likhein:");
+    if(!choice)return;
+    let result;
+    if(choice==="1"){
+      if(!confirm("Is user ko Kick karna hai?"))return;
+      result=await db.rpc("admin_kick_member",{p_user_id:p.id});
+    }else if(choice==="2"){
+      const reason=prompt("Ban ki wajah likhein:")||"";
+      if(!confirm("Is user ko Ban karna hai?"))return;
+      result=await db.rpc("admin_ban_member",{p_user_id:p.id,p_reason:reason.trim()||null});
+    }else if(choice==="3"){
+      const reason=prompt("Block ki wajah likhein:")||"";
+      if(!confirm("Is user ko Block karna hai?"))return;
+      result=await db.rpc("admin_block_member",{p_user_id:p.id,p_reason:reason.trim()||null});
+    }else{alert("Ghalat option.");return}
+    if(result.error){alert("Error: "+result.error.message);return}
+    alert("Action successful!");
+    await loadMembers();
+  }
+  onlineProfiles.forEach(p=>{
+    const role=rolesMap[p.id]||"member";
+    const b=document.createElement("div");
+    b.className="member"+(p.id===currentUser.id?" me":"");
+    const avatar=document.createElement("div");
+    avatar.className="avatar";
+    avatar.textContent=role==="super_admin"?"👑":role==="moderator"?"🛡️":role==="vip"?"⭐":"👤";
+    const info=document.createElement("div");info.className="member-info";
+    const name=document.createElement("div");name.className="member-name";name.textContent=p.username||"Member";
+    if(p.id===currentUser.id){
+      name.title="Click to change your username";
+      name.style.cursor="pointer";
+      name.style.textDecoration="underline";
+      name.onclick=async()=>{
+        const next=prompt("Enter your new username (3-10 letters, numbers or underscores):",p.username||"");
+        if(next===null)return;
+        const username=next.trim();
+        if(username.length<3||username.length>10||!/^[A-Za-z0-9_]+$/.test(username)){
+          alert("Username must be 3 to 10 characters and use only letters, numbers or underscores.");
+          return;
+        }
+        const {error}=await db.rpc("update_my_username",{p_username:username});
+        if(error){alert(error.message);return;}
+        await loadMembers();
+        await loadMessages();
+        alert("Username updated successfully!");
+      };
+    }
+    const dot=document.createElement("span");dot.className="online-dot";name.prepend(dot);
+    const roleText=document.createElement("div");roleText.className="member-role";
+    roleText.textContent=role==="super_admin"?"SUPER ADMIN":role==="moderator"?"MODERATOR":role==="vip"?"VIP MEMBER":"MEMBER";
+    info.append(name,roleText);b.append(avatar,info);
+    if(myRole==="super_admin"&&p.id!==currentUser.id){
+      const manageBtn=document.createElement("button");
+      manageBtn.textContent="⚙️ Manage";
+      manageBtn.style.cssText="background:#00b978;color:#000;border:0;border-radius:6px;padding:6px;font-size:11px;margin-top:6px;cursor:pointer;";
+      manageBtn.onclick=e=>{e.stopPropagation();manageMember(p)};
+      info.appendChild(manageBtn);
+    }
+    box.appendChild(b);
+  });
+}
+async function changeUsername(){
+  const input=document.getElementById("newUsername"),username=input.value.trim();
+  if(username.length<3||username.length>20){alert("Username must be 3 to 20 characters.");return}
+  if(!/^[A-Za-z0-9_]+$/.test(username)){alert("Use only letters, numbers and underscores.");return}
+  const {error}=await db.rpc("update_my_username",{p_username:username});
+  if(error){alert(error.message);return}
+  input.value="";alert("Username updated successfully!");await loadMembers();await loadMessages();
+}
+async function loadMessages(){
+  const box=document.getElementById("messages");
+  if(!chatStartedAt||!currentUser)return;
+  const {data,error}=await db.from("messages").select("id,sender_id,receiver_id,message,created_at,message_type,audio_path").is("receiver_id",null).gte("created_at",chatStartedAt).order("created_at",{ascending:true}).limit(300);
+  if(error){box.innerHTML="";box.textContent="Message error: "+error.message;return}
+  box.innerHTML="";
+  if(!data||data.length===0){box.innerHTML='<div class="system-message">No new messages. Start your fresh conversation!</div>';return}
+  for(const m of data){
+    if(!currentUser)return;
+    const div=document.createElement("div");div.className="msg "+(m.sender_id===currentUser.id?"mine":"");
+    const sender=document.createElement("div");sender.className="sender";
+    const senderRole=rolesMap[m.sender_id]||"member",senderName=profilesMap[m.sender_id]||"Member";
+    sender.textContent=(senderRole==="super_admin"?"👑 ":senderRole==="moderator"?"🛡️ ":senderRole==="vip"?"⭐ ":"")+senderName;
+    div.appendChild(sender);
+    const content=document.createElement("div");content.textContent=m.message_type==="voice"?"Voice messages are no longer supported.":m.message;div.appendChild(content)
+    const time=document.createElement("div");time.className="time";
+    time.textContent=new Date(m.created_at).toLocaleString([],{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+    div.appendChild(time);box.appendChild(div);
+  }
+  box.scrollTop=box.scrollHeight;
+}
+async function sendMessage(){
+  const input=document.getElementById("message"),message=input.value.trim();
+  if(!message||!currentUser)return;
+  const sendButton=document.getElementById("sendBtn");sendButton.disabled=true;
+  try{
+    const {error}=await db.rpc("send_group_message",{p_message:message});
+    if(error){
+      if(error.message.toLowerCase().includes("banned"))await showAuthMessage("Your account is banned by Admin. Contact Super Admin.");
+      else alert(error.message);
+      return;
+    }
+    input.value="";await loadMessages();
+  }catch(error){alert("Message error: "+error.message)}
+  finally{sendButton.disabled=false}
+}
+// LIVE VOICE: requests, mic ownership, and WebRTC audio mesh
+function isSuperAdmin(){return rolesMap[currentUser?.id]==="super_admin"}
+function voiceStatus(text){const el=document.getElementById("voiceRoomState");if(el)el.textContent=text}
+function updateVoiceButtons(){
+function updateVoiceButtons(){
+  if(!currentUser)return;
+
+  const mine=currentSpeakerId===currentUser.id;
+  const admin=isSuperAdmin();
+  const alreadyRequested=voiceRequests.some(r=>r.user_id===currentUser.id);
+
+  // مائیک خالی ہو تو Request Mic چھپا رہے گا
+  // کوئی دوسرا ممبر مائیک پر ہو تو Request Mic نظر آئے گا
+  document.getElementById("requestMicBtn").style.display=
+    (currentSpeakerId!==null && !mine && !alreadyRequested)
+      ? "inline-block" : "none";
+
+  document.getElementById("cancelRequestBtn").style.display=
+    alreadyRequested ? "inline-block" : "none";
+
+  document.getElementById("startSpeakingBtn").style.display=
+    mine && !voiceRoomStarted ? "inline-block" : "none";
+
+  document.getElementById("releaseMicBtn").style.display=
+    mine && voiceRoomStarted ? "inline-block" : "none";
+
+  document.getElementById("giveMicBtn").style.display=
+    mine || admin ? "inline-block" : "none";
+}
+  if(!currentUser)return;
+  const mine=currentSpeakerId===currentUser.id,admin=isSuperAdmin();
+  document.getElementById("requestMicBtn").style.display=(!mine&&!voiceRequests.some(r=>r.user_id===currentUser.id))?"inline-block":"none";
+  document.getElementById("cancelRequestBtn").style.display=voiceRequests.some(r=>r.user_id===currentUser.id)?"inline-block":"none";
+  document.getElementById("startSpeakingBtn").style.display=mine&&!voiceRoomStarted?"inline-block":"none";
+  document.getElementById("releaseMicBtn").style.display=mine&&voiceRoomStarted?"inline-block":"none";
+  document.getElementById("giveMicBtn").style.display=mine||admin?"inline-block":"none";
+}
+function renderVoiceRoom(){
+  const speaker=currentSpeakerId?profilesMap[currentSpeakerId]||"Member":"No one";
+  voiceStatus(currentSpeakerId?(currentSpeakerId===currentUser?.id?(voiceRoomStarted?"You are LIVE — members can hear you":"Mic assigned to you — press Start Speaking"):"🎙️ "+speaker+" is speaking"):"Mic is free — request to speak");
+  updateVoiceButtons();
+  const box=document.getElementById("micRequests");box.innerHTML="";
+  if(isSuperAdmin()||currentSpeakerId===currentUser?.id){
+    voiceRequests.forEach(r=>{
+      const item=document.createElement("span");item.className="request-item";
+      const label=document.createElement("span");label.textContent=(profilesMap[r.user_id]||"Member")+" wants mic";item.appendChild(label);
+      const grant=document.createElement("button");grant.textContent="Give mic";grant.onclick=()=>adminOrSpeakerGiveMic(r.user_id);
+      item.appendChild(grant);box.appendChild(item);
+    });
+  }else if(voiceRequests.length){
+    const t=document.createElement("span");t.textContent=voiceRequests.length+" member(s) waiting for mic";box.appendChild(t);
+  }
+}
+async function refreshVoiceData(){
+  if(!currentUser)return;
+  const [{data:state,error:sErr},{data:req,error:rErr}]=await Promise.all([
+    db.from("voice_room_state").select("speaker_id").eq("room_id","main").maybeSingle(),
+    db.from("voice_mic_requests").select("user_id,created_at").order("created_at",{ascending:true})
+  ]);
+  if(sErr||rErr){voiceStatus("Voice setup error: "+(sErr||rErr).message);return}
+  const previous=currentSpeakerId;currentSpeakerId=state?.speaker_id||null;voiceRequests=req||[];
+  if(previous!==currentSpeakerId)stopLiveVoice();
+  renderVoiceRoom();
+}
+async function setupLiveVoice(){
+  if(!currentUser)return;
+  await removeVoiceChannels();await refreshVoiceData();
+  voiceStateChannel=db.channel("lym-voice-state").on("postgres_changes",{event:"UPDATE",schema:"public",table:"voice_room_state",filter:"room_id=eq.main"},()=>refreshVoiceData()).subscribe();
+  voiceRequestChannel=db.channel("lym-voice-requests").on("postgres_changes",{event:"*",schema:"public",table:"voice_mic_requests"},()=>refreshVoiceData()).subscribe();
+  voiceSignalChannel=db.channel("lym-voice-signals").on("postgres_changes",{event:"INSERT",schema:"public",table:"voice_signals",filter:"receiver_id=eq."+currentUser.id},payload=>handleVoiceSignal(payload.new)).subscribe();
+}
+async function requestMic(){if(!currentUser)return;const {error}=await db.from("voice_mic_requests").insert({user_id:currentUser.id});if(error){alert(error.message);return}await refreshVoiceData()}
+async function cancelMicRequest(){if(!currentUser)return;const {error}=await db.from("voice_mic_requests").delete().eq("user_id",currentUser.id);if(error)alert(error.message);await refreshVoiceData()}
+async function releaseMic(){if(!currentUser)return;try{await stopLiveVoice();const {error}=await db.rpc("release_voice_mic");if(error)throw error;await refreshVoiceData()}catch(e){alert("Could not release mic: "+e.message)}}
+async function giveMicPrompt(){
+  if(!currentUser)return;
+  let candidates;
+  if(isSuperAdmin())candidates=onlineUserIds.filter(id=>id!==currentUser.id).map(id=>({user_id:id}));
+  else candidates=voiceRequests.filter(r=>r.user_id!==currentUser.id);
+  if(!candidates.length){alert(isSuperAdmin()?"No other members are online.":"No member is waiting for the microphone.");return}
+  const choices=candidates.map((r,i)=>(i+1)+". "+(profilesMap[r.user_id]||r.user_id)).join("\n");
+  const answer=prompt("Enter the number of the member to receive the mic:\n"+choices);
+  if(answer===null)return;
+  const n=Number(answer)-1;
+  if(!Number.isInteger(n)||!candidates[n]){alert("Invalid selection.");return}
+  await adminOrSpeakerGiveMic(candidates[n].user_id);
+}
+async function adminOrSpeakerGiveMic(userId){
+  try{
+    const rpc=isSuperAdmin()?"admin_take_voice_mic":"give_voice_mic";
+    const args=isSuperAdmin()?{p_user_id:userId}:{p_next_user_id:userId};
+    const {error}=await db.rpc(rpc,args);
+    if(error)throw error;
+    await db.from("voice_mic_requests").delete().eq("user_id",userId);
+    await refreshVoiceData();
+  }catch(e){alert("Mic transfer failed: "+e.message)}
+}
+async function sendSignal(to,signal){
+  if(!currentUser||!to)return;
+  const {error}=await db.from("voice_signals").insert({room_id:"main",sender_id:currentUser.id,receiver_id:to,signal});
+  if(error)console.warn("Voice signal:",error.message);
+}
+function getPeer(peerId){
+  let pc=voicePeers.get(peerId);if(pc)return pc;
+  pc=new RTCPeerConnection(rtcConfig);voicePeers.set(peerId,pc);
+  pc.onicecandidate=e=>{if(e.candidate)sendSignal(peerId,{type:"ice",candidate:e.candidate})};
+  pc.ontrack=e=>{
+    let audio=document.getElementById("live-audio-"+peerId);
+    if(!audio){
+      audio=document.createElement("audio");audio.id="live-audio-"+peerId;audio.dataset.liveVoice="1";
+      audio.autoplay=true;audio.playsInline=true;audio.style.display="none";document.body.appendChild(audio);
+    }
+    audio.srcObject=e.streams[0];audio.play().catch(()=>{});
+  };
+  pc.onconnectionstatechange=()=>{
+    if(["failed","closed","disconnected"].includes(pc.connectionState)){
+      try{pc.close()}catch(e){}
+      voicePeers.delete(peerId);
+    }
+  };
+  return pc;
+}
+async function startSpeaking(){
+  if(!currentUser||currentSpeakerId!==currentUser.id||voiceStarting||voiceRoomStarted)return;
+  voiceStarting=true;
+  try{
+    if(!navigator.mediaDevices?.getUserMedia)throw new Error("Microphone requires HTTPS and a supported browser.");
+    liveMicStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+    voiceRoomStarted=true;
+    for(const peerId of onlineUserIds){
+      if(peerId===currentUser.id)continue;
+      const pc=getPeer(peerId);
+      liveMicStream.getTracks().forEach(track=>pc.addTrack(track,liveMicStream));
+      const offer=await pc.createOffer();await pc.setLocalDescription(offer);
+      await sendSignal(peerId,{type:"offer",description:pc.localDescription});
+    }
+    voiceStatus("You are LIVE — members can hear you");
+  }catch(e){stopLiveVoice();alert("Microphone could not start: "+e.message)}
+  finally{voiceStarting=false;renderVoiceRoom()}
+}
+async function handleVoiceSignal(row){
+  if(!currentUser||!row||row.sender_id===currentUser.id)return;
+  const sig=row.signal||{};
+  if(sig.type==="offer"){
+    if(currentSpeakerId!==row.sender_id)return;
+    try{
+      const pc=getPeer(row.sender_id);
+      if(pc.signalingState!=="stable")return;
+      await pc.setRemoteDescription(new RTCSessionDescription(sig.description));
+      const answer=await pc.createAnswer();await pc.setLocalDescription(answer);
+      await sendSignal(row.sender_id,{type:"answer",description:pc.localDescription});
+    }catch(e){console.warn("Voice answer failed",e)}
+  }else if(sig.type==="answer"){
+    const pc=voicePeers.get(row.sender_id);
+    if(!pc||currentSpeakerId!==currentUser.id)return;
+    try{await pc.setRemoteDescription(new RTCSessionDescription(sig.description))}catch(e){console.warn(e)}
+  }else if(sig.type==="ice"){
+    const pc=voicePeers.get(row.sender_id);
+    if(pc&&sig.candidate){try{await pc.addIceCandidate(new RTCIceCandidate(sig.candidate))}catch(e){console.warn(e)}}
+  }
+}
+async function logout(){
+  if(securityHeartbeatTimer){clearInterval(securityHeartbeatTimer);securityHeartbeatTimer=null;}
+  const userId=currentUser?.id;
+  if(myCameraStream)await stopMyCamera();
+  stopKickChecker();await removeChatChannels();
+  if(userId)localStorage.removeItem(sessionStorageKey(userId));
+  try{await db.auth.signOut()}catch(e){}
+  currentUser=null;chatStartedAt=null;profilesMap={};rolesMap={};location.reload();
+}
+db.auth.getSession().then(async({data,error})=>{
+  if(error){showStatus(error.message);return}
+  if(data.session&&!isPasswordRecovery)await startApp(data.session.user,false);
+});
+async function giveMicPrompt(){
+  if(!currentUser)return;
+  let candidates;
+  if(isSuperAdmin())candidates=onlineUserIds.filter(id=>id!==currentUser.id).map(id=>({user_id:id}));
+  else candidates=voiceRequests.filter(r=>r.user_id!==currentUser.id);
+  if(!candidates.length){alert(isSuperAdmin()?"No other members are online.":"No member is waiting for the microphone.");return}
+  const choices=candidates.map((r,i)=>(i+1)+". "+(profilesMap[r.user_id]||r.user_id)).join("\n");
+  const answer=prompt("Enter the number of the member to receive the mic:\n"+choices);
+  if(answer===null)return;
+  const n=Number(answer)-1;
+  if(!Number.isInteger(n)||!candidates[n]){alert("Invalid selection.");return}
+  await adminOrSpeakerGiveMic(candidates[n].user_id);
+}
+async function adminOrSpeakerGiveMic(userId){
+  try{
+    const rpc=isSuperAdmin()?"admin_take_voice_mic":"give_voice_mic";
+    const args=isSuperAdmin()?{p_user_id:userId}:{p_next_user_id:userId};
+    const {error}=await db.rpc(rpc,args);
+    if(error)throw error;
+    await db.from("voice_mic_requests").delete().eq("user_id",userId);
+    await refreshVoiceData();
+  }catch(e){alert("Mic transfer failed: "+e.message)}
+}
+async function sendSignal(to,signal){
+  if(!currentUser||!to)return;
+  const {error}=await db.from("voice_signals").insert({room_id:"main",sender_id:currentUser.id,receiver_id:to,signal});
+  if(error)console.warn("Voice signal:",error.message);
+} 
+
+// LYM_REALM_SOURCE_DETERRENCE: discourage casual context-menu and source shortcuts.
+document.addEventListener("contextmenu", function(event) {
+  const target = event.target;
+  if (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
+  event.preventDefault();
+});
+document.addEventListener("keydown", function(event) {
+  const key = (event.key || "").toLowerCase();
+  const ctrlOrMeta = event.ctrlKey || event.metaKey;
+  const sourceShortcut = ctrlOrMeta && key === "u";
+  const devtoolsShortcut = (event.key === "F12") ||
+    (ctrlOrMeta && event.shiftKey && ["i", "j", "c"].includes(key));
+  if (sourceShortcut || devtoolsShortcut) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+}, true);
+</script>
+</body>
+</html>
