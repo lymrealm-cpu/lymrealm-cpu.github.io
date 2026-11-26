@@ -153,18 +153,20 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 
 #videoIncomingRequests{
   position:fixed;
-  top:145px;
+  top:50%;
   left:50%;
-  transform:translateX(-50%);
+  transform:translate(-50%,-50%);
   z-index:10001;
   width:max-content;
-  max-width:calc(100vw - 20px);
-  padding:10px;
+  max-width:calc(100vw - 24px);
+  max-height:70vh;
+  overflow-y:auto;
+  padding:14px;
   color:#e8fff4;
   background:#092b21;
-  border:1px solid #f5d477;
-  border-radius:12px;
-  box-shadow:0 6px 24px #0009;
+  border:2px solid #f5d477;
+  border-radius:14px;
+  box-shadow:0 8px 30px #000b;
 }
 #videoIncomingRequests:empty{display:none}
 #videoIncomingRequests h4{
@@ -188,7 +190,15 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 .video-request-item .approve-video{background:#087b55;border-color:#f5d477}
 .video-request-item .reject-video{background:#6b2525;border-color:#d66}
 @media(max-width:650px){
-  #videoIncomingRequests{top:155px;width:calc(100vw - 20px);max-width:calc(100vw - 20px)}
+  #videoIncomingRequests{
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:calc(100vw - 24px);
+    max-width:calc(100vw - 24px);
+    max-height:70vh;
+    padding:12px;
+  }
   .video-request-item{gap:5px;padding:6px}
   .video-request-item .request-label{flex-basis:100%;font-size:11px}
   .video-request-item button{flex:1;padding:7px 5px;font-size:11px}
