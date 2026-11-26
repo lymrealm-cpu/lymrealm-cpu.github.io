@@ -151,6 +151,49 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
   display:none;
 }
 
+#videoIncomingRequests{
+  position:fixed;
+  top:145px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:10001;
+  width:max-content;
+  max-width:calc(100vw - 20px);
+  padding:10px;
+  color:#e8fff4;
+  background:#092b21;
+  border:1px solid #f5d477;
+  border-radius:12px;
+  box-shadow:0 6px 24px #0009;
+}
+#videoIncomingRequests:empty{display:none}
+#videoIncomingRequests h4{
+  margin:0 0 8px;
+  color:#f5d477;
+  font-size:14px;
+}
+.video-request-item{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:7px;
+  padding:8px;
+  margin-top:6px;
+  background:#123c2d;
+  border:1px solid #287b59;
+  border-radius:9px;
+}
+.video-request-item .request-label{flex:1 1 150px;font-size:12px}
+.video-request-item button{width:auto!important;margin:0!important;padding:7px 10px;font-size:12px}
+.video-request-item .approve-video{background:#087b55;border-color:#f5d477}
+.video-request-item .reject-video{background:#6b2525;border-color:#d66}
+@media(max-width:650px){
+  #videoIncomingRequests{top:155px;width:calc(100vw - 20px);max-width:calc(100vw - 20px)}
+  .video-request-item{gap:5px;padding:6px}
+  .video-request-item .request-label{flex-basis:100%;font-size:11px}
+  .video-request-item button{flex:1;padding:7px 5px;font-size:11px}
+}
+
 /* Floating, slightly larger draggable camera preview */
 .camera-panel #myCameraPreview{
   position:fixed!important;
@@ -330,7 +373,1078 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 <div id="videoIncomingRequests"></div>
 </main></div>
 <script>
-const _0x447cb2=_0x1a03;(function(_0x4d6dbd,_0x282469){const _0x4b4591=_0x1a03,_0x266e30=_0x4d6dbd();while(!![]){try{const _0x5566e2=parseInt(_0x4b4591(0x141))/0x1*(parseInt(_0x4b4591(0x166))/0x2)+-parseInt(_0x4b4591(0x18e))/0x3+-parseInt(_0x4b4591(0x179))/0x4*(parseInt(_0x4b4591(0x170))/0x5)+parseInt(_0x4b4591(0x156))/0x6*(-parseInt(_0x4b4591(0x151))/0x7)+-parseInt(_0x4b4591(0x11b))/0x8*(-parseInt(_0x4b4591(0x78))/0x9)+parseInt(_0x4b4591(0x13b))/0xa+-parseInt(_0x4b4591(0x1a7))/0xb;if(_0x5566e2===_0x282469)break;else _0x266e30['push'](_0x266e30['shift']());}catch(_0x20dfca){_0x266e30['push'](_0x266e30['shift']());}}}(_0x285f,0xe7021));const _0x401465=_0x11a8;!(function(){const _0x5e79e6=_0x1a03,_0x39a617=_0x11a8,_0x595eb4=_0x35d4();for(;;)try{if(0xaab84===-parseInt(_0x39a617(0x11e))/0x1+parseInt(_0x39a617(0x193))/0x2+-parseInt(_0x39a617(0x1aa))/0x3*(-parseInt(_0x39a617(0x146))/0x4)+-parseInt(_0x39a617(0x136))/0x5+parseInt(_0x39a617(0xdd))/0x6+-parseInt(_0x39a617(0x103))/0x7+parseInt(_0x39a617(0x1c5))/0x8*(parseInt(_0x39a617(0xf7))/0x9))break;_0x595eb4[_0x5e79e6(0x7a)](_0x595eb4['shift']());}catch(_0x1e6cb6){_0x595eb4['push'](_0x595eb4[_0x5e79e6(0x100)]());}}());const _0x13483b=_0x5563;!(function(){const _0x19fa21=_0x11a8,_0x1d81d2=_0x5563,_0x5a7777=_0x54ab();for(;;)try{if(0x70bc7==parseInt(_0x1d81d2(0x1bd))/0x1+parseInt(_0x1d81d2(0x1b0))/0x2*(-parseInt(_0x1d81d2(0x92))/0x3)+-parseInt(_0x1d81d2(0x1a4))/0x4+parseInt(_0x1d81d2(0x99))/0x5+parseInt(_0x1d81d2(0x1a1))/0x6+parseInt(_0x1d81d2(0x18b))/0x7+-parseInt(_0x1d81d2(0xe7))/0x8*(-parseInt(_0x1d81d2(0x12b))/0x9))break;_0x5a7777[_0x19fa21(0x18e)](_0x5a7777[_0x19fa21(0x1d4)]());}catch(_0x443c8c){_0x5a7777[_0x19fa21(0x18e)](_0x5a7777[_0x19fa21(0x1d4)]());}}());const SUPABASE_URL=_0x13483b(0x1b7),SUPABASE_KEY=_0x447cb2(0xc9),db=supabase[_0x13483b(0x184)](SUPABASE_URL,SUPABASE_KEY);let currentUser=null,chatStartedAt=null,securityHeartbeatTimer=null;async function sendSecurityHeartbeat(){const _0x4dd7b6=_0x447cb2,_0x280c9b=_0x11a8,_0x1cc2d2=_0x13483b;if(currentUser)try{await db['functions'][_0x4dd7b6(0xf6)](_0x1cc2d2(0xfb),{'body':{'action':_0x280c9b(0x1b4),'path':window[_0x1cc2d2(0x131)][_0x1cc2d2(0xa3)]||_0x280c9b(0x191)}});}catch(_0x3cfb48){console[_0x1cc2d2(0x17a)](_0x1cc2d2(0x106),_0x3cfb48?.['message']||_0x3cfb48);}}function startSecurityHeartbeat(){securityHeartbeatTimer&&clearInterval(securityHeartbeatTimer),sendSecurityHeartbeat(),securityHeartbeatTimer=setInterval(sendSecurityHeartbeat,0x493e0);}function _0x1a03(_0x349b98,_0x528ad7){_0x349b98=_0x349b98-0x70;const _0x285fb2=_0x285f();let _0x1a0384=_0x285fb2[_0x349b98];return _0x1a0384;}let myCameraStream=null;function _0x5563(_0x29fb27,_0x4e8163){return _0x29fb27-=0x92,_0x54ab()[_0x29fb27];}!(function(){const _0x2b60ce=_0x447cb2,_0x2194d8=_0x11a8,_0x5057a0=_0x13483b,_0x394eef=document[_0x2194d8(0x122)](_0x5057a0(0x193)),_0x58a4c1=_0x394eef[_0x5057a0(0x1bf)](_0x5057a0(0x169)),_0x1ea64c=_0x394eef[_0x2b60ce(0x103)](_0x5057a0(0x14c));if(!_0x394eef||!_0x58a4c1||!_0x1ea64c)return;const _0x2247f4=document['createElement'](_0x5057a0(0xa1));_0x2247f4['className']=_0x2b60ce(0xd6);const _0x549c09=document[_0x2194d8(0x15b)](_0x5057a0(0xa1));_0x549c09[_0x2194d8(0x1c6)]=_0x2b60ce(0x12b);const _0x174490=_0x1ea64c[_0x2194d8(0x115)](_0x5057a0(0x19d)),_0x4bdef0=_0x1ea64c[_0x5057a0(0x1bf)](_0x2194d8(0xc8)),_0x32fe37=_0x4bdef0[_0x5057a0(0x1bf)](_0x2194d8(0xf8)),_0x51f8b6=_0x4bdef0[_0x5057a0(0x1bf)](_0x2194d8(0x11c)),_0x4afc3a=_0x4bdef0[_0x2194d8(0x115)](_0x5057a0(0xf6)),_0x55e4b5=(_0x58a4c1[_0x2194d8(0x115)]('.profile'),_0x58a4c1[_0x5057a0(0x1bf)](_0x5057a0(0x12a))),_0x2f800c=_0x58a4c1['querySelector'](_0x2194d8(0x105)),_0xaef18=_0x1ea64c[_0x5057a0(0x1bf)]('#videoCameraMembers'),_0x4c0f45=_0x1ea64c['querySelector'](_0x5057a0(0x138)),_0x2c7a93=_0x1ea64c[_0x2194d8(0x115)](_0x5057a0(0x185)),_0x2e17cf=document[_0x2194d8(0x15b)](_0x5057a0(0x1c3));_0x2e17cf[_0x5057a0(0x1be)]=_0x5057a0(0xac),_0x2e17cf[_0x2b60ce(0x177)]='',_0x2e17cf[_0x2194d8(0x197)](_0x174490);const _0x13c303=document[_0x5057a0(0x9e)](_0x2194d8(0x140));_0x13c303[_0x5057a0(0x1be)]=_0x5057a0(0xac),_0x13c303[_0x5057a0(0xae)]='<div\x20class=\x22side-heading\x22>🏠\x20ROOMS</div>',[[_0x2b60ce(0x196),_0x5057a0(0x128)],[_0x2194d8(0x107),_0x5057a0(0x123)],[_0x5057a0(0x17f),_0x2b60ce(0x114)],[_0x5057a0(0xd6),_0x2194d8(0x1df)],[_0x5057a0(0xd9),_0x2b60ce(0x199)]][_0x2b60ce(0x8e)](([_0x308ea2,_0x33a8f6],_0x1bb1a0)=>{const _0x2f0b5b=_0x2b60ce,_0x5e31ee=_0x2194d8,_0xf56742=_0x5057a0,_0x27aa62=document[_0xf56742(0x9e)](_0x5e31ee(0x16a));_0x27aa62[_0xf56742(0x1be)]=_0xf56742(0x93)+(0x0===_0x1bb1a0?_0xf56742(0x104):''),_0x27aa62[_0x5e31ee(0x183)]=_0x33a8f6,_0x27aa62[_0xf56742(0x1a5)][_0x5e31ee(0x1ec)]=_0x308ea2,_0x27aa62[_0x2f0b5b(0x130)]=()=>{const _0x3dca6a=_0x2f0b5b,_0x3d5dd9=_0xf56742;selectVideoRoom(_0x308ea2),_0x13c303[_0x3d5dd9(0x13c)](_0x3d5dd9(0x1c1))[_0x3dca6a(0x8e)](_0x16fe30=>{const _0x2d1f3b=_0x3d5dd9;_0x16fe30[_0x2d1f3b(0x170)][_0x2d1f3b(0x117)](_0x2d1f3b(0x151),_0x16fe30[_0x2d1f3b(0x1a5)][_0x2d1f3b(0x15e)]===_0x308ea2);});},_0x13c303[_0x5e31ee(0x197)](_0x27aa62);}),_0x2247f4[_0x2194d8(0x108)](_0x2e17cf,_0x13c303),_0x32fe37[_0x2194d8(0x199)]();const _0x34aec9=document[_0x5057a0(0x9e)](_0x5057a0(0x1c3));_0x34aec9[_0x2194d8(0x1c6)]=_0x2194d8(0x106),_0x34aec9[_0x5057a0(0xae)]='',_0x34aec9[_0x5057a0(0x1b9)](_0x51f8b6,_0x4afc3a),_0xaef18&&_0x34aec9['appendChild'](_0xaef18),_0x4c0f45&&_0x34aec9[_0x5057a0(0x189)](_0x4c0f45),_0x2c7a93&&_0x34aec9['appendChild'](_0x2c7a93),_0x549c09[_0x5057a0(0x1b9)](_0x34aec9,_0x55e4b5,_0x2f800c),_0x58a4c1[_0x5057a0(0xee)]();const _0x5cd5e2=_0x1ea64c[_0x2194d8(0x115)](_0x2194d8(0x1b6)),_0x240d80=document[_0x2194d8(0x15b)](_0x2194d8(0x140));_0x240d80[_0x2194d8(0x1c6)]=_0x5057a0(0x129),_0x240d80[_0x5057a0(0xae)]=_0x2b60ce(0x10f),_0x5cd5e2&&_0x240d80[_0x5057a0(0x189)](_0x5cd5e2),_0x394eef[_0x5057a0(0x108)](_0x2247f4,_0x1ea64c,_0x549c09,_0x240d80);}());let isPasswordRecovery=!0x1,selectedVideoRoom=_0x13483b(0xbe),videoPeers=new Map(),videoSignalChannel=null,videoRequestChannel=null,videoSeenSignals=new Set(),videoStarting=!0x1,videoPendingIce=new Map();function videoPeerKey(_0x5deaf1,_0x4a1c13=selectedVideoRoom){return _0x4a1c13+'|'+_0x5deaf1;}function removeRemoteVideo(_0x5547b0){const _0xc1926e=_0x11a8,_0x1f8b29=_0x13483b,_0x58d3e2=document['getElementById'](_0x1f8b29(0x95)+_0x5547b0);_0x58d3e2&&(_0x58d3e2[_0xc1926e(0x153)]=null,_0x58d3e2[_0x1f8b29(0xee)]());}function closeVideoPeer(_0x593e1b,_0x2be795=selectedVideoRoom){const _0x4372e7=_0x11a8,_0x39d9bc=_0x13483b,_0x246474=videoPeerKey(_0x593e1b,_0x2be795),_0x250be6=videoPeers[_0x4372e7(0x1a0)](_0x246474);if(_0x250be6){try{_0x250be6[_0x39d9bc(0x114)]();}catch(_0x181ccb){}videoPeers[_0x39d9bc(0x186)](_0x246474);}videoPendingIce[_0x39d9bc(0x186)](_0x246474),removeRemoteVideo(_0x593e1b);}function _0x35d4(){const _0x5d02a2=_0x447cb2,_0x485f35=['message',_0x5d02a2(0x18f),_0x5d02a2(0xd2),'background:#00b978;color:#000;border:0;border-radius:6px;padding:6px;font-size:11px;margin-top:6px;cursor:pointer;','reload','228472sdyAPt',_0x5d02a2(0x145),'🎵\x20Music',_0x5d02a2(0x172),_0x5d02a2(0xce),'stun:stun.l.google.com:19302',_0x5d02a2(0xfa),'getSession','auth','removeChannel','Click\x20to\x20change\x20your\x20username',_0x5d02a2(0x18a),'lym-voice-requests','user',_0x5d02a2(0xf0),'room','some','messages','Chat\x20start\x20error:\x20','id,status','3877932PeWQTE','Message\x20error:\x20',_0x5d02a2(0x1a1),'Is\x20user\x20ko\x20Ban\x20karna\x20hai?',_0x5d02a2(0x1a4),_0x5d02a2(0xf5),'username','isContentEditable',_0x5d02a2(0x16f),_0x5d02a2(0x105),'user_',_0x5d02a2(0x14b),'Online\x20status\x20error:\x20',_0x5d02a2(0x93),'Please\x20login\x20first.',_0x5d02a2(0x9c),'Voice\x20signal:',_0x5d02a2(0x70),_0x5d02a2(0x112),'Loading\x20online\x20members...','lym-video-signals-',_0x5d02a2(0xaa),_0x5d02a2(0x16e),'Home',_0x5d02a2(0x99),_0x5d02a2(0x8d),_0x5d02a2(0x17a),_0x5d02a2(0x1a6),_0x5d02a2(0x19e),'email','rejected',_0x5d02a2(0x92),'lym_chat_started_at_',_0x5d02a2(0x192),_0x5d02a2(0x173),_0x5d02a2(0x8e),'connect',_0x5d02a2(0x131),_0x5d02a2(0x18c),'password','🛡️\x20','giveMicBtn','right','vip','newUsername',_0x5d02a2(0xbb),'You\x20were\x20kicked\x20by\x20Super\x20Admin.\x20You\x20may\x20log\x20in\x20again.','1798224uDsZqh',_0x5d02a2(0x142),_0x5d02a2(0xa8),_0x5d02a2(0x82),_0x5d02a2(0x77),_0x5d02a2(0xa0),_0x5d02a2(0x176),'min','Could\x20not\x20expire\x20camera\x20approvals:','startSpeakingBtn','moderator','Camera\x20ON\x20•\x20','Approve','Incoming\x20camera\x20requests:','Block\x20ki\x20wajah\x20likhein:','\x20active',_0x5d02a2(0x10c),'INSERT','isInteger',_0x5d02a2(0x7b),_0x5d02a2(0x18b),_0x5d02a2(0xc1),'camera_owner_id',_0x5d02a2(0x124),_0x5d02a2(0x107),_0x5d02a2(0x154),_0x5d02a2(0x86),_0x5d02a2(0x174),'Approved\x20video\x20requests:','stop','start_fresh_chat',_0x5d02a2(0xda),_0x5d02a2(0xf3),'Camera\x20OFF',_0x5d02a2(0xe0),_0x5d02a2(0x137),'key','scrollTop',_0x5d02a2(0x127),'block',_0x5d02a2(0x197),_0x5d02a2(0x7d),'Islamic','append','ctrlKey','frequency',_0x5d02a2(0x10d),'select','auto','Mic\x20transfer\x20failed:\x20',_0x5d02a2(0x17f),'Camera\x20status\x20could\x20not\x20be\x20published:\x20','grid',_0x5d02a2(0x17e),'If\x20this\x20email\x20is\x20registered,\x20a\x20password\x20reset\x20link\x20has\x20been\x20sent.\x20Check\x20Inbox\x20and\x20Spam.','admin_take_voice_mic','querySelector',_0x5d02a2(0xa4),_0x5d02a2(0x175),_0x5d02a2(0x169),'autoplay','user_id','innerHTML','.video-controls',_0x5d02a2(0x155),_0x5d02a2(0x7f),'MEMBER','You\x20are\x20LIVE\x20—\x20members\x20can\x20hear\x20you',_0x5d02a2(0xe9),'getElementById',_0x5d02a2(0xf1),'\x20joined\x20the\x20room','revoke_video_view_request',_0x5d02a2(0xbc),'user_roles','Approve\x20error:\x20','MODERATOR','addIceCandidate','VIP\x20MEMBER','bye',_0x5d02a2(0x185),'map','insert',_0x5d02a2(0xa7),'21SvDOjo','gte','remote-video-','toISOString',_0x5d02a2(0x98),_0x5d02a2(0xf7),_0x5d02a2(0x165),'Enter\x20the\x20number\x20of\x20the\x20member\x20to\x20receive\x20the\x20mic:\x0a','getUserMedia',_0x5d02a2(0xc4),_0x5d02a2(0xb8),_0x5d02a2(0x138),'text-chat-board',_0x5d02a2(0x133),_0x5d02a2(0xdd),_0x5d02a2(0x118),'Error:\x20',_0x5d02a2(0x110),'app','692965VbUQAT','signUp',_0x5d02a2(0x19d),'⭐\x20VIP\x20MEMBER',_0x5d02a2(0x130),_0x5d02a2(0x106),_0x5d02a2(0xe4),'value',_0x5d02a2(0xe5),_0x5d02a2(0x180),_0x5d02a2(0xd4),'No\x20member\x20is\x20waiting\x20for\x20the\x20microphone.','join','ontrack','from','srcObject','.section-title',_0x5d02a2(0x190),'member',_0x5d02a2(0xb2),'liveVoice',_0x5d02a2(0xc0),'pointermove',_0x5d02a2(0x17b),'createOffer','users',_0x5d02a2(0x162),_0x5d02a2(0x12d),'Chat\x20session\x20error:\x20','setItem',_0x5d02a2(0x76),_0x5d02a2(0xf9),_0x5d02a2(0x104),'Ban\x20ki\x20wajah\x20likhein:',_0x5d02a2(0xae),_0x5d02a2(0x87),_0x5d02a2(0x85),'div',_0x5d02a2(0x15e),'Role\x20error:\x20','filter','addTrack',_0x5d02a2(0xb5),'offsetWidth',_0x5d02a2(0x9a),_0x5d02a2(0x13a),'pointerdown','localDescription',_0x5d02a2(0xec),'pointer','max',_0x5d02a2(0x128),_0x5d02a2(0x121),_0x5d02a2(0xe8),'track',_0x5d02a2(0xd8),_0x5d02a2(0xe7),'trim',_0x5d02a2(0xe3),_0x5d02a2(0xc2),'member-name','limit',_0x5d02a2(0x178),_0x5d02a2(0x111),_0x5d02a2(0x189),'passwordRecoveryPanel','delete',_0x5d02a2(0x117),'camera_on',_0x5d02a2(0xcc),_0x5d02a2(0x116),'micRequests','prepend','request-item','push','User:\x20','mine','/chat.html','Enter\x20your\x20registered\x20email\x20address\x20first.',_0x5d02a2(0x182),_0x5d02a2(0x13f),'lym-online-members',_0x5d02a2(0x102),'appendChild','catch','remove','short','toLocaleString',_0x5d02a2(0x144),_0x5d02a2(0x14f),'Password\x20update\x20error:\x20',_0x5d02a2(0x74),'get',_0x5d02a2(0xb3),_0x5d02a2(0x193),_0x5d02a2(0xfc),_0x5d02a2(0x19f),'update_my_username',_0x5d02a2(0xcf),'super_admin','session',_0x5d02a2(0x13c),_0x5d02a2(0x152),'speechSynthesis','getTracks',_0x5d02a2(0x126),'Member','Camera\x20status:',_0x5d02a2(0xb0),_0x5d02a2(0x168),'connectionState',_0x5d02a2(0x188),_0x5d02a2(0xdc),_0x5d02a2(0xfb),_0x5d02a2(0x164),_0x5d02a2(0xba),_0x5d02a2(0x18d),_0x5d02a2(0x16d),'Voice\x20messages\x20are\x20no\x20longer\x20supported.',_0x5d02a2(0x163),'\x20me',_0x5d02a2(0x161),'createAnswer',_0x5d02a2(0x195),'indexOf','get_my_chat_started_at','Reset\x20email\x20error:\x20','onicecandidate','Request\x20check\x20error:\x20','8EGKdbe',_0x5d02a2(0x159),_0x5d02a2(0x13e),_0x5d02a2(0xe2),_0x5d02a2(0x1a2),'warn',_0x5d02a2(0x10b),'has','requester_id',_0x5d02a2(0x15c),'video_view_requests','location','Profile\x20error:\x20',_0x5d02a2(0x83),_0x5d02a2(0x101),'shift',_0x5d02a2(0x11f),'splice','cursor'];return(_0x35d4=function(){return _0x485f35;})();}async function closeAllVideoPeers(_0x1c8027=!0x1){const _0x596e43=_0x447cb2,_0x74abfb=_0x11a8,_0x32e454=_0x13483b,_0x667a02=[...videoPeers[_0x596e43(0x149)]()];for(const [_0x20adee,_0x1db168]of _0x667a02){const _0x75863f=_0x20adee[_0x74abfb(0x1c0)]('|'),_0x196d5b=_0x20adee[_0x32e454(0x19a)](0x0,_0x75863f),_0x193520=_0x20adee[_0x32e454(0x19a)](_0x75863f+0x1);_0x1c8027&&currentUser&&await sendVideoSignal(_0x193520,{'type':_0x32e454(0xc2)},currentUser['id'],_0x196d5b);try{_0x1db168[_0x596e43(0x137)]();}catch(_0x5712c0){}removeRemoteVideo(_0x193520);}videoPeers[_0x32e454(0x1c9)](),videoPendingIce[_0x32e454(0x1c9)]();}async function setupVideoChat(){const _0x27cf31=_0x447cb2,_0x38b211=_0x11a8,_0x26d307=_0x13483b;if(currentUser){if(videoSignalChannel){try{await db[_0x27cf31(0x14a)](videoSignalChannel);}catch(_0x196904){}videoSignalChannel=null;}if(videoSeenSignals[_0x26d307(0x1c9)](),videoSignalChannel=db[_0x38b211(0x166)](_0x26d307(0x13a)+currentUser['id'])['on']('postgres_changes',{'event':_0x38b211(0xee),'schema':_0x26d307(0xb4),'table':_0x38b211(0x1b1),'filter':_0x26d307(0x192)+currentUser['id']},_0xe42697=>{const _0x44a44c=_0x27cf31,_0x5ad30b=_0x38b211,_0x4604d3=_0xe42697[_0x44a44c(0x160)];_0x4604d3&&!videoSeenSignals[_0x44a44c(0x15b)](_0x4604d3['id'])&&(videoSeenSignals[_0x5ad30b(0x17b)](_0x4604d3['id']),handleVideoSignal(_0x4604d3));})[_0x26d307(0x122)](),videoRequestChannel){try{await db[_0x26d307(0x1cc)](videoRequestChannel);}catch(_0x1f61c2){}videoRequestChannel=null;}videoRequestChannel=db[_0x38b211(0x166)](_0x26d307(0x1b6)+currentUser['id'])['on'](_0x38b211(0x163),{'event':'*','schema':_0x26d307(0xb4),'table':_0x38b211(0x1cf),'filter':_0x27cf31(0x136)+currentUser['id']},()=>{loadIncomingVideoRequests();})[_0x38b211(0x1f3)](_0x4c49e0=>{const _0x210916=_0x26d307;_0x210916(0xad)!==_0x4c49e0&&_0x210916(0x15f)!==_0x4c49e0||console[_0x210916(0x17a)]('Video\x20request\x20realtime:',_0x4c49e0);}),await loadVideoCameras(),await loadIncomingVideoRequests();}}async function syncApprovedVideoPeers(){const _0x137ce2=_0x447cb2,_0x59ae49=_0x11a8,_0x2c1ada=_0x13483b;if(!currentUser)return;const {data:_0x513fd9,error:_0x14e1b5}=await db['from'](_0x2c1ada(0x120))[_0x59ae49(0x10c)](_0x59ae49(0x182))['eq']('camera_owner_id',currentUser['id'])['eq'](_0x2c1ada(0x12c),selectedVideoRoom)['eq'](_0x59ae49(0x1a2),_0x137ce2(0x80));if(_0x14e1b5)console[_0x137ce2(0x81)](_0x2c1ada(0xb9),_0x14e1b5['message']);else{if(myCameraStream)for(const _0x2aee42 of _0x513fd9||[]){if(_0x2aee42[_0x2c1ada(0x162)]===currentUser['id'])continue;const _0x725820=videoPeerKey(_0x2aee42[_0x2c1ada(0x162)],_0x2aee42['room_name']);if(!videoPeers[_0x2c1ada(0x11b)](_0x725820))try{const _0x300bc0=getVideoPeer(_0x2aee42[_0x137ce2(0x90)],currentUser['id'],_0x2aee42[_0x59ae49(0x1fa)]);myCameraStream[_0x2c1ada(0xda)]()[_0x59ae49(0xd1)](_0x26132a=>_0x300bc0[_0x59ae49(0x16d)](_0x26132a,myCameraStream));const _0x3d0419=await _0x300bc0[_0x2c1ada(0xeb)]();await _0x300bc0[_0x59ae49(0x112)](_0x3d0419),await sendVideoSignal(_0x2aee42[_0x2c1ada(0x162)],{'type':'offer','description':_0x300bc0[_0x2c1ada(0xc4)]},currentUser['id'],_0x2aee42[_0x2c1ada(0x12c)]);}catch(_0x18324f){console[_0x2c1ada(0x17a)](_0x2c1ada(0x9c),_0x18324f[_0x59ae49(0x1d8)]),closeVideoPeer(_0x2aee42[_0x137ce2(0x90)],_0x2aee42[_0x59ae49(0x1fa)]);}}}}async function startMyCamera(){const _0x314669=_0x447cb2,_0x137a34=_0x11a8,_0x4167e3=_0x13483b;if((function(){const _0x5bad5f=_0x1a03,_0x58c21b=_0x11a8,_0x54f9e7=_0x5563,_0x28f250=document[_0x54f9e7(0xd4)](_0x5bad5f(0x12c));if(!_0x28f250)return;let _0x1406cf=!0x1,_0x11dc67=0x0,_0x2ce5d6=0x0,_0x3ae7dd=0x0,_0x2bc174=0x0;'1'!==_0x28f250[_0x54f9e7(0x1a5)][_0x54f9e7(0x1a3)]&&(_0x28f250[_0x54f9e7(0x1a5)][_0x54f9e7(0x1a3)]='1',_0x28f250['addEventListener'](_0x54f9e7(0x146),_0x2d4e85=>{const _0xb9077e=_0x11a8,_0x430baa=_0x54f9e7,_0x876c2=_0x28f250[_0x430baa(0xea)]();_0x1406cf=!0x0,_0x11dc67=_0x2d4e85['clientX'],_0x2ce5d6=_0x2d4e85[_0x430baa(0x183)],_0x3ae7dd=_0x876c2[_0xb9077e(0x167)],_0x2bc174=_0x876c2[_0x430baa(0xdc)],_0x28f250['setPointerCapture'](_0x2d4e85[_0xb9077e(0xe0)]);}),_0x28f250['addEventListener'](_0x58c21b(0x15a),_0x46537a=>{const _0x2bbd8f=_0x5bad5f,_0xb22978=_0x58c21b,_0x46f195=_0x54f9e7;if(!_0x1406cf)return;const _0x11636f=Math[_0x46f195(0x15a)](0x0,Math[_0x46f195(0xbb)](innerWidth-_0x28f250[_0xb22978(0x16f)],_0x3ae7dd+_0x46537a['clientX']-_0x11dc67)),_0x1bfe60=Math[_0x46f195(0x15a)](0x0,Math[_0x46f195(0xbb)](innerHeight-_0x28f250[_0xb22978(0x118)],_0x2bc174+_0x46537a[_0x2bbd8f(0x17c)]-_0x2ce5d6));_0x28f250[_0xb22978(0xf4)][_0xb22978(0x167)]=_0x11636f+'px',_0x28f250[_0x46f195(0x1b8)][_0xb22978(0x178)]=_0x1bfe60+'px',_0x28f250[_0x46f195(0x1b8)][_0xb22978(0xd8)]=_0xb22978(0x10d),_0x28f250['style'][_0xb22978(0x1da)]=_0x46f195(0x126);}),_0x28f250[_0x54f9e7(0x19b)]('pointerup',()=>_0x1406cf=!0x1),_0x28f250[_0x54f9e7(0x19b)](_0x54f9e7(0x139),()=>_0x1406cf=!0x1));}()),currentUser){if(myCameraStream)alert('Your\x20camera\x20is\x20already\x20ON.');else{if(navigator[_0x4167e3(0xcb)]?.[_0x4167e3(0x1ab)])try{myCameraStream=await navigator[_0x137a34(0x202)][_0x4167e3(0x1ab)]({'video':!0x0,'audio':!0x1});const _0xa5815e=document[_0x137a34(0x122)](_0x4167e3(0xfd));_0xa5815e[_0x4167e3(0x1ad)]=myCameraStream,_0xa5815e[_0x137a34(0xf4)][_0x4167e3(0x17d)]=_0x4167e3(0x10a);const {error:_0x44f9e6}=await db[_0x4167e3(0xce)]('video_room_cameras')[_0x137a34(0x168)]({'user_id':currentUser['id'],'room_name':selectedVideoRoom,'camera_on':!0x0,'updated_at':new Date()[_0x314669(0x14c)]()},{'onConflict':_0x314669(0x92)});if(_0x44f9e6)throw new Error(_0x137a34(0x110)+_0x44f9e6[_0x4167e3(0x152)]);const _0x396a8a=document[_0x4167e3(0xd4)](_0x4167e3(0xed));_0x396a8a&&(_0x396a8a[_0x4167e3(0x1ba)]=_0x4167e3(0x130)+selectedVideoRoom+'\x20•\x20Waiting\x20for\x20view\x20requests'),await loadVideoCameras(),await syncApprovedVideoPeers();}catch(_0x542654){myCameraStream&&(myCameraStream[_0x4167e3(0xda)]()[_0x137a34(0xd1)](_0x5d629a=>_0x5d629a['stop']()),myCameraStream=null);const _0x25e2ff=document[_0x314669(0xb1)](_0x4167e3(0xfd));_0x25e2ff&&(_0x25e2ff['srcObject']=null,_0x25e2ff[_0x137a34(0xf4)][_0x314669(0x16f)]=_0x137a34(0xc9)),alert(_0x4167e3(0x18f)+_0x542654[_0x314669(0xb9)]);}else alert(_0x314669(0x9f));}}else alert(_0x4167e3(0xf1));}async function expireApprovedVideoRequests(_0x259139){const _0x48c1fd=_0x447cb2,_0x19d5ef=_0x11a8,_0x165fe3=_0x13483b;if(!currentUser||!_0x259139)return;const {error:_0x4995b4}=await db['from'](_0x165fe3(0x120))[_0x48c1fd(0xd3)]({'status':_0x165fe3(0x15d)})['eq'](_0x48c1fd(0xa5),currentUser['id'])['eq'](_0x165fe3(0x12c),_0x259139)['eq'](_0x19d5ef(0x1a2),_0x165fe3(0x196));_0x4995b4&&(console[_0x19d5ef(0x1ca)](_0x165fe3(0x10e),_0x4995b4[_0x165fe3(0x152)]),alert('Camera\x20approval\x20reset\x20error:\x20'+_0x4995b4['message']));}async function stopMyCamera(){const _0x215d07=_0x447cb2,_0x472347=_0x11a8,_0x337b42=_0x13483b;currentUser&&myCameraStream&&await closeAllVideoPeers(!0x0),myCameraStream&&(myCameraStream[_0x472347(0x1ac)]()[_0x472347(0xd1)](_0x5b1cd0=>_0x5b1cd0[_0x472347(0xfa)]()),myCameraStream=null);const _0x8f45b1=document['getElementById'](_0x337b42(0xfd));if(_0x8f45b1&&(_0x8f45b1[_0x337b42(0x1ad)]=null,_0x8f45b1[_0x337b42(0x1b8)][_0x337b42(0x17d)]=_0x337b42(0x14a)),currentUser){const {error:_0x12d985}=await db[_0x215d07(0x10a)](_0x337b42(0x1a2))[_0x337b42(0x176)]({'user_id':currentUser['id'],'room_name':selectedVideoRoom,'camera_on':!0x1,'updated_at':new Date()[_0x337b42(0xa5)]()},{'onConflict':_0x337b42(0x15c)});_0x12d985&&console['warn'](_0x337b42(0xa0),_0x12d985[_0x337b42(0x152)]),await expireApprovedVideoRequests(selectedVideoRoom);}const _0x291a74=document[_0x215d07(0xb1)](_0x337b42(0xed));_0x291a74&&(_0x291a74[_0x215d07(0x111)]=_0x337b42(0x16f)),await loadVideoCameras();}async function loadVideoCameras(){const _0x1ff1db=_0x447cb2,_0x512d0d=_0x11a8,_0x4d6721=_0x13483b;if(!currentUser)return;const _0x22b8d3=document[_0x512d0d(0x122)](_0x512d0d(0x15e));if(!_0x22b8d3)return;const {data:_0x51db0f,error:_0x2b9aef}=await db[_0x4d6721(0xce)](_0x1ff1db(0xe7))['select'](_0x4d6721(0xb1))['eq'](_0x4d6721(0x12c),selectedVideoRoom)['eq'](_0x512d0d(0x188),!0x0);_0x2b9aef?console[_0x4d6721(0x17a)](_0x2b9aef[_0x4d6721(0x152)]):(_0x22b8d3[_0x512d0d(0x11b)]='',(_0x51db0f||[])[_0x4d6721(0x10c)](_0x27e553=>{const _0x43c9f0=_0x1ff1db,_0x136a39=_0x512d0d,_0x3d7beb=_0x4d6721;if(_0x27e553[_0x3d7beb(0x1b2)]===currentUser['id'])return;const _0x48cfb3=document[_0x3d7beb(0x9e)](_0x43c9f0(0xc3));_0x48cfb3[_0x3d7beb(0x1ba)]=_0x3d7beb(0x19f)+(profilesMap[_0x27e553[_0x136a39(0x11a)]]||_0x27e553[_0x3d7beb(0x1b2)][_0x3d7beb(0x19a)](0x0,0x8));const _0x744ca0=document[_0x43c9f0(0x17b)](_0x43c9f0(0x15e));_0x744ca0['textContent']=_0x136a39(0x1b5),_0x744ca0[_0x136a39(0x148)]=()=>requestVideoAccess(_0x27e553[_0x136a39(0x11a)]),_0x48cfb3[_0x136a39(0x197)](_0x744ca0),_0x22b8d3[_0x3d7beb(0x189)](_0x48cfb3);}));}async function requestVideoAccess(_0x880214){const _0x5fd41c=_0x447cb2,_0x2272ff=_0x11a8,_0x44cbfb=_0x13483b;if(!currentUser||!_0x880214)return;const {data:_0x3afc34,error:_0x1535ab}=await db[_0x44cbfb(0xce)](_0x2272ff(0x1cf))[_0x5fd41c(0x11c)](_0x44cbfb(0x161))['eq']('requester_id',currentUser['id'])['eq'](_0x44cbfb(0xff),_0x880214)['eq'](_0x2272ff(0x1fa),selectedVideoRoom)['in'](_0x44cbfb(0x134),[_0x44cbfb(0xf5),_0x44cbfb(0x196)])[_0x44cbfb(0xa4)](0x1);if(_0x1535ab)return void alert(_0x2272ff(0x1c4)+_0x1535ab[_0x44cbfb(0x152)]);if(_0x3afc34?.[_0x44cbfb(0xde)])return void alert(_0x44cbfb(0x196)===_0x3afc34[0x0][_0x44cbfb(0x134)]?_0x44cbfb(0xc9):_0x5fd41c(0xc7));const {error:_0x2ecca2}=await db[_0x2272ff(0x152)](_0x5fd41c(0xc6))[_0x44cbfb(0x11e)]({'requester_id':currentUser['id'],'camera_owner_id':_0x880214,'room_name':selectedVideoRoom});_0x2ecca2?alert(_0x44cbfb(0x1af)+_0x2ecca2[_0x2272ff(0x1d8)]):(alert(_0x2272ff(0x184)),loadIncomingVideoRequests());}async function loadIncomingVideoRequests(){const _0x1e3767=_0x447cb2,_0x4550cc=_0x11a8,_0xb6a4d3=_0x13483b;if(!currentUser)return;const _0x523f66=document[_0xb6a4d3(0xd4)](_0x1e3767(0x13d));if(!_0x523f66)return;const {data:_0x30f8b3,error:_0x45d70a}=await db[_0xb6a4d3(0xce)](_0xb6a4d3(0x120))[_0xb6a4d3(0x103)](_0x1e3767(0xa6))['eq'](_0xb6a4d3(0xff),currentUser['id'])['eq'](_0xb6a4d3(0x12c),selectedVideoRoom)['eq'](_0x4550cc(0x1a2),'pending');if(_0x45d70a){console[_0x4550cc(0x1ca)](_0x4550cc(0xea),_0x45d70a[_0xb6a4d3(0x152)]),_0x523f66[_0xb6a4d3(0x108)]();const _0x3862ef=document[_0x4550cc(0x15b)]('div');return _0x3862ef['textContent']=_0xb6a4d3(0xa2)+_0x45d70a[_0x1e3767(0xb9)],void _0x523f66[_0x4550cc(0x197)](_0x3862ef);}if(!_0x30f8b3||0x0===_0x30f8b3[_0x4550cc(0x1b8)])return void(_0x523f66[_0xb6a4d3(0xae)]='');_0x523f66[_0x1e3767(0x177)]=_0x4550cc(0x117);const _0x504ca1=new Map();_0x30f8b3[_0xb6a4d3(0x10c)](_0x3874d1=>{const _0x300a3f=_0x1e3767,_0x1190e1=_0x4550cc,_0xb07a5e=_0xb6a4d3;_0x504ca1[_0x300a3f(0x15b)](_0x3874d1[_0x1190e1(0x1cd)])||_0x504ca1[_0xb07a5e(0xfe)](_0x3874d1[_0xb07a5e(0x162)],_0x3874d1);}),_0x504ca1[_0xb6a4d3(0x10c)](_0x52b5ba=>{const _0x287c5e=_0x1e3767,_0xa5d7c9=_0x4550cc,_0x54c6c9=_0xb6a4d3,_0x5dc77d=document[_0x54c6c9(0x9e)](_0x54c6c9(0xfa));_0x5dc77d[_0xa5d7c9(0x12d)][_0x54c6c9(0x13b)]=_0x52b5ba[_0xa5d7c9(0x1cd)],_0x5dc77d['textContent']=_0x287c5e(0x19c)+_0x52b5ba[_0xa5d7c9(0x1cd)][_0x54c6c9(0x19a)](0x0,0x8);const _0x12445e=document[_0xa5d7c9(0x15b)](_0x54c6c9(0x187));_0x12445e[_0xa5d7c9(0x183)]=_0x54c6c9(0x14b),_0x12445e[_0xa5d7c9(0x148)]=()=>approveVideoRequest(_0x52b5ba['id'],_0x52b5ba[_0xa5d7c9(0x1cd)]);const _0x310e30=document[_0x287c5e(0x17b)](_0x54c6c9(0x187));_0x310e30[_0xa5d7c9(0x183)]=_0x54c6c9(0xe2),_0x310e30[_0x54c6c9(0xaf)]=()=>rejectVideoRequest(_0x52b5ba['id'],_0x52b5ba['requester_id']),_0x5dc77d[_0x54c6c9(0x189)](_0x12445e),_0x5dc77d[_0xa5d7c9(0x197)](_0x310e30),_0x523f66[_0xa5d7c9(0x197)](_0x5dc77d);});}async function approveVideoRequest(_0x12648a,_0x1e4bdc){const _0x5639b3=_0x447cb2,_0x5f476e=_0x11a8,_0x14385b=_0x13483b,_0x33de7e=document[_0x5f476e(0x122)](_0x14385b(0x16b)),_0x3e1b67=_0x33de7e?.['querySelector'](_0x5639b3(0x11a)+_0x1e4bdc+'\x22]');_0x3e1b67&&_0x3e1b67[_0x5f476e(0x199)]();const {data:_0x3ee6e8,error:_0x1651e4}=await db[_0x14385b(0xce)](_0x14385b(0x120))[_0x14385b(0x103)]('id')['eq'](_0x14385b(0xff),currentUser['id'])['eq'](_0x14385b(0x162),_0x1e4bdc)['eq']('room_name',selectedVideoRoom)['eq'](_0x5f476e(0x1a2),'pending');if(_0x1651e4)return alert(_0x14385b(0x1a0)+_0x1651e4['message']),void await loadIncomingVideoRequests();const _0x2241ab=[...new Set([_0x12648a,...(_0x3ee6e8||[])[_0x5f476e(0x12e)](_0x24301e=>_0x24301e['id'])])];for(const _0x96079f of _0x2241ab){const {error:_0x1fa500}=await db[_0x14385b(0xcc)]('approve_video_view_request',{'p_request_id':_0x96079f});if(_0x1fa500)return alert(_0x5f476e(0x128)+_0x1fa500[_0x14385b(0x152)]),void await loadIncomingVideoRequests();}await loadIncomingVideoRequests(),await syncApprovedVideoPeers();}async function rejectVideoRequest(_0x2a9f52,_0xbb05bd){const _0x1cc74b=_0x447cb2,_0x429e88=_0x11a8,_0x5f4eb1=_0x13483b,_0x1f7563=document[_0x429e88(0x122)]('videoIncomingRequests'),_0x2ac5f9=_0x1f7563?.[_0x1cc74b(0x103)]('[data-requester-id=\x22'+_0xbb05bd+'\x22]');_0x2ac5f9&&_0x2ac5f9[_0x429e88(0x199)]();const {data:_0x1f06b2,error:_0x4560f1}=await db[_0x5f4eb1(0xce)](_0x5f4eb1(0x120))['select']('id')['eq'](_0x429e88(0xf3),currentUser['id'])['eq'](_0x5f4eb1(0x162),_0xbb05bd)['eq'](_0x5f4eb1(0x12c),selectedVideoRoom)['eq'](_0x5f4eb1(0x134),'pending');if(_0x4560f1)return alert(_0x5f4eb1(0x1a0)+_0x4560f1[_0x429e88(0x1d8)]),void await loadIncomingVideoRequests();const _0x5111fd=[...new Set([_0x2a9f52,...(_0x1f06b2||[])[_0x5f4eb1(0x156)](_0x144b88=>_0x144b88['id'])])];for(const _0x4132cc of _0x5111fd){const {error:_0x53d048}=await db[_0x5f4eb1(0xcc)]('revoke_video_view_request',{'p_request_id':_0x4132cc});if(_0x53d048)return alert(_0x5f4eb1(0x13f)+_0x53d048[_0x429e88(0x1d8)]),void await loadIncomingVideoRequests();}await loadIncomingVideoRequests();}async function revokeVideoPermission(_0x4a6673){const _0x2764c1=_0x447cb2,_0xba9026=_0x11a8,_0x316a3e=_0x13483b,{error:_0x68e507}=await db[_0x2764c1(0x13f)](_0xba9026(0x125),{'p_request_id':_0x4a6673});_0x68e507?alert(_0x68e507[_0x316a3e(0x152)]):alert(_0xba9026(0x18a));}async function sendVideoSignal(_0x4452fc,_0x53b50f,_0x54a104,_0x18db47=selectedVideoRoom){const _0x17a4d9=_0x447cb2,_0x269eb5=_0x11a8,_0x2a43b7=_0x13483b;if(!currentUser||!_0x4452fc||!_0x54a104)return;const {error:_0x5d035a}=await db[_0x17a4d9(0x10a)](_0x2a43b7(0xbd))[_0x2a43b7(0x11e)]({'sender_id':currentUser['id'],'receiver_id':_0x4452fc,'camera_owner_id':_0x54a104,'room_name':_0x18db47,'signal':_0x53b50f});_0x5d035a&&console[_0x269eb5(0x1ca)](_0x2a43b7(0xfc),_0x5d035a[_0x2a43b7(0x152)]);}function getVideoPeer(_0x565cd4,_0xcc2861,_0x4510b5=selectedVideoRoom){const _0x32a6ce=_0x11a8,_0x2ac3b3=_0x13483b,_0x319327=videoPeerKey(_0x565cd4,_0x4510b5);let _0xf364d6=videoPeers[_0x2ac3b3(0x17e)](_0x319327);return _0xf364d6||(_0xf364d6=new RTCPeerConnection(rtcConfig),videoPeers[_0x2ac3b3(0xfe)](_0x319327,_0xf364d6),_0xf364d6[_0x32a6ce(0x1c3)]=async _0x409618=>{const _0x350039=_0x1a03;_0x409618[_0x350039(0x77)]&&await sendVideoSignal(_0x565cd4,{'type':'ice','candidate':_0x409618['candidate']},_0xcc2861,_0x4510b5);},_0xf364d6[_0x32a6ce(0x151)]=_0x48bce6=>{const _0x46825d=_0x1a03,_0x3ec461=_0x32a6ce,_0x55942f=_0x2ac3b3;let _0x1959ea=document[_0x55942f(0xd4)](_0x55942f(0x95)+_0x565cd4);_0x1959ea||(_0x1959ea=document[_0x55942f(0x9e)](_0x55942f(0x179)),_0x1959ea['id']=_0x3ec461(0x133)+_0x565cd4,_0x1959ea[_0x55942f(0x136)]=!0x0,_0x1959ea[_0x55942f(0x14e)]=!0x0,_0x1959ea[_0x55942f(0xe3)]=!0x0,_0x1959ea[_0x3ec461(0xf4)][_0x3ec461(0x17f)]=_0x46825d(0x122),document[_0x55942f(0xd4)](_0x55942f(0xbc))?.[_0x55942f(0x189)](_0x1959ea)),_0x1959ea[_0x55942f(0x1ad)]=_0x48bce6[_0x55942f(0x142)][0x0],_0x1959ea[_0x46825d(0x7c)]()[_0x3ec461(0x198)](()=>{});},_0xf364d6[_0x2ac3b3(0x173)]=()=>{const _0x24d1dc=_0x1a03,_0x259a6d=_0x32a6ce;['failed',_0x24d1dc(0xff),_0x2ac3b3(0x1c2)][_0x259a6d(0x1d2)](_0xf364d6[_0x259a6d(0x1b2)])&&closeVideoPeer(_0x565cd4,_0x4510b5);},_0xf364d6);}async function hasApprovedVideoAccess(_0x4c591e,_0x4d9e61,_0x5cfe77){const _0x16c98f=_0x447cb2,_0x498e60=_0x11a8,_0x3eb93d=_0x13483b;if(!_0x4c591e||!_0x4d9e61||!_0x5cfe77)return!0x1;const {data:_0x966255,error:_0x52cdbd}=await db[_0x498e60(0x152)](_0x3eb93d(0x120))[_0x3eb93d(0x103)]('id')['eq']('camera_owner_id',_0x4c591e)['eq'](_0x16c98f(0x90),_0x4d9e61)['eq'](_0x3eb93d(0x12c),_0x5cfe77)['eq'](_0x498e60(0x1a2),_0x3eb93d(0x196))[_0x3eb93d(0xa4)](0x1)[_0x3eb93d(0xef)]();return _0x52cdbd?(console[_0x498e60(0x1ca)](_0x16c98f(0x15f),_0x52cdbd[_0x3eb93d(0x152)]),!0x1):!!_0x966255;}async function handleVideoSignal(_0x2859da){const _0x399231=_0x447cb2,_0x224a1c=_0x11a8,_0x1e8a94=_0x13483b;if(!currentUser||!_0x2859da||_0x2859da['sender_id']===currentUser['id']||_0x2859da[_0x1e8a94(0x12c)]!==selectedVideoRoom)return;const _0x3738af=_0x2859da[_0x224a1c(0x174)]||{},_0x4db906=_0x2859da[_0x1e8a94(0xff)],_0x34aa01=_0x2859da[_0x1e8a94(0x12c)],_0x22d3b6=currentUser['id']===_0x4db906?_0x2859da[_0x1e8a94(0x16d)]:currentUser['id'],_0x1b9d2e=videoPeerKey(_0x2859da[_0x399231(0x117)],_0x34aa01);if(_0x224a1c(0x12c)!==_0x3738af[_0x1e8a94(0x135)]){if(await hasApprovedVideoAccess(_0x4db906,_0x22d3b6,_0x34aa01)){if(_0x1e8a94(0x172)===_0x3738af[_0x1e8a94(0x135)]){if(_0x4db906!==_0x2859da[_0x224a1c(0x187)]||_0x2859da[_0x224a1c(0x170)]!==currentUser['id'])return;try{const _0x10d79a=getVideoPeer(_0x2859da['sender_id'],_0x4db906,_0x34aa01);await _0x10d79a[_0x1e8a94(0xc7)](new RTCSessionDescription(_0x3738af[_0x1e8a94(0x178)]));const _0x3085e1=videoPendingIce[_0x224a1c(0x1a0)](_0x1b9d2e)||[];for(const _0x2e179f of _0x3085e1)try{await _0x10d79a[_0x1e8a94(0xcf)](new RTCIceCandidate(_0x2e179f));}catch(_0x4a9529){}videoPendingIce[_0x399231(0xa9)](_0x1b9d2e);const _0x2962af=await _0x10d79a['createAnswer']();await _0x10d79a[_0x1e8a94(0x19c)](_0x2962af),await sendVideoSignal(_0x2859da[_0x1e8a94(0x16d)],{'type':_0x224a1c(0x1ad),'description':_0x10d79a['localDescription']},_0x4db906,_0x34aa01);}catch(_0x42c736){console[_0x1e8a94(0x17a)](_0x1e8a94(0xe4),_0x42c736['message']),closeVideoPeer(_0x2859da[_0x224a1c(0x187)],_0x34aa01);}}else{if(_0x1e8a94(0xe0)===_0x3738af[_0x1e8a94(0x135)]){const _0x22bb40=videoPeers[_0x399231(0x171)](_0x1b9d2e);if(!_0x22bb40||_0x4db906!==currentUser['id'])return;try{await _0x22bb40[_0x399231(0x13a)](new RTCSessionDescription(_0x3738af[_0x1e8a94(0x178)]));}catch(_0x1c85ea){console[_0x1e8a94(0x17a)](_0x1e8a94(0xbf),_0x1c85ea[_0x224a1c(0x1d8)]);}}else{if(_0x1e8a94(0xd3)===_0x3738af['type']){const _0xffe200=videoPeers[_0x1e8a94(0x17e)](_0x1b9d2e);if(_0xffe200&&_0xffe200[_0x224a1c(0x1fc)])try{await _0xffe200[_0x399231(0x158)](new RTCIceCandidate(_0x3738af[_0x1e8a94(0xaa)]));}catch(_0x45a9f3){}else{const _0x43c837=videoPendingIce[_0x224a1c(0x1a0)](_0x1b9d2e)||[];_0x43c837[_0x1e8a94(0x143)](_0x3738af[_0x1e8a94(0xaa)]),videoPendingIce[_0x1e8a94(0xfe)](_0x1b9d2e,_0x43c837);}}}}}else closeVideoPeer(_0x2859da[_0x224a1c(0x187)],_0x34aa01);}else closeVideoPeer(_0x2859da[_0x1e8a94(0x16d)],_0x34aa01);}async function selectVideoRoom(_0x5e0bca){const _0x3fb7a3=_0x447cb2,_0x43f4b1=_0x11a8,_0x473170=_0x13483b;if(![_0x473170(0xbe),_0x3fb7a3(0x1a3),'Help',_0x473170(0xd6),_0x473170(0xd9)][_0x473170(0x19e)](_0x5e0bca)||_0x5e0bca===selectedVideoRoom)return;const _0x107932=selectedVideoRoom,_0x346493=!!myCameraStream;if(await closeAllVideoPeers(!0x0),currentUser&&(await db[_0x43f4b1(0x152)](_0x3fb7a3(0xe7))[_0x473170(0x176)]({'user_id':currentUser['id'],'room_name':_0x107932,'camera_on':!0x1,'updated_at':new Date()[_0x43f4b1(0x134)]()},{'onConflict':_0x3fb7a3(0x92)}),await expireApprovedVideoRequests(_0x107932)),selectedVideoRoom=_0x5e0bca,_0x346493&&currentUser){const {error:_0x3c83d6}=await db[_0x473170(0xce)](_0x3fb7a3(0xe7))[_0x473170(0x176)]({'user_id':currentUser['id'],'room_name':_0x5e0bca,'camera_on':!0x0,'updated_at':new Date()[_0x473170(0xa5)]()},{'onConflict':_0x43f4b1(0xcd)});_0x3c83d6&&console['warn'](_0x43f4b1(0x1e8),_0x3c83d6[_0x3fb7a3(0xb9)]);}document[_0x3fb7a3(0xb1)](_0x43f4b1(0x14a))[_0x473170(0x1ba)]=(_0x346493?_0x43f4b1(0xe8):'')+'Selected\x20Video\x20Room:\x20'+_0x5e0bca,await loadVideoCameras(),await loadIncomingVideoRequests(),await syncApprovedVideoPeers();}setInterval(()=>{currentUser&&(loadVideoCameras(),loadIncomingVideoRequests(),syncApprovedVideoPeers());},0x1388),db[_0x401465(0x1e5)]['onAuthStateChange'](_0x3096d1=>{const _0x6347fd=_0x447cb2,_0x2698c3=_0x401465,_0x32b7e7=_0x13483b;'PASSWORD_RECOVERY'===_0x3096d1&&(isPasswordRecovery=!0x0,document[_0x6347fd(0xb1)](_0x32b7e7(0x193))['style'][_0x6347fd(0x16f)]=_0x32b7e7(0x14a),document[_0x2698c3(0x122)](_0x6347fd(0x16a))[_0x2698c3(0xf4)][_0x32b7e7(0x17d)]=_0x2698c3(0xc9),document[_0x32b7e7(0xd4)](_0x32b7e7(0x177))[_0x6347fd(0x124)][_0x2698c3(0x1f9)]=_0x2698c3(0x104),document[_0x2698c3(0x122)](_0x32b7e7(0x16e))[_0x2698c3(0xf4)]['display']=_0x32b7e7(0x14a),document[_0x2698c3(0x122)](_0x2698c3(0x185))[_0x32b7e7(0x1b8)][_0x2698c3(0x1f9)]=_0x32b7e7(0x10a),showStatus(_0x6347fd(0x113)));}),window[_0x13483b(0x105)]=!0x1;let liveChannel=null,presenceChannel=null,onlineUserIds=[],profilesMap={},rolesMap={},kickCheckInterval=null,kickBeingHandled=!0x1,voiceStateChannel=null,voiceSignalChannel=null,voiceRequestChannel=null,currentSpeakerId=null,voiceRequests=[],voicePeers=new Map(),liveMicStream=null,voiceRoomStarted=!0x1,voiceStarting=!0x1;const rtcConfig={'iceServers':[{'urls':_0x13483b(0x199)}]};let soundUnlocked=!0x1,pendingAnnouncements=[],notificationAudioContext=null;function unlockChatSounds(){const _0x14c800=_0x401465,_0x37abce=_0x13483b;soundUnlocked=!0x0;try{notificationAudioContext=new(window[(_0x37abce(0x1c0))]||window[(_0x14c800(0xd0))])(),notificationAudioContext['resume']();}catch(_0x16121f){}_0x37abce(0x147)in window&&speechSynthesis['getVoices'](),pendingAnnouncements[_0x37abce(0x113)](0x0)[_0x14c800(0xd1)](speakAnnouncement);}function _0x54ab(){const _0x4b392b=_0x447cb2,_0x6670ba=_0x401465,_0x1af5e1=['room_id',_0x4b392b(0x80),'createGain',_0x6670ba(0xc4),_0x6670ba(0x1e2),_0x4b392b(0x12a),'addEventListener','setLocalDescription',_0x6670ba(0x1c9),_0x4b392b(0x83),_0x4b392b(0x19c),'Request\x20lookup\x20error:\x20',_0x6670ba(0x1f1),_0x6670ba(0x17c),'dragReady',_0x4b392b(0x15a),'dataset',_0x6670ba(0x16c),_0x6670ba(0x124),_0x4b392b(0xed),'start',_0x6670ba(0x195),_0x6670ba(0x139),_0x4b392b(0xcd),_0x4b392b(0xfd),_0x6670ba(0x1c8),'Request\x20error:\x20',_0x6670ba(0x1dd),_0x4b392b(0x96),_0x6670ba(0x11a),_0x6670ba(0x1bd),_0x6670ba(0xed),_0x6670ba(0x13b),_0x6670ba(0x123),_0x4b392b(0x148),'style','append',_0x4b392b(0x111),_0x6670ba(0x1d5),_0x4b392b(0x123),'123349wLTmQu','className','querySelector',_0x6670ba(0x1cb),_0x6670ba(0x1bf),_0x4b392b(0x8c),_0x6670ba(0x140),_0x6670ba(0x1e3),_0x6670ba(0x1f7),'destination',_0x6670ba(0x1e4),_0x6670ba(0x101),_0x4b392b(0xe3),'speaker_id','disabled',_0x6670ba(0x1e6),_0x6670ba(0x131),'room-link','online-dot',_0x4b392b(0xfe),'⚙️\x20Manage',_0x6670ba(0x18c),_0x4b392b(0x186),_0x6670ba(0x1eb),_0x6670ba(0xc1),_0x6670ba(0x1fe),_0x6670ba(0x1b9),_0x6670ba(0x1fb),_0x6670ba(0x15b),_0x4b392b(0xef),_0x6670ba(0x1af),'aside',_0x6670ba(0x10f),_0x6670ba(0x13f),_0x6670ba(0x181),'toISOString',_0x6670ba(0x179),_0x6670ba(0x132),_0x6670ba(0x196),_0x4b392b(0x184),_0x4b392b(0x77),_0x6670ba(0x1be),_0x4b392b(0xea),_0x4b392b(0xa3),_0x4b392b(0x177),_0x4b392b(0x130),_0x4b392b(0x198),_0x6670ba(0x11d),_0x6670ba(0x1d7),_0x6670ba(0x1b0),_0x6670ba(0x13a),_0x6670ba(0x158),_0x4b392b(0x14e),'Voice\x20answer\x20failed',_0x6670ba(0x1a1),_0x6670ba(0xf9),'tagName',_0x6670ba(0xe4),_0x4b392b(0x91),_0x4b392b(0x168),_0x6670ba(0xc5),_0x6670ba(0xc7),_0x4b392b(0x8f),'🛡️\x20MODERATOR','bye',_0x4b392b(0x191),_0x6670ba(0x173),_0x4b392b(0xc5),_0x6670ba(0xfd),_0x6670ba(0x171),_0x6670ba(0x111),'Permission\x20already\x20approved!',_0x4b392b(0x140),_0x6670ba(0x202),'rpc',_0x4b392b(0x94),'from',_0x6670ba(0x12a),'error',_0x6670ba(0x170),_0x6670ba(0x17d),_0x6670ba(0x137),_0x4b392b(0xb1),_0x4b392b(0x1a0),'Music','span',_0x6670ba(0x121),_0x4b392b(0xdb),_0x6670ba(0x1ac),_0x6670ba(0x1ae),_0x6670ba(0x178),'stop',_0x6670ba(0x1b8),_0x6670ba(0x18b),_0x6670ba(0x1ad),_0x6670ba(0x200),_0x4b392b(0x132),'controls',_0x6670ba(0x13c),_0x6670ba(0x1f2),_0x4b392b(0xde),'57976edTUge',_0x6670ba(0x17f),_0x6670ba(0x16d),_0x4b392b(0x119),_0x6670ba(0x15c),_0x6670ba(0x174),_0x4b392b(0xe4),'remove',_0x4b392b(0x108),_0x6670ba(0x180),_0x6670ba(0x1ff),_0x6670ba(0x14d),'Invalid\x20selection.',_0x4b392b(0xad),_0x4b392b(0x9d),_0x6670ba(0x1bb),_0x4b392b(0xf8),'password','🛡️',_0x6670ba(0x169),_0x4b392b(0xbe),'Video\x20signal:','myCameraPreview',_0x6670ba(0xca),_0x6670ba(0xf3),_0x4b392b(0x109),'failed','lym-public-group-chat','select',_0x6670ba(0xec),'appStarting',_0x4b392b(0x187),_0x4b392b(0x194),_0x4b392b(0x11e),_0x6670ba(0x126),_0x6670ba(0x104),_0x6670ba(0xc3),'forEach',_0x6670ba(0xef),_0x6670ba(0xe5),_0x6670ba(0x129),_0x4b392b(0x157),_0x4b392b(0x146),_0x6670ba(0x12b),_0x6670ba(0x1d6),_0x6670ba(0x100),_0x6670ba(0x1ef),_0x6670ba(0x1ee),_0x6670ba(0xf0),_0x4b392b(0xf9),_0x4b392b(0xae),_0x6670ba(0x18f),_0x6670ba(0x1cc),'INSERT',_0x4b392b(0x147),_0x6670ba(0x12f),_0x6670ba(0x109),'video_view_requests',_0x6670ba(0x162),_0x6670ba(0x1f3),_0x4b392b(0x9e),_0x4b392b(0x15d),_0x6670ba(0x1c1),_0x6670ba(0x10d),'msg\x20','🏠\x20Home',_0x6670ba(0x13d),_0x6670ba(0x154),'423FKYhAB','room_name',_0x6670ba(0x192),'Username\x20must\x20be\x203\x20to\x2020\x20characters.',_0x6670ba(0x1ce),_0x6670ba(0xe8),_0x6670ba(0x1d0),_0x6670ba(0xf2),_0x6670ba(0x1db),'status','type',_0x4b392b(0x89),_0x6670ba(0x145),'#videoIncomingRequests',_0x6670ba(0x157),_0x6670ba(0xc2),_0x4b392b(0xee),_0x6670ba(0x177),_0x6670ba(0x1a8),_0x6670ba(0xd9),_0x4b392b(0xca),_0x6670ba(0x114),'toLowerCase',_0x6670ba(0x142),_0x6670ba(0x18e),_0x6670ba(0x10b),_0x4b392b(0xe1),_0x6670ba(0x172),_0x4b392b(0xd1),'releaseMicBtn',_0x4b392b(0xdf),_0x4b392b(0x1a6),_0x6670ba(0xe9),_0x4b392b(0x125),'getTime','playsInline',_0x6670ba(0xcf),_0x4b392b(0x79),_0x6670ba(0xfc),_0x6670ba(0x1d8),_0x4b392b(0x154),_0x6670ba(0xe3),'Is\x20user\x20ko\x20Kick\x20karna\x20hai?','map',_0x4b392b(0xd0),_0x4b392b(0x139),_0x4b392b(0x120),_0x6670ba(0x176),_0x6670ba(0xd2),_0x4b392b(0x92),_0x6670ba(0xcc),_0x6670ba(0x1ec),_0x4b392b(0x16b),_0x4b392b(0xab),_0x6670ba(0x1f0),'requester_id',_0x6670ba(0x1bc),'voice_room_state',_0x6670ba(0x1a5),_0x6670ba(0x14c),_0x6670ba(0xd7),_0x6670ba(0xe6),_0x4b392b(0x7e),_0x6670ba(0x130),_0x4b392b(0x13d),_0x6670ba(0x113),_0x4b392b(0x117),_0x4b392b(0xac),_0x6670ba(0xfe),_0x6670ba(0x14e),_0x6670ba(0x14f),_0x6670ba(0x1d9),'onconnectionstatechange','UPDATE','Mic\x20is\x20free\x20—\x20request\x20to\x20speak','upsert','auth','description',_0x4b392b(0x19b),_0x6670ba(0x1ca),_0x6670ba(0x161),'welcomeScreen','display',_0x4b392b(0x171),_0x6670ba(0x203),_0x6670ba(0x201),_0x4b392b(0x11d),_0x6670ba(0xe7),_0x4b392b(0x17c),'createClient','#videoRemoteStreams','delete','button',_0x6670ba(0x135),_0x6670ba(0x197),_0x4b392b(0x84),_0x6670ba(0x144),_0x6670ba(0xdf),_0x6670ba(0x1a6),'ontrack',_0x4b392b(0x10e),'contextmenu',_0x6670ba(0x19c),_0x4b392b(0xf5),_0x6670ba(0x143),_0x6670ba(0x10e)];return(_0x54ab=function(){return _0x1af5e1;})();}function speakAnnouncement(_0x33ed40){const _0x15a615=_0x13483b;if(!(_0x401465(0x1ab)in window))return;if(!soundUnlocked)return void pendingAnnouncements[_0x15a615(0x143)](_0x33ed40);const _0x176593=new SpeechSynthesisUtterance(_0x33ed40);_0x176593[_0x15a615(0x149)]=_0x15a615(0x1bc),_0x176593['rate']=0x1,speechSynthesis[_0x15a615(0x191)](_0x176593);}function playMessageTone(){const _0x562d9e=_0x401465,_0x489279=_0x13483b;if(!soundUnlocked||!notificationAudioContext)return;const _0x20e3a1=notificationAudioContext,_0x1f1c8c=_0x20e3a1[_0x489279(0xb8)](),_0x87b4e3=_0x20e3a1[_0x489279(0x197)](),_0x369f58=_0x20e3a1[_0x489279(0x9b)];_0x1f1c8c[_0x562d9e(0x10a)][_0x489279(0xa9)]=0x294,_0x87b4e3[_0x489279(0xd5)][_0x562d9e(0xf5)](0.08,_0x369f58),_0x87b4e3[_0x489279(0xd5)][_0x489279(0x124)](0.001,_0x369f58+0.2),_0x1f1c8c['connect'](_0x87b4e3),_0x87b4e3[_0x489279(0x15b)](_0x20e3a1[_0x489279(0x1c6)]),_0x1f1c8c[_0x489279(0x1a9)](_0x369f58),_0x1f1c8c[_0x489279(0xdd)](_0x369f58+0.2);}function enterChat(){const _0x65bf69=_0x401465,_0x5ad780=_0x13483b;document['getElementById'](_0x5ad780(0x17c))[_0x65bf69(0xf4)][_0x65bf69(0x1f9)]=_0x65bf69(0xc9),unlockChatSounds();}function showStatus(_0x377418){const _0x536ef8=_0x447cb2,_0x157731=_0x401465;document[_0x536ef8(0xb1)](_0x536ef8(0x193))[_0x157731(0x183)]=_0x377418;}function sessionStorageKey(_0x98e68a){return _0x401465(0xce)+_0x98e68a;}function timeValue(_0x44d756){const _0x12743a=_0x13483b;if(!_0x44d756)return null;const _0x40d5a9=new Date(_0x44d756)[_0x12743a(0x14d)]();return Number['isFinite'](_0x40d5a9)?_0x40d5a9:null;}function saveChatSession(_0x579645,_0xab261f){_0x579645&&_0xab261f&&localStorage[_0x13483b(0x17b)](sessionStorageKey(_0x579645),String(_0xab261f));}function _0x11a8(_0x1741b1,_0x58db1e){return _0x1741b1-=0xc1,_0x35d4()[_0x1741b1];}function stopKickChecker(){kickCheckInterval&&(clearInterval(kickCheckInterval),kickCheckInterval=null);}function stopLiveMic(){const _0x941034=_0x447cb2,_0x4e7e1e=_0x13483b;liveMicStream&&(liveMicStream[_0x941034(0xb6)]()[_0x4e7e1e(0x10c)](_0x19b05e=>_0x19b05e[_0x4e7e1e(0xdd)]()),liveMicStream=null);}function closeVoicePeers(){const _0x37cfb9=_0x401465,_0x919f08=_0x13483b;for(const _0x3e5a0b of voicePeers['values']())try{_0x3e5a0b[_0x919f08(0x114)]();}catch(_0x30dcbb){}voicePeers[_0x37cfb9(0x17e)]();}function stopLiveVoice(){const _0x51f2f3=_0x401465,_0xebe2cc=_0x13483b;voiceStarting=!0x1,voiceRoomStarted=!0x1,stopLiveMic(),closeVoicePeers(),document[_0x51f2f3(0x177)](_0xebe2cc(0x145))['forEach'](_0x230807=>{const _0x4381d7=_0x51f2f3;_0x230807[_0x4381d7(0x153)]=null,_0x230807[_0x4381d7(0x199)]();});}async function removeVoiceChannels(){const _0x201b59=_0x13483b;for(const _0x54bdfc of[voiceStateChannel,voiceSignalChannel,voiceRequestChannel])if(_0x54bdfc)try{await db[_0x201b59(0x1cc)](_0x54bdfc);}catch(_0x45e243){}voiceStateChannel=voiceSignalChannel=voiceRequestChannel=null,stopLiveVoice();}async function removeChatChannels(){const _0x1acef7=_0x447cb2,_0x4ca7d2=_0x401465,_0x3f8b34=_0x13483b;if(presenceChannel){const _0x4c621c=presenceChannel;presenceChannel=null;try{await db[_0x4ca7d2(0x1e6)](_0x4c621c);}catch(_0x43c6d7){}}if(liveChannel){const _0x381061=liveChannel;liveChannel=null;try{await db[_0x4ca7d2(0x1e6)](_0x381061);}catch(_0x1ee9d7){}}if(videoSignalChannel){const _0x4fbe2c=videoSignalChannel;videoSignalChannel=null;try{await db[_0x1acef7(0x14a)](_0x4fbe2c);}catch(_0x2618bb){}}if(videoRequestChannel){const _0x52b413=videoRequestChannel;videoRequestChannel=null;try{await db[_0x3f8b34(0x1cc)](_0x52b413);}catch(_0x328bba){}}if(await closeAllVideoPeers(!0x1),currentUser&&myCameraStream){const {error:_0xcb6f20}=await db[_0x3f8b34(0xce)]('video_room_cameras')['upsert']({'user_id':currentUser['id'],'room_name':selectedVideoRoom,'camera_on':!0x1,'updated_at':new Date()[_0x3f8b34(0xa5)]()},{'onConflict':'user_id,room_name'});_0xcb6f20&&console[_0x3f8b34(0x17a)](_0x3f8b34(0x1b3),_0xcb6f20[_0x3f8b34(0x152)]);}myCameraStream&&(myCameraStream['getTracks']()[_0x4ca7d2(0xd1)](_0x2b60f7=>_0x2b60f7[_0x1acef7(0xaf)]()),myCameraStream=null);const _0x35fd2a=document[_0x3f8b34(0xd4)](_0x3f8b34(0xfd));_0x35fd2a&&(_0x35fd2a[_0x3f8b34(0x1ad)]=null,_0x35fd2a[_0x4ca7d2(0xf4)][_0x3f8b34(0x17d)]=_0x4ca7d2(0xc9)),await removeVoiceChannels(),onlineUserIds=[];}async function showAuthMessage(_0x1e8ace){const _0xdd6daa=_0x447cb2,_0x2b8647=_0x401465,_0x495e9a=_0x13483b;stopKickChecker(),await removeChatChannels();try{await db[_0x495e9a(0x177)][_0x495e9a(0xe1)]();}catch(_0x1502c6){}currentUser=null,chatStartedAt=null,profilesMap={},rolesMap={},document[_0x495e9a(0xd4)](_0x495e9a(0x193))['style'][_0x495e9a(0x17d)]=_0x495e9a(0x14a),document[_0xdd6daa(0xb1)](_0x495e9a(0x17c))['style'][_0x495e9a(0x17d)]='none',document[_0x495e9a(0xd4)](_0x2b8647(0x1e5))[_0x495e9a(0x1b8)][_0x2b8647(0x1f9)]=_0x495e9a(0x10a),document[_0x2b8647(0x122)](_0x2b8647(0x1a4))[_0x495e9a(0x1b8)]['display']=_0xdd6daa(0x1a6),document[_0x495e9a(0xd4)](_0xdd6daa(0xd9))[_0x2b8647(0x11b)]='',showStatus(_0x1e8ace);}async function sendPasswordReset(){const _0x165091=_0x447cb2,_0x51e961=_0x401465,_0x79a33b=_0x13483b,_0x452d5c=document[_0x79a33b(0xd4)](_0x79a33b(0xf4))[_0x79a33b(0xa9)][_0x79a33b(0xd2)]();if(!_0x452d5c)return void showStatus(_0x79a33b(0x12d));showStatus(_0x79a33b(0x14f));const {error:_0x105159}=await db[_0x79a33b(0x177)]['resetPasswordForEmail'](_0x452d5c,{'redirectTo':'https://lymrealm-cpu.github.io/chat.html'});showStatus(_0x105159?_0x51e961(0x1c2)+_0x105159[_0x165091(0xb9)]:_0x79a33b(0x16c));}async function saveNewPassword(){const _0x38b3e1=_0x447cb2,_0x344e3f=_0x401465,_0xafe360=_0x13483b,_0x19bbf7=document[_0xafe360(0xd4)](_0xafe360(0xd8))[_0xafe360(0xa9)],_0x393591=document[_0xafe360(0xd4)](_0xafe360(0x98))[_0xafe360(0xa9)];if(_0x19bbf7['length']<0x6)return void showStatus(_0x38b3e1(0x73));if(_0x19bbf7!==_0x393591)return void showStatus(_0xafe360(0x1c4));showStatus(_0x344e3f(0x19d));const {error:_0x482381}=await db[_0xafe360(0x177)][_0x38b3e1(0x12e)]({'password':_0x19bbf7});_0x482381?showStatus(_0x344e3f(0x19e)+_0x482381[_0xafe360(0x152)]):(showStatus(_0x38b3e1(0x183)),await db[_0xafe360(0x177)][_0xafe360(0xe1)](),isPasswordRecovery=!0x1,document[_0xafe360(0xd4)]('passwordRecoveryPanel')[_0xafe360(0x1b8)][_0xafe360(0x17d)]=_0xafe360(0x14a),document[_0xafe360(0xd4)](_0xafe360(0x16e))[_0xafe360(0x1b8)][_0xafe360(0x17d)]=_0xafe360(0x10a),document[_0x38b3e1(0xb1)](_0xafe360(0xd8))[_0xafe360(0xa9)]='',document[_0xafe360(0xd4)](_0xafe360(0x98))[_0x38b3e1(0x184)]='',document[_0xafe360(0xd4)](_0x344e3f(0xd5))[_0x344e3f(0x14b)]='');}async function login(){const _0x19d160=_0x401465,_0x3b0060=_0x13483b,_0x1534ca=document[_0x19d160(0x122)](_0x19d160(0xcb))[_0x3b0060(0xa9)][_0x3b0060(0xd2)](),_0x5f3d30=document['getElementById'](_0x3b0060(0xf8))[_0x3b0060(0xa9)];if(_0x1534ca&&_0x5f3d30){showStatus(_0x19d160(0x1a9));try{const {data:_0x3fb2ef,error:_0x1b2fcc}=await db[_0x3b0060(0x177)]['signInWithPassword']({'email':_0x1534ca,'password':_0x5f3d30});if(_0x1b2fcc)return void showStatus(_0x1b2fcc[_0x19d160(0x1d8)]);showStatus('Login\x20successful.\x20Opening\x20chat...'),await startApp(_0x3fb2ef[_0x3b0060(0x150)],!0x0);}catch(_0x4013ac){showStatus(_0x3b0060(0x158)+_0x4013ac[_0x3b0060(0x152)]);}}else showStatus(_0x3b0060(0x159));}async function signup(){const _0x31d42e=_0x447cb2,_0x5aad1d=_0x401465,_0x3f8592=_0x13483b,_0x147e0b=document[_0x3f8592(0xd4)](_0x31d42e(0xad))[_0x5aad1d(0x14b)][_0x31d42e(0xc8)](),_0x4e8bfa=document[_0x5aad1d(0x122)](_0x5aad1d(0xd5))[_0x3f8592(0xa9)];if(!_0x147e0b||!_0x4e8bfa)return void showStatus(_0x31d42e(0x120));showStatus(_0x5aad1d(0x1e1));const {data:_0x7a00e4,error:_0x56b4a1}=await db[_0x5aad1d(0x1e5)][_0x3f8592(0x137)]({'email':_0x147e0b,'password':_0x4e8bfa});_0x56b4a1?showStatus(_0x56b4a1[_0x3f8592(0x152)]):_0x7a00e4[_0x3f8592(0x13d)]?await startApp(_0x7a00e4[_0x5aad1d(0x1ea)],!0x0):showStatus(_0x31d42e(0x9b));}async function setupPresence(){const _0x2d680a=_0x401465,_0x48ce3f=_0x13483b;if(!currentUser)return;presenceChannel&&(await db[_0x2d680a(0x1e6)](presenceChannel),presenceChannel=null);let _0x550ac5=new Set(),_0x124141=!0x1;onlineUserIds=[currentUser['id']],presenceChannel=db[_0x48ce3f(0x119)](_0x48ce3f(0x1aa),{'config':{'presence':{'key':currentUser['id']}}}),presenceChannel['on']('presence',{'event':'sync'},async()=>{const _0xecef4f=_0x1a03,_0x1da97c=_0x48ce3f,_0x39010d=presenceChannel[_0x1da97c(0x1b4)](),_0x1c5f5a=[...new Set(Object[_0xecef4f(0x95)](_0x39010d)['flat']()[_0x1da97c(0x156)](_0xc9c8a2=>_0xc9c8a2[_0x1da97c(0x1b2)])['filter'](Boolean))],_0x3d2b63=_0x124141?_0x1c5f5a[_0xecef4f(0xa2)](_0xd3cef9=>!_0x550ac5[_0x1da97c(0x11b)](_0xd3cef9)&&_0xd3cef9!==currentUser['id']):[];_0x550ac5=new Set(_0x1c5f5a),_0x124141=!0x0,onlineUserIds=_0x1c5f5a,currentUser&&_0x1da97c(0xc8)===document[_0x1da97c(0xd4)](_0x1da97c(0x193))[_0x1da97c(0x1b8)][_0x1da97c(0x17d)]&&(await loadMembers(),_0x3d2b63[_0x1da97c(0x10c)](_0x64ddbb=>{const _0xab1eec=_0x1da97c;speakAnnouncement((profilesMap[_0x64ddbb]||_0xab1eec(0xdb))+_0xab1eec(0x1a7));}));}),await new Promise(_0x2d1f1a=>{const _0x4c8f8e=_0x1a03;let _0x217eb4=!0x1;const _0x578653=()=>{_0x217eb4||(_0x217eb4=!0x0,_0x2d1f1a());},_0x5360ed=setTimeout(_0x578653,0x1f40);presenceChannel[_0x4c8f8e(0x1a1)](async _0x2b1c78=>{const _0x25bfdd=_0x4c8f8e,_0x5f2397=_0x11a8,_0x40091d=_0x5563;if(_0x25bfdd(0x129)===_0x2b1c78){const {error:_0x2093c3}=await presenceChannel[_0x5f2397(0x17a)]({'user_id':currentUser['id']});_0x2093c3&&showStatus(_0x5f2397(0x1fd)+_0x2093c3[_0x40091d(0x152)]),clearTimeout(_0x5360ed),_0x578653();}[_0x40091d(0xad),_0x25bfdd(0x16b),_0x5f2397(0x16e)][_0x40091d(0x19e)](_0x2b1c78)&&(showStatus(_0x40091d(0x1b5)),clearTimeout(_0x5360ed),_0x578653());});});}async function checkBanStatus(){const _0x22e327=_0x401465,_0x5e7990=_0x13483b,{data:_0x109d7e,error:_0x7d5cba}=await db[_0x5e7990(0xcc)](_0x22e327(0x1de));return _0x7d5cba?(await showAuthMessage(_0x5e7990(0x109)+_0x7d5cba[_0x5e7990(0x152)]),!0x1):!0x0!==_0x109d7e||(await showAuthMessage(_0x5e7990(0x166)),!0x1);}async function handleKicked(){const _0xc7a188=_0x401465;kickBeingHandled||(kickBeingHandled=!0x0,await showAuthMessage(_0xc7a188(0xdc)),kickBeingHandled=!0x1);}async function checkKickStatus(){const _0x5045ab=_0x447cb2,_0x11608b=_0x13483b;if(!currentUser||!chatStartedAt||kickBeingHandled)return;const _0x42f255=currentUser['id'],_0x3674db=timeValue(chatStartedAt),{data:_0x25f1b7,error:_0x2a9759}=await db[_0x5045ab(0x13f)](_0x11608b(0x125));if(_0x2a9759||!currentUser||currentUser['id']!==_0x42f255)return;const _0x3219cc=timeValue(_0x25f1b7);null!==_0x3219cc&&null!==_0x3674db&&_0x3219cc!==_0x3674db&&await handleKicked();}function startKickChecker(){stopKickChecker(),kickCheckInterval=setInterval(checkKickStatus,0xfa0);}async function startApp(_0xf3b831,_0x49b64b=!0x1){const _0x278abc=_0x447cb2,_0x1bd869=_0x401465,_0x2a8b5f=_0x13483b;if(!window[_0x2a8b5f(0x105)]){window[_0x2a8b5f(0x105)]=!0x0;try{if(!await checkBanStatus())return;if(currentUser=_0xf3b831,startSecurityHeartbeat(),_0x49b64b){const {data:_0x32a759,error:_0x4d39b6}=await db[_0x2a8b5f(0xcc)](_0x1bd869(0xfb));if(_0x4d39b6)return void await showAuthMessage(_0x278abc(0xa1)+_0x4d39b6[_0x2a8b5f(0x152)]);chatStartedAt=_0x32a759,saveChatSession(_0xf3b831['id'],chatStartedAt);}else{const {data:_0x5cc3ac,error:_0x5c63f2}=await db[_0x2a8b5f(0xcc)](_0x1bd869(0x1c1));if(_0x5c63f2)return void await showAuthMessage(_0x1bd869(0x160)+_0x5c63f2[_0x2a8b5f(0x152)]);if(chatStartedAt=_0x5cc3ac,!chatStartedAt){const _0x44e3c2=await db[_0x278abc(0x13f)](_0x1bd869(0xfb));if(_0x44e3c2[_0x2a8b5f(0xd0)])return void await showAuthMessage(_0x2a8b5f(0x115)+_0x44e3c2[_0x278abc(0x75)][_0x2a8b5f(0x152)]);chatStartedAt=_0x44e3c2['data'];}const _0x380c51=localStorage[_0x2a8b5f(0x144)](sessionStorageKey(_0xf3b831['id']));if(_0x380c51){const _0x23e35b=timeValue(_0x380c51),_0x48cacf=timeValue(chatStartedAt);if(null!==_0x23e35b&&null!==_0x48cacf&&_0x23e35b!==_0x48cacf)return void await handleKicked();}saveChatSession(_0xf3b831['id'],chatStartedAt);}if(!chatStartedAt)return void await showAuthMessage(_0x1bd869(0x1c7));const _0x40b14b=_0x2a8b5f(0x9d)+_0xf3b831['id'][_0x2a8b5f(0xb3)]('-','')[_0x2a8b5f(0x111)](0x0,0x8),{error:_0x2f25e3}=await db[_0x2a8b5f(0xce)](_0x2a8b5f(0x18d))[_0x278abc(0x85)]({'id':_0xf3b831['id'],'username':_0x40b14b},{'onConflict':'id','ignoreDuplicates':!0x0});if(_0x2f25e3)return void await showAuthMessage('Profile\x20error:\x20'+_0x2f25e3[_0x2a8b5f(0x152)]);if(document['getElementById']('auth')[_0x2a8b5f(0x1b8)][_0x2a8b5f(0x17d)]=_0x2a8b5f(0x14a),document[_0x1bd869(0x122)](_0x2a8b5f(0x193))[_0x2a8b5f(0x1b8)][_0x2a8b5f(0x17d)]=_0x1bd869(0x111),document['getElementById'](_0x2a8b5f(0x17c))['style'][_0x2a8b5f(0x17d)]='flex',document['getElementById'](_0x1bd869(0x1a4))[_0x1bd869(0xf4)][_0x2a8b5f(0x17d)]=_0x278abc(0xf4),document[_0x1bd869(0x122)](_0x2a8b5f(0x116))[_0x2a8b5f(0xae)]=_0x1bd869(0x1b7),await setupPresence(),!currentUser)return;if(await loadMembers(),await loadMessages(),!currentUser)return;liveChannel&&await db[_0x2a8b5f(0x1cc)](liveChannel),liveChannel=db[_0x2a8b5f(0x119)](_0x2a8b5f(0x102))['on'](_0x1bd869(0x163),{'event':'INSERT','schema':_0x1bd869(0x13a),'table':'messages'},_0x641352=>{const _0x4b57fe=_0x278abc,_0x99d0fc=_0x2a8b5f,_0x46b32c=_0x641352[_0x4b57fe(0x160)];null===_0x46b32c[_0x99d0fc(0xd1)]&&currentUser&&(_0x46b32c[_0x99d0fc(0x16d)]!==currentUser['id']&&playMessageTone(),loadMessages());})[_0x278abc(0x1a1)](),startKickChecker(),await setupLiveVoice(),await setupVideoChat();}finally{window[_0x2a8b5f(0x105)]=!0x1;}}}async function loadMembers(){const _0x52776f=_0x447cb2,_0x240884=_0x401465,_0x5632c1=_0x13483b;if(!currentUser)return;const _0x2f5562=document[_0x240884(0x122)](_0x240884(0x15d));_0x2f5562[_0x52776f(0x111)]=_0x5632c1(0x9a);const {data:_0x95741c,error:_0x2d544a}=await db[_0x5632c1(0xce)](_0x240884(0x1a6))[_0x5632c1(0x103)]('id,username');if(_0x2d544a)return void(_0x2f5562[_0x5632c1(0x1ba)]=_0x240884(0x1d1)+_0x2d544a[_0x5632c1(0x152)]);const {data:_0x8f8313,error:_0x477fc9}=await db[_0x5632c1(0xce)](_0x240884(0x127))[_0x5632c1(0x103)](_0x52776f(0x17d));if(_0x477fc9)return void(_0x2f5562['textContent']=_0x240884(0x16b)+_0x477fc9[_0x240884(0x1d8)]);profilesMap={},rolesMap={},(_0x95741c||[])[_0x52776f(0x8e)](_0x66571e=>profilesMap[_0x66571e['id']]=_0x66571e[_0x5632c1(0x1c5)]),(_0x8f8313||[])[_0x52776f(0x8e)](_0x2b274a=>rolesMap[_0x2b274a[_0x5632c1(0x1b2)]]=_0x2b274a[_0x5632c1(0xf7)]);const _0x146d7d={'super_admin':0x1,'moderator':0x2,'vip':0x3,'member':0x4},_0x419e17=(_0x95741c||[])[_0x240884(0x16c)](_0x149fe6=>onlineUserIds[_0x5632c1(0x19e)](_0x149fe6['id']));_0x419e17[_0x240884(0x159)]((_0x4a634a,_0x8e9d1d)=>(_0x146d7d[rolesMap[_0x4a634a['id']]||_0x5632c1(0xe6)]||0x4)-(_0x146d7d[rolesMap[_0x8e9d1d['id']]||_0x240884(0x156)]||0x4)||(_0x4a634a[_0x5632c1(0x1c5)]||'')[_0x5632c1(0x154)](_0x8e9d1d['username']||''));const _0x18c020=profilesMap[currentUser['id']]||_0x240884(0x1ae),_0x414099=rolesMap[currentUser['id']]||_0x5632c1(0xe6),_0x4c92f7=document[_0x5632c1(0xd4)](_0x5632c1(0xf2)),_0x46c4da=document[_0x5632c1(0xd4)](_0x52776f(0x143));_0x4c92f7&&(_0x4c92f7[_0x240884(0x183)]=_0x18c020),_0x46c4da&&(_0x46c4da[_0x5632c1(0x1ba)]='super_admin'===_0x414099?_0x5632c1(0x1b1):_0x5632c1(0x182)===_0x414099?_0x5632c1(0xc1):_0x240884(0xd9)===_0x414099?_0x240884(0x147):_0x52776f(0x8a)),_0x2f5562[_0x52776f(0x177)]='',document[_0x240884(0x122)](_0x240884(0x13e))[_0x5632c1(0x1ba)]=_0x419e17[_0x5632c1(0xde)]+'\x20Online',_0x419e17[_0x240884(0x1b8)]?_0x419e17['forEach'](_0x335229=>{const _0x7387b1=_0x52776f,_0x3cd4d0=_0x240884,_0x3244b4=_0x5632c1,_0x286836=rolesMap[_0x335229['id']]||'member',_0x145be9=document[_0x3cd4d0(0x15b)](_0x3cd4d0(0x169));_0x145be9[_0x3cd4d0(0x1c6)]=_0x3244b4(0xe6)+(_0x335229['id']===currentUser['id']?_0x3244b4(0x163):'');const _0x3f896e=document['createElement'](_0x3244b4(0xfa));_0x3f896e[_0x3cd4d0(0x1c6)]=_0x3244b4(0xca),_0x3f896e[_0x3244b4(0x1ba)]=_0x3cd4d0(0x1a7)===_0x286836?'👑':_0x3244b4(0x182)===_0x286836?_0x3244b4(0xf9):_0x3244b4(0x13e)===_0x286836?'⭐':'👤';const _0x21eb86=document[_0x3244b4(0x9e)](_0x3244b4(0xfa));_0x21eb86[_0x7387b1(0x159)]=_0x3cd4d0(0x1a3);const _0xb0d429=document[_0x3244b4(0x9e)](_0x3244b4(0xfa));_0xb0d429[_0x3244b4(0x1be)]=_0x3244b4(0xf0),_0xb0d429[_0x3244b4(0x1ba)]=_0x335229[_0x3244b4(0x1c5)]||_0x7387b1(0x167),_0x335229['id']===currentUser['id']&&(_0xb0d429['title']=_0x3cd4d0(0x1e7),_0xb0d429[_0x7387b1(0x124)][_0x3244b4(0xb2)]=_0x3cd4d0(0x175),_0xb0d429[_0x3244b4(0x1b8)][_0x3244b4(0x110)]=_0x7387b1(0xd5),_0xb0d429[_0x3244b4(0xaf)]=async()=>{const _0x407ede=_0x7387b1,_0x5c467b=_0x3cd4d0,_0x18b758=_0x3244b4,_0x29ce7d=prompt('Enter\x20your\x20new\x20username\x20(3-10\x20letters,\x20numbers\x20or\x20underscores):',_0x335229[_0x18b758(0x1c5)]||'');if(null===_0x29ce7d)return;const _0x3c8f82=_0x29ce7d['trim']();if(_0x3c8f82[_0x18b758(0xde)]<0x3||_0x3c8f82[_0x18b758(0xde)]>0xa||!/^[A-Za-z0-9_]+$/[_0x18b758(0xc6)](_0x3c8f82))return void alert(_0x18b758(0xc0));const {error:_0x3736d4}=await db[_0x5c467b(0x194)](_0x407ede(0xd7),{'p_username':_0x3c8f82});_0x3736d4?alert(_0x3736d4[_0x5c467b(0x1d8)]):(await loadMembers(),await loadMessages(),alert('Username\x20updated\x20successfully!'));});const _0x55932d=document[_0x3cd4d0(0x15b)](_0x3244b4(0xd7));_0x55932d[_0x3cd4d0(0x1c6)]=_0x3244b4(0x94),_0xb0d429[_0x3244b4(0x97)](_0x55932d);const _0x188644=document[_0x3244b4(0x9e)](_0x3244b4(0xfa));if(_0x188644['className']=_0x7387b1(0xe6),_0x188644[_0x7387b1(0x111)]=_0x3244b4(0xb6)===_0x286836?'SUPER\x20ADMIN':_0x3244b4(0x182)===_0x286836?_0x3244b4(0x10f):_0x3244b4(0x13e)===_0x286836?_0x3244b4(0x112):_0x3cd4d0(0x11f),_0x21eb86[_0x3cd4d0(0x108)](_0xb0d429,_0x188644),_0x145be9[_0x3cd4d0(0x108)](_0x3f896e,_0x21eb86),_0x3244b4(0xb6)===_0x414099&&_0x335229['id']!==currentUser['id']){const _0xbe3a0e=document[_0x3244b4(0x9e)](_0x7387b1(0x15e));_0xbe3a0e[_0x3244b4(0x1ba)]=_0x3244b4(0x96),_0xbe3a0e[_0x3cd4d0(0xf4)][_0x3244b4(0xe8)]=_0x3244b4(0x133),_0xbe3a0e[_0x3244b4(0xaf)]=_0x5cff0d=>{const _0x32f2be=_0x3cd4d0;_0x5cff0d[_0x32f2be(0xdb)](),async function(_0x389b5f){const _0x291f5b=_0x1a03,_0x3af4f3=_0x32f2be,_0x20f823=_0x5563;if(_0x3af4f3(0x1a7)!==_0x414099)return;if(_0x389b5f['id']===currentUser['id'])return;if(_0x3af4f3(0x1a7)===rolesMap[_0x389b5f['id']])return void alert('Super\x20Admin\x20ko\x20manage\x20nahi\x20kar\x20sakte.');const _0x14807b=prompt(_0x20f823(0x11a)+(_0x389b5f[_0x20f823(0x1c5)]||_0x3af4f3(0x1ae))+_0x20f823(0x18a));if(!_0x14807b)return;let _0x303736;if('1'===_0x14807b){if(!confirm(_0x20f823(0x155)))return;_0x303736=await db[_0x20f823(0xcc)]('admin_kick_member',{'p_user_id':_0x389b5f['id']});}else{if('2'===_0x14807b){const _0x190dac=prompt(_0x3af4f3(0x165))||'';if(!confirm(_0x3af4f3(0x1f4)))return;_0x303736=await db[_0x20f823(0xcc)](_0x20f823(0x181),{'p_user_id':_0x389b5f['id'],'p_reason':_0x190dac[_0x20f823(0xd2)]()||null});}else{if('3'!==_0x14807b)return void alert(_0x20f823(0x160));{const _0x4ac025=prompt(_0x3af4f3(0xeb))||'';if(!confirm(_0x291f5b(0x135)))return;_0x303736=await db[_0x3af4f3(0x194)]('admin_block_member',{'p_user_id':_0x389b5f['id'],'p_reason':_0x4ac025['trim']()||null});}}}_0x303736[_0x20f823(0xd0)]?alert(_0x3af4f3(0x141)+_0x303736[_0x20f823(0xd0)]['message']):(alert('Action\x20successful!'),await loadMembers());}(_0x335229);},_0x21eb86[_0x3244b4(0x189)](_0xbe3a0e);}_0x2f5562[_0x3244b4(0x189)](_0x145be9);}):_0x2f5562[_0x5632c1(0x1ba)]=_0x5632c1(0x188);}async function changeUsername(){const _0x3de69b=_0x447cb2,_0x3289be=_0x401465,_0x4b290e=_0x13483b,_0x3fb08e=document[_0x4b290e(0xd4)](_0x3289be(0xda)),_0x3d4ee0=_0x3fb08e[_0x3de69b(0x184)][_0x3de69b(0xc8)]();if(_0x3d4ee0[_0x3289be(0x1b8)]<0x3||_0x3d4ee0[_0x3289be(0x1b8)]>0x14)return void alert(_0x4b290e(0x12e));if(!/^[A-Za-z0-9_]+$/['test'](_0x3d4ee0))return void alert(_0x3de69b(0x12f));const {error:_0x6c70b5}=await db[_0x3289be(0x194)](_0x4b290e(0x165),{'p_username':_0x3d4ee0});_0x6c70b5?alert(_0x6c70b5[_0x3289be(0x1d8)]):(_0x3fb08e[_0x4b290e(0xa9)]='',alert('Username\x20updated\x20successfully!'),await loadMembers(),await loadMessages());}async function loadMessages(){const _0x39e5d2=_0x447cb2,_0x254922=_0x401465,_0xda3204=_0x13483b,_0x334a75=document[_0x254922(0x122)](_0xda3204(0x116));if(!chatStartedAt||!currentUser)return;const {data:_0x5dfa96,error:_0x44d340}=await db[_0xda3204(0xce)](_0x254922(0x1ee))[_0xda3204(0x103)](_0x254922(0x1f5))['is']('receiver_id',null)[_0xda3204(0xa7)](_0xda3204(0x1ae),chatStartedAt)[_0x254922(0xf1)](_0xda3204(0x1ae),{'ascending':!0x0})[_0x39e5d2(0x150)](0x12c);if(_0x44d340)return _0x334a75['innerHTML']='',void(_0x334a75[_0xda3204(0x1ba)]=_0x254922(0x1f2)+_0x44d340[_0x254922(0x1d8)]);if(_0x334a75[_0xda3204(0xae)]='',_0x5dfa96&&0x0!==_0x5dfa96[_0xda3204(0xde)]){for(const _0x11cbe2 of _0x5dfa96){if(!currentUser)return;const _0x58f593=document[_0x39e5d2(0x17b)](_0xda3204(0xfa));_0x58f593[_0x39e5d2(0x159)]=_0xda3204(0x127)+(_0x11cbe2[_0x254922(0x187)]===currentUser['id']?_0x254922(0x190):'');const _0xdcb496=document[_0xda3204(0x9e)](_0x254922(0x169));_0xdcb496[_0xda3204(0x1be)]=_0xda3204(0x157);const _0x3d541a=rolesMap[_0x11cbe2[_0xda3204(0x16d)]]||_0x254922(0x156),_0x1e7d8b=profilesMap[_0x11cbe2[_0xda3204(0x16d)]]||_0x254922(0x1ae);_0xdcb496['textContent']=(_0x254922(0x1a7)===_0x3d541a?_0x39e5d2(0xb7):_0xda3204(0x182)===_0x3d541a?_0x254922(0xd6):_0x254922(0xd9)===_0x3d541a?'⭐\x20':'')+_0x1e7d8b,_0x58f593[_0xda3204(0x189)](_0xdcb496);const _0x566bda=document[_0xda3204(0x9e)](_0xda3204(0xfa));_0x566bda[_0x39e5d2(0x111)]=_0x39e5d2(0x72)===_0x11cbe2[_0x254922(0xc6)]?_0x254922(0x1ba):_0x11cbe2[_0xda3204(0x152)],_0x58f593[_0xda3204(0x189)](_0x566bda);const _0x3cbc56=document[_0x39e5d2(0x17b)](_0xda3204(0xfa));_0x3cbc56[_0x254922(0x1c6)]=_0xda3204(0x121),_0x3cbc56[_0x39e5d2(0x111)]=new Date(_0x11cbe2[_0xda3204(0x1ae)])[_0x254922(0x19b)]([],{'month':_0x254922(0x19a),'day':'numeric','hour':_0x39e5d2(0x134),'minute':_0x39e5d2(0x134)}),_0x58f593[_0x39e5d2(0x1a5)](_0x3cbc56),_0x334a75[_0x39e5d2(0x1a5)](_0x58f593);}_0x334a75[_0x254922(0x102)]=_0x334a75[_0xda3204(0xa8)];}else _0x334a75[_0xda3204(0xae)]=_0x254922(0xde);}async function sendMessage(){const _0x414971=_0x447cb2,_0x2265a9=_0x401465,_0x439006=_0x13483b,_0x58efcd=document['getElementById'](_0x414971(0xb9)),_0x2a1c29=_0x58efcd[_0x439006(0xa9)][_0x439006(0xd2)]();if(!_0x2a1c29||!currentUser)return;const _0xe7b3a9=document[_0x439006(0xd4)](_0x2265a9(0x1b3));_0xe7b3a9[_0x2265a9(0x1e0)]=!0x0;try{const {error:_0x223f27}=await db[_0x439006(0xcc)]('send_group_message',{'p_message':_0x2a1c29});if(_0x223f27)return void(_0x223f27[_0x439006(0x152)][_0x439006(0x141)]()[_0x439006(0x19e)](_0x414971(0x14d))?await showAuthMessage(_0x414971(0xe5)):alert(_0x223f27['message']));_0x58efcd[_0x439006(0xa9)]='',await loadMessages();}catch(_0x419d19){alert(_0x439006(0xe5)+_0x419d19[_0x439006(0x152)]);}finally{_0xe7b3a9[_0x439006(0x1cb)]=!0x1;}}function isSuperAdmin(){return'super_admin'===rolesMap[currentUser?.['id']];}function voiceStatus(_0x461247){const _0x4c756f=_0x447cb2,_0x171e7c=_0x13483b,_0x5226b8=document[_0x171e7c(0xd4)](_0x4c756f(0xbd));_0x5226b8&&(_0x5226b8[_0x171e7c(0x1ba)]=_0x461247);}function updateVoiceButtons(){const _0x258629=_0x447cb2,_0x5b72e0=_0x401465,_0x257f7a=_0x13483b;if(!currentUser)return;const _0xdc064b=currentSpeakerId===currentUser['id'],_0x4bbe03=isSuperAdmin();document[_0x257f7a(0xd4)](_0x257f7a(0xc5))[_0x257f7a(0x1b8)][_0x257f7a(0x17d)]=_0xdc064b||voiceRequests['some'](_0xdf7ad6=>_0xdf7ad6[_0x257f7a(0x1b2)]===currentUser['id'])?_0x257f7a(0x14a):_0x5b72e0(0xf2),document[_0x257f7a(0xd4)](_0x257f7a(0xb0))[_0x257f7a(0x1b8)][_0x257f7a(0x17d)]=voiceRequests[_0x5b72e0(0x1ed)](_0x22c87b=>_0x22c87b[_0x5b72e0(0x11a)]===currentUser['id'])?_0x257f7a(0x132):_0x257f7a(0x14a),document[_0x257f7a(0xd4)](_0x257f7a(0x168))[_0x257f7a(0x1b8)][_0x257f7a(0x17d)]=_0xdc064b&&!voiceRoomStarted?_0x257f7a(0x132):_0x5b72e0(0xc9),document[_0x257f7a(0xd4)](_0x257f7a(0x148))[_0x5b72e0(0xf4)][_0x258629(0x16f)]=_0xdc064b&&voiceRoomStarted?'inline-block':_0x257f7a(0x14a),document[_0x258629(0xb1)](_0x257f7a(0x167))[_0x257f7a(0x1b8)][_0x5b72e0(0x1f9)]=_0xdc064b||_0x4bbe03?_0x258629(0xc1):_0x257f7a(0x14a);}function renderVoiceRoom(){const _0x2fc60a=_0x447cb2,_0x454083=_0x401465,_0x1381fe=_0x13483b,_0x1cd183=currentSpeakerId?profilesMap[currentSpeakerId]||_0x1381fe(0xdb):_0x454083(0x116);voiceStatus(currentSpeakerId?currentSpeakerId===currentUser?.['id']?_0x454083(voiceRoomStarted?0x120:0xd4):_0x1381fe(0x1ac)+_0x1cd183+_0x2fc60a(0x97):_0x1381fe(0x175)),updateVoiceButtons();const _0x31219d=document[_0x1381fe(0xd4)](_0x1381fe(0xdf));if(_0x31219d[_0x454083(0x11b)]='',isSuperAdmin()||currentSpeakerId===currentUser?.['id'])voiceRequests[_0x2fc60a(0x8e)](_0xce0abc=>{const _0x3711f4=_0x2fc60a,_0x4f21c9=_0x454083,_0x127bc6=_0x1381fe,_0x34f6af=document[_0x4f21c9(0x15b)](_0x4f21c9(0x164));_0x34f6af[_0x3711f4(0x159)]=_0x4f21c9(0x18d);const _0x11bfdd=document[_0x3711f4(0x17b)]('span');_0x11bfdd[_0x127bc6(0x1ba)]=(profilesMap[_0xce0abc[_0x127bc6(0x1b2)]]||'Member')+'\x20wants\x20mic',_0x34f6af[_0x127bc6(0x189)](_0x11bfdd);const _0xbfa5dc=document[_0x127bc6(0x9e)](_0x127bc6(0x187));_0xbfa5dc[_0x4f21c9(0x183)]=_0x127bc6(0xc3),_0xbfa5dc[_0x3711f4(0x130)]=()=>adminOrSpeakerGiveMic(_0xce0abc[_0x4f21c9(0x11a)]),_0x34f6af[_0x127bc6(0x189)](_0xbfa5dc),_0x31219d[_0x3711f4(0x1a5)](_0x34f6af);});else{if(voiceRequests[_0x1381fe(0xde)]){const _0x2cd057=document[_0x1381fe(0x9e)](_0x1381fe(0xd7));_0x2cd057[_0x454083(0x183)]=voiceRequests[_0x454083(0x1b8)]+_0x1381fe(0x1bb),_0x31219d['appendChild'](_0x2cd057);}}}async function refreshVoiceData(){const _0x30b8e1=_0x447cb2,_0x19ff26=_0x401465,_0x4baf5f=_0x13483b;if(!currentUser)return;const [{data:_0x294d2d,error:_0xae7943},{data:_0xb94db3,error:_0x41da03}]=await Promise[_0x19ff26(0x189)]([db[_0x4baf5f(0xce)](_0x4baf5f(0x164))[_0x4baf5f(0x103)](_0x4baf5f(0x1ca))['eq'](_0x4baf5f(0x195),_0x30b8e1(0xef))[_0x4baf5f(0xef)](),db[_0x4baf5f(0xce)](_0x4baf5f(0x10b))['select'](_0x19ff26(0xd3))[_0x19ff26(0xf1)]('created_at',{'ascending':!0x0})]);if(_0xae7943||_0x41da03)return void voiceStatus(_0x4baf5f(0x1a8)+(_0xae7943||_0x41da03)[_0x19ff26(0x1d8)]);const _0xa54d8f=currentSpeakerId;currentSpeakerId=_0x294d2d?.[_0x4baf5f(0x1ca)]||null,voiceRequests=_0xb94db3||[],_0xa54d8f!==currentSpeakerId&&stopLiveVoice(),renderVoiceRoom();}function _0x285f(){const _0x48967b=['room_name','voice_signals','setValueAtTime','maybeSingle','stable','from','AudioContext','presenceState','getItem','Camera\x20error:\x20','<div\x20class=\x22text-chat-title\x22>💬\x20Text\x20Chat\x20Board</div>','streams','textContent','Help','Enter\x20and\x20confirm\x20your\x20new\x20password.','❓\x20Help','user_id','Camera\x20permission\x20revoked.','sender_id','section','getBoundingClientRect','[data-requester-id=\x22','14899232SIVajH','select','admin_ban_member','replaceChildren','\x20member(s)\x20waiting\x20for\x20mic','Enter\x20email\x20and\x20password.','top','width:100%;max-width:180px;border-radius:10px;margin:5px;','en-US','style',':scope\x20>\x20.chat','answer','8704150vNULJi','querySelectorAll','SUBSCRIBED','slice','sidebar\x20users-sidebar','myCameraPreview','voice_room_state','updateUser','Use\x20only\x20letters,\x20numbers\x20and\x20underscores.','onclick','user_id,created_at','Reject','onlineCount','2-digit','Is\x20user\x20ko\x20Block\x20karna\x20hai?','camera_owner_id=eq.','close','Video\x20answer\x20failed:','Login\x20error:\x20','setRemoteDescription','18835070ACemIJ','Logging\x20in...','videoIncomingRequests','Chat\x20session\x20could\x20not\x20be\x20started.\x20Please\x20login\x20again.','rpc','avatar','69VzwEsw','<div\x20class=\x22system-message\x22>No\x20new\x20messages.\x20Start\x20your\x20fresh\x20conversation!</div>','myrole','speak','is_my_account_banned','substring','Could\x20not\x20release\x20mic:\x20','https://probxnzduietjivnqrac.supabase.co','entries','removeChannel','remoteDescription','toISOString','banned','super_admin','Updating\x20password...','limit','875MuMYid','6027gSVjKm','Invalid\x20selection.','No\x20other\x20members\x20are\x20online.','user_id,room_name,camera_on','33990UuzgKr','textDecoration','addIceCandidate','className','2568820wNLjcv','has','keydown','exponentialRampToValueAtTime','button','Video\x20permission\x20check:','new','Camera\x20logout\x20status:','videoCameraMembers','#myCameraPreview','.composer','ice','23366okNoGr','Member','video_signals','offsetHeight','welcomeScreen','TIMED_OUT','Voice\x20signal:','Video\x20offer\x20failed:','preventDefault','display','120kZmlDv','get','disabled','webkitAudioContext','#videoRooms','<h4>Incoming\x20Camera\x20Requests</h4>','localeCompare','innerHTML','requester_id,room_name','73832ejiblG','.video-room','createElement','clientY','user_id,role','setLocalDescription','Camera\x20request\x20error:\x20','myname','admin_take_voice_mic','451494pjnsob','Password\x20updated.\x20Please\x20login\x20with\x20your\x20new\x20password.','value','dataset','confirmNewPassword','Security\x20monitor\x20heartbeat:','sendBtn','Camera\x20permission\x20request\x20sent!','New\x20room\x20camera\x20status:','order','Mic\x20assigned\x20to\x20you\x20—\x20press\x20Start\x20Speaking','length','5005977vkwEZT','offer','onconnectionstatechange','Give\x20mic','Sending\x20password\x20reset\x20email...','status','catch','.room-link','Home','#users','cancelRequestBtn','👤\x20One\x20by\x20One','target','video','Member:\x20','1496emQrZN','set','logoutBtn','gain','subscribe','.voice-room','Islamic','id,sender_id,receiver_id,message,created_at,message_type,audio_path','appendChild','none','8646583ByNMgG','mediaDevices','shiftKey','voice','Password\x20must\x20be\x20at\x20least\x206\x20characters.','signalingState','error','time','candidate','9egVrvJ','user','push','toggle','play','side-panel\x20camera-panel',':scope\x20>\x20.sidebar','578783ZBIcMy','approved','warn','pointerId','includes','\x0a\x0a1\x20=\x20Kick\x20User\x0a2\x20=\x20Ban\x20User\x0a3\x20=\x20Block\x20User\x0a\x0aNumber\x20likhein:','upsert','14283351mmajNC','left','removeItem','autoplay','MEMBER','body','disconnected','Video\x20answer:','forEach','Username\x20must\x20be\x203\x20to\x2010\x20characters\x20and\x20use\x20only\x20letters,\x20numbers\x20or\x20underscores.','requester_id','videoRemoteStreams','user_id,room_name','currentTime','metaKey','values','👑\x20SUPER\x20ADMIN','\x20is\x20speaking','No\x20online\x20members.','message_type','receiver_id','Account\x20created.\x20Confirm\x20your\x20email,\x20then\x20login.','signOut','pending','☪\x20Islamic','Camera\x20requires\x20HTTPS\x20and\x20Chrome.','addEventListener','Chat\x20start\x20error:\x20','filter','CHANNEL_ERROR','No\x20one','camera_owner_id','id,requester_id,room_name','room_id=eq.main','lym-voice-state','delete','voice_mic_requests','Ghalat\x20option.','loginPanel','email','channel','stop','replaceAll','getElementById','pointercancel','createOscillator','insert','CLOSED','getTracks','👑\x20','Online\x20status\x20connection\x20problem.\x20Please\x20refresh.','message','<div\x20class=\x22system-message\x22>Welcome\x20to\x20your\x20fresh\x20LYM\x20REALM\x20chat!</div>','stopPropagation','Account\x20verification\x20failed.\x20Please\x20try\x20again.\x20','voiceRoomState','security-monitor','join','sort','inline-block','cssText','div','public','requestMicBtn','video_view_requests','Your\x20request\x20is\x20already\x20pending.','trim','sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr','Reject\x20error:\x20','No\x20member\x20is\x20waiting\x20for\x20the\x20microphone.','all','🎙️\x20','Creating\x20account...','profiles','sender','speechSynthesis','bottom','update','classList','underline','sidebar\x20rooms-sidebar','update_my_username','add','messages','active','One\x20by\x20One','heartbeat','pathname','member','lang','F12','[data-live-voice=\x271\x27]','created_at','clear','videoRoomStatus','Your\x20account\x20is\x20banned\x20by\x20Admin.\x20Contact\x20Super\x20Admin.','member-role','video_room_cameras','live-audio-','newPassword','side-panel','Microphone\x20could\x20not\x20start:\x20','signal','Voice\x20setup\x20error:\x20','requesterId','main','3471745ddKdkh','lym-video-requests-','give_voice_mic','test','block','receiver_id=eq.','invoke','1711775pAfxUe','role','postgres_changes','Passwords\x20do\x20not\x20match.','Request\x20to\x20View','member-info','srcObject','remote-video-','closed','shift','then','scrollHeight','querySelector','span'];_0x285f=function(){return _0x48967b;};return _0x285f();}async function setupLiveVoice(){const _0x4210dc=_0x447cb2,_0xf19115=_0x401465,_0xc520e=_0x13483b;currentUser&&(await removeVoiceChannels(),await refreshVoiceData(),voiceStateChannel=db[_0xc520e(0x119)](_0xc520e(0x18c))['on'](_0xc520e(0x118),{'event':_0xc520e(0x174),'schema':_0xc520e(0xb4),'table':_0xf19115(0x15f),'filter':_0xc520e(0x16a)},()=>refreshVoiceData())[_0xc520e(0x122)](),voiceRequestChannel=db[_0x4210dc(0xae)](_0xf19115(0x1e9))['on'](_0xf19115(0x163),{'event':'*','schema':_0xc520e(0xb4),'table':'voice_mic_requests'},()=>refreshVoiceData())['subscribe'](),voiceSignalChannel=db[_0x4210dc(0xae)]('lym-voice-signals')['on'](_0xc520e(0x118),{'event':_0xc520e(0x11c),'schema':_0xc520e(0xb4),'table':_0xf19115(0x149),'filter':_0xf19115(0x1f6)+currentUser['id']},_0x1a30c2=>handleVoiceSignal(_0x1a30c2['new']))[_0xf19115(0x1f3)]());}async function requestMic(){const _0x93cc4c=_0x447cb2;if(!currentUser)return;const {error:_0x386667}=await db[_0x93cc4c(0x10a)]('voice_mic_requests')[_0x93cc4c(0xb4)]({'user_id':currentUser['id']});_0x386667?alert(_0x386667['message']):await refreshVoiceData();}async function cancelMicRequest(){const _0x255c1c=_0x401465,_0x4f6c45=_0x13483b;if(!currentUser)return;const {error:_0x448dfe}=await db[_0x4f6c45(0xce)]('voice_mic_requests')[_0x255c1c(0x186)]()['eq'](_0x255c1c(0x11a),currentUser['id']);_0x448dfe&&alert(_0x448dfe[_0x4f6c45(0x152)]),await refreshVoiceData();}async function releaseMic(){const _0x4540ce=_0x13483b;if(currentUser)try{await stopLiveVoice();const {error:_0x228d90}=await db[_0x4540ce(0xcc)]('release_voice_mic');if(_0x228d90)throw _0x228d90;await refreshVoiceData();}catch(_0x2582a0){alert(_0x4540ce(0x11d)+_0x2582a0[_0x4540ce(0x152)]);}}async function giveMicPrompt(){const _0x42460b=_0x447cb2,_0x1283d4=_0x401465,_0x50afc9=_0x13483b;if(!currentUser)return;let _0xdaf05e;if(_0xdaf05e=isSuperAdmin()?onlineUserIds[_0x50afc9(0x1a6)](_0x24f4ee=>_0x24f4ee!==currentUser['id'])['map'](_0x3d1aee=>({'user_id':_0x3d1aee})):voiceRequests[_0x50afc9(0x1a6)](_0x258435=>_0x258435[_0x50afc9(0x1b2)]!==currentUser['id']),!_0xdaf05e[_0x1283d4(0x1b8)])return void alert(isSuperAdmin()?_0x1283d4(0xf6):_0x50afc9(0x171));const _0x4abc04=_0xdaf05e[_0x50afc9(0x156)]((_0x5f039e,_0xdc3345)=>_0xdc3345+0x1+'.\x20'+(profilesMap[_0x5f039e[_0x50afc9(0x1b2)]]||_0x5f039e[_0x50afc9(0x1b2)]))[_0x42460b(0xbf)]('\x0a'),_0x144a47=prompt('Enter\x20the\x20number\x20of\x20the\x20member\x20to\x20receive\x20the\x20mic:\x0a'+_0x4abc04);if(null===_0x144a47)return;const _0x12a358=Number(_0x144a47)-0x1;Number[_0x1283d4(0xef)](_0x12a358)&&_0xdaf05e[_0x12a358]?await adminOrSpeakerGiveMic(_0xdaf05e[_0x12a358][_0x50afc9(0x1b2)]):alert(_0x50afc9(0xf3));}async function adminOrSpeakerGiveMic(_0x61510e){const _0x58b2d6=_0x447cb2,_0x136612=_0x401465,_0xea8b15=_0x13483b;try{const _0x4b307d=isSuperAdmin()?_0xea8b15(0x140):'give_voice_mic',_0x4734fa=isSuperAdmin()?{'p_user_id':_0x61510e}:{'p_next_user_id':_0x61510e},{error:_0x1a7256}=await db[_0xea8b15(0xcc)](_0x4b307d,_0x4734fa);if(_0x1a7256)throw _0x1a7256;await db[_0x136612(0x152)](_0xea8b15(0x10b))[_0xea8b15(0x186)]()['eq'](_0x58b2d6(0x115),_0x61510e),await refreshVoiceData();}catch(_0x4c0de0){alert(_0xea8b15(0x194)+_0x4c0de0[_0x136612(0x1d8)]);}}async function sendSignal(_0x16bd1a,_0x310605){const _0x31af2b=_0x447cb2,_0xa782ad=_0x401465,_0xd4ae54=_0x13483b;if(!currentUser||!_0x16bd1a)return;const {error:_0x1bbfc8}=await db[_0xd4ae54(0xce)](_0xa782ad(0x149))[_0xd4ae54(0x11e)]({'room_id':'main','sender_id':currentUser['id'],'receiver_id':_0x16bd1a,'signal':_0x310605});_0x1bbfc8&&console[_0xd4ae54(0x17a)](_0x31af2b(0x16c),_0x1bbfc8[_0xd4ae54(0x152)]);}function getPeer(_0x1eb61b){const _0x45404c=_0x447cb2,_0x2bda39=_0x401465,_0x1399af=_0x13483b;let _0x5db4ba=voicePeers[_0x1399af(0x17e)](_0x1eb61b);return _0x5db4ba||(_0x5db4ba=new RTCPeerConnection(rtcConfig),voicePeers[_0x45404c(0x19e)](_0x1eb61b,_0x5db4ba),_0x5db4ba[_0x2bda39(0x1c3)]=_0x397065=>{const _0x227c7e=_0x45404c,_0x3634f3=_0x1399af;_0x397065['candidate']&&sendSignal(_0x1eb61b,{'type':_0x3634f3(0xd3),'candidate':_0x397065[_0x227c7e(0x77)]});},_0x5db4ba[_0x1399af(0x18e)]=_0x383c16=>{const _0x402a57=_0x45404c,_0x1cdbe2=_0x2bda39,_0xb6e244=_0x1399af;let _0x5abf8b=document[_0x1cdbe2(0x122)](_0x1cdbe2(0x179)+_0x1eb61b);_0x5abf8b||(_0x5abf8b=document[_0x1cdbe2(0x15b)]('audio'),_0x5abf8b['id']=_0xb6e244(0xa6)+_0x1eb61b,_0x5abf8b[_0xb6e244(0x1a5)][_0xb6e244(0xb5)]='1',_0x5abf8b[_0x1cdbe2(0x119)]=!0x0,_0x5abf8b[_0xb6e244(0x14e)]=!0x0,_0x5abf8b[_0xb6e244(0x1b8)][_0xb6e244(0x17d)]=_0xb6e244(0x14a),document[_0x402a57(0x8b)][_0x1cdbe2(0x197)](_0x5abf8b)),_0x5abf8b[_0xb6e244(0x1ad)]=_0x383c16[_0x1cdbe2(0x142)][0x0],_0x5abf8b['play']()[_0xb6e244(0x107)](()=>{});},_0x5db4ba[_0x2bda39(0x155)]=()=>{const _0xc5da55=_0x45404c,_0x8a98a0=_0x1399af;if([_0x8a98a0(0x101),'closed','disconnected'][_0xc5da55(0x83)](_0x5db4ba['connectionState'])){try{_0x5db4ba[_0xc5da55(0x137)]();}catch(_0xe3a84){}voicePeers[_0x8a98a0(0x186)](_0x1eb61b);}},_0x5db4ba);}async function startSpeaking(){const _0x1cc7fb=_0x447cb2,_0x560e68=_0x401465,_0x32e83d=_0x13483b;if(currentUser&&currentSpeakerId===currentUser['id']&&!voiceStarting&&!voiceRoomStarted){voiceStarting=!0x0;try{if(!navigator[_0x32e83d(0xcb)]?.[_0x32e83d(0x1ab)])throw new Error('Microphone\x20requires\x20HTTPS\x20and\x20a\x20supported\x20browser.');liveMicStream=await navigator[_0x560e68(0x202)][_0x32e83d(0x1ab)]({'audio':{'echoCancellation':!0x0,'noiseSuppression':!0x0,'autoGainControl':!0x0}}),voiceRoomStarted=!0x0;for(const _0x5071f2 of onlineUserIds){if(_0x5071f2===currentUser['id'])continue;const _0x58d196=getPeer(_0x5071f2);liveMicStream[_0x32e83d(0xda)]()[_0x1cc7fb(0x8e)](_0x558b51=>_0x58d196[_0x32e83d(0xe9)](_0x558b51,liveMicStream));const _0x567ff9=await _0x58d196[_0x560e68(0x15c)]();await _0x58d196[_0x32e83d(0x19c)](_0x567ff9),await sendSignal(_0x5071f2,{'type':_0x32e83d(0x172),'description':_0x58d196[_0x560e68(0x173)]});}voiceStatus(_0x560e68(0x120));}catch(_0x3fca07){stopLiveVoice(),alert(_0x1cc7fb(0xeb)+_0x3fca07[_0x32e83d(0x152)]);}finally{voiceStarting=!0x1,renderVoiceRoom();}}}async function handleVoiceSignal(_0x4a4b66){const _0x17d936=_0x447cb2,_0x8a7615=_0x401465,_0x4270c8=_0x13483b;if(!currentUser||!_0x4a4b66||_0x4a4b66[_0x4270c8(0x16d)]===currentUser['id'])return;const _0x13e10a=_0x4a4b66[_0x4270c8(0xec)]||{};if(_0x4270c8(0x172)===_0x13e10a[_0x4270c8(0x135)]){if(currentSpeakerId!==_0x4a4b66[_0x4270c8(0x16d)])return;try{const _0x3d9b5e=getPeer(_0x4a4b66[_0x4270c8(0x16d)]);if(_0x4270c8(0x100)!==_0x3d9b5e[_0x8a7615(0x19f)])return;await _0x3d9b5e['setRemoteDescription'](new RTCSessionDescription(_0x13e10a[_0x4270c8(0x178)]));const _0x6589b3=await _0x3d9b5e[_0x4270c8(0xab)]();await _0x3d9b5e[_0x8a7615(0x112)](_0x6589b3),await sendSignal(_0x4a4b66[_0x17d936(0x117)],{'type':_0x8a7615(0x1ad),'description':_0x3d9b5e['localDescription']});}catch(_0x57b389){console[_0x8a7615(0x1ca)](_0x4270c8(0xb7),_0x57b389);}}else{if(_0x8a7615(0x1ad)===_0x13e10a[_0x4270c8(0x135)]){const _0x32feeb=voicePeers[_0x8a7615(0x1a0)](_0x4a4b66[_0x4270c8(0x16d)]);if(!_0x32feeb||currentSpeakerId!==currentUser['id'])return;try{await _0x32feeb[_0x8a7615(0x171)](new RTCSessionDescription(_0x13e10a[_0x4270c8(0x178)]));}catch(_0xcda534){console['warn'](_0xcda534);}}else{if(_0x4270c8(0xd3)===_0x13e10a[_0x4270c8(0x135)]){const _0x9d3ea6=voicePeers[_0x4270c8(0x17e)](_0x4a4b66[_0x8a7615(0x187)]);if(_0x9d3ea6&&_0x13e10a[_0x8a7615(0xe1)])try{await _0x9d3ea6[_0x4270c8(0xcf)](new RTCIceCandidate(_0x13e10a[_0x8a7615(0xe1)]));}catch(_0x4f1d03){console[_0x8a7615(0x1ca)](_0x4f1d03);}}}}}async function logout(){const _0x3cf5c0=_0x447cb2,_0x18eacc=_0x401465,_0x192d49=_0x13483b;securityHeartbeatTimer&&(clearInterval(securityHeartbeatTimer),securityHeartbeatTimer=null);const _0x6932c2=currentUser?.['id'];myCameraStream&&await stopMyCamera(),stopKickChecker(),await removeChatChannels(),_0x6932c2&&localStorage[_0x3cf5c0(0x88)](sessionStorageKey(_0x6932c2));try{await db[_0x192d49(0x177)][_0x18eacc(0x200)]();}catch(_0x4e9a23){}currentUser=null,chatStartedAt=null,profilesMap={},rolesMap={},location[_0x18eacc(0x1dc)]();}async function giveMicPrompt(){const _0x244440=_0x447cb2,_0x227b8f=_0x401465,_0x713267=_0x13483b;if(!currentUser)return;let _0x52a015;if(_0x52a015=isSuperAdmin()?onlineUserIds[_0x244440(0xa2)](_0x9c7e25=>_0x9c7e25!==currentUser['id'])[_0x713267(0x156)](_0x44b97e=>({'user_id':_0x44b97e})):voiceRequests[_0x227b8f(0x16c)](_0x4cb8c1=>_0x4cb8c1['user_id']!==currentUser['id']),!_0x52a015[_0x713267(0xde)])return void alert(isSuperAdmin()?_0x713267(0x153):_0x244440(0xcb));const _0x81ccd6=_0x52a015[_0x713267(0x156)]((_0x3ee8e7,_0x1a6fdb)=>_0x1a6fdb+0x1+'.\x20'+(profilesMap[_0x3ee8e7[_0x713267(0x1b2)]]||_0x3ee8e7[_0x713267(0x1b2)]))[_0x227b8f(0x150)]('\x0a'),_0x588689=prompt(_0x227b8f(0x138)+_0x81ccd6);if(null===_0x588689)return;const _0x2050d8=Number(_0x588689)-0x1;Number[_0x713267(0x10d)](_0x2050d8)&&_0x52a015[_0x2050d8]?await adminOrSpeakerGiveMic(_0x52a015[_0x2050d8][_0x244440(0x115)]):alert(_0x244440(0x153));}async function adminOrSpeakerGiveMic(_0x32602c){const _0x2a0590=_0x447cb2,_0x1d5355=_0x401465,_0xd993b6=_0x13483b;try{const _0x4d24c6=isSuperAdmin()?_0x2a0590(0x181):_0x2a0590(0xf2),_0x158f45=isSuperAdmin()?{'p_user_id':_0x32602c}:{'p_next_user_id':_0x32602c},{error:_0x8db265}=await db[_0x1d5355(0x194)](_0x4d24c6,_0x158f45);if(_0x8db265)throw _0x8db265;await db[_0xd993b6(0xce)](_0xd993b6(0x10b))[_0xd993b6(0x186)]()['eq'](_0x2a0590(0x115),_0x32602c),await refreshVoiceData();}catch(_0x5242e6){alert(_0x1d5355(0x10e)+_0x5242e6[_0xd993b6(0x152)]);}}async function sendSignal(_0x2fb0a0,_0x4f159a){const _0x57fbfb=_0x447cb2,_0x28077b=_0x401465,_0x56bbcd=_0x13483b;if(!currentUser||!_0x2fb0a0)return;const {error:_0x57e793}=await db['from'](_0x28077b(0x149))[_0x57fbfb(0xb4)]({'room_id':_0x56bbcd(0x9f),'sender_id':currentUser['id'],'receiver_id':_0x2fb0a0,'signal':_0x4f159a});_0x57e793&&console[_0x56bbcd(0x17a)](_0x56bbcd(0x180),_0x57e793[_0x57fbfb(0xb9)]);}db[_0x13483b(0x177)][_0x13483b(0x1c7)]()[_0x401465(0x1d3)](async({data:_0x1cca6b,error:_0xb58292})=>{const _0x364709=_0x13483b;_0xb58292?showStatus(_0xb58292[_0x364709(0x152)]):_0x1cca6b[_0x364709(0x13d)]&&!isPasswordRecovery&&await startApp(_0x1cca6b[_0x364709(0x13d)][_0x364709(0x150)],!0x1);}),document['addEventListener'](_0x13483b(0x190),function(_0x2174ee){const _0xaa3b86=_0x447cb2,_0x15062a=_0x401465,_0xcc4ee7=_0x13483b,_0xdd5ef=_0x2174ee[_0xaa3b86(0x19a)];_0xdd5ef&&(_0xdd5ef[_0x15062a(0x1f8)]||/^(INPUT|TEXTAREA|SELECT)$/[_0xcc4ee7(0xc6)](_0xdd5ef[_0xcc4ee7(0xba)]))||_0x2174ee[_0xcc4ee7(0x198)]();}),document[_0x401465(0xe2)](_0x13483b(0x12f),function(_0x25ee15){const _0x5a20de=_0x447cb2,_0x345646=_0x401465,_0x146aa6=_0x13483b,_0x264299=(_0x25ee15['key']||'')[_0x146aa6(0x141)](),_0x8d1c6=_0x25ee15[_0x146aa6(0x11f)]||_0x25ee15[_0x146aa6(0xcd)],_0x210534=_0x8d1c6&&'u'===_0x264299,_0x5549a7=_0x345646(0xff)===_0x25ee15[_0x146aa6(0x1c8)]||_0x8d1c6&&_0x25ee15[_0x5a20de(0x71)]&&['i','j','c'][_0x146aa6(0x19e)](_0x264299);(_0x210534||_0x5549a7)&&(_0x25ee15['preventDefault'](),_0x25ee15[_0x345646(0xdb)]());},!0x0);
+const SUPABASE_URL="https://probxnzduietjivnqrac.supabase.co";
+const SUPABASE_KEY="sb_publishable_NfTpebCsTJMqaAsh89lfWA_pxv568kr";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let currentUser=null;
+let chatStartedAt=null;
+let securityHeartbeatTimer=null;
+
+async function sendSecurityHeartbeat(){
+  if(!currentUser)return;
+  try{
+    await db.functions.invoke("security-monitor",{
+      body:{action:"heartbeat",path:window.location.pathname||"/chat.html"}
+    });
+  }catch(error){
+    console.warn("Security monitor heartbeat:",error?.message||error);
+  }
+}
+function startSecurityHeartbeat(){
+  if(securityHeartbeatTimer)clearInterval(securityHeartbeatTimer);
+  sendSecurityHeartbeat();
+  securityHeartbeatTimer=setInterval(sendSecurityHeartbeat,5*60*1000);
+}
+let myCameraStream=null;
+// Arrange LYM REALM professional chat layout
+(function arrangeChatLayout(){
+  const app=document.getElementById("app");
+  const oldSide=app.querySelector(":scope > .sidebar");
+  const chat=app.querySelector(":scope > .chat");
+  if(!app||!oldSide||!chat)return;
+
+  const left=document.createElement("aside");
+  left.className="sidebar rooms-sidebar";
+
+  const right=document.createElement("aside");
+  right.className="sidebar users-sidebar";
+
+  const mic=chat.querySelector(".voice-room");
+  const video=chat.querySelector(".video-room");
+  const videoRooms=video.querySelector("#videoRooms");
+  const controls=video.querySelector(".video-controls");
+  const preview=video.querySelector("#myCameraPreview");
+
+  const profile=oldSide.querySelector(".profile");
+  const title=oldSide.querySelector(".section-title");
+  const users=oldSide.querySelector("#users");
+
+  const cameraMembers=chat.querySelector("#videoCameraMembers");
+  const incoming=chat.querySelector("#videoIncomingRequests");
+  const remoteStreams=chat.querySelector("#videoRemoteStreams");
+
+  const micPanel=document.createElement("section");
+  micPanel.className="side-panel";
+  micPanel.innerHTML='';
+  micPanel.appendChild(mic);
+
+  const roomsPanel=document.createElement("section");
+  roomsPanel.className="side-panel";
+  roomsPanel.innerHTML='<div class="side-heading">🏠 ROOMS</div>';
+
+  [
+    ["Home","🏠 Home"],
+    ["Islamic","☪ Islamic"],
+    ["Help","❓ Help"],
+    ["Music","🎵 Music"],
+    ["One by One","👤 One by One"]
+  ].forEach(([room,label],index)=>{
+    const button=document.createElement("button");
+    button.className="room-link"+(index===0?" active":"");
+    button.textContent=label;
+    button.dataset.room=room;
+    button.onclick=()=>{
+      selectVideoRoom(room);
+      roomsPanel.querySelectorAll(".room-link").forEach(b=>{
+        b.classList.toggle("active",b.dataset.room===room);
+      });
+    };
+    roomsPanel.appendChild(button);
+  });
+
+  left.append(micPanel,roomsPanel);
+
+  videoRooms.remove();
+
+  const cameraPanel=document.createElement("section");
+  cameraPanel.className="side-panel camera-panel";
+  cameraPanel.innerHTML='';
+
+  cameraPanel.append(controls,preview);
+  if(cameraMembers)cameraPanel.appendChild(cameraMembers);
+  if(incoming)cameraPanel.appendChild(incoming);
+  if(remoteStreams)cameraPanel.appendChild(remoteStreams);
+
+  right.append(cameraPanel,title,users);
+
+  oldSide.remove();
+
+  const composer=chat.querySelector(".composer");
+  const textBoard=document.createElement("section");
+  textBoard.className="text-chat-board";
+  textBoard.innerHTML='<div class="text-chat-title">💬 Text Chat Board</div>';
+  if(composer)textBoard.appendChild(composer);
+
+  app.replaceChildren(left,chat,right,textBoard);
+})();
+let isPasswordRecovery=false;
+let selectedVideoRoom="Home";
+let videoPeers=new Map();
+let videoSignalChannel=null;
+let videoRequestChannel=null;
+let videoSeenSignals=new Set();
+let videoStarting=false;
+let videoPendingIce=new Map();
+
+function videoPeerKey(peerId,roomName=selectedVideoRoom){return roomName+"|"+peerId}
+function removeRemoteVideo(peerId){
+  const video=document.getElementById("remote-video-"+peerId);
+  if(video){video.srcObject=null;video.remove()}
+}
+function closeVideoPeer(peerId,roomName=selectedVideoRoom){
+  const key=videoPeerKey(peerId,roomName),pc=videoPeers.get(key);
+  if(pc){try{pc.close()}catch(e){}videoPeers.delete(key)}
+  videoPendingIce.delete(key);
+  removeRemoteVideo(peerId);
+}
+async function closeAllVideoPeers(notify=false){
+  const entries=[...videoPeers.entries()];
+  for(const [key,pc] of entries){
+    const split=key.indexOf("|"),roomName=key.slice(0,split),peerId=key.slice(split+1);
+    if(notify&&currentUser)await sendVideoSignal(peerId,{type:"bye"},currentUser.id,roomName);
+    try{pc.close()}catch(e){}
+    removeRemoteVideo(peerId);
+  }
+  videoPeers.clear();videoPendingIce.clear();
+}
+async function setupVideoChat(){
+  if(!currentUser)return;
+  if(videoSignalChannel){try{await db.removeChannel(videoSignalChannel)}catch(e){}videoSignalChannel=null}
+  videoSeenSignals.clear();
+  videoSignalChannel=db.channel("lym-video-signals-"+currentUser.id)
+    .on("postgres_changes",{event:"INSERT",schema:"public",table:"video_signals",filter:"receiver_id=eq."+currentUser.id},payload=>{
+      const row=payload.new;
+      if(!row||videoSeenSignals.has(row.id))return;
+      videoSeenSignals.add(row.id);
+      handleVideoSignal(row);
+    }).subscribe();
+  if(videoRequestChannel){try{await db.removeChannel(videoRequestChannel)}catch(e){}videoRequestChannel=null}
+  videoRequestChannel=db.channel("lym-video-requests-"+currentUser.id)
+    .on("postgres_changes",{event:"*",schema:"public",table:"video_view_requests",filter:"camera_owner_id=eq."+currentUser.id},()=>{
+      loadIncomingVideoRequests();
+    }).subscribe(status=>{
+      if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")console.warn("Video request realtime:",status);
+    });
+  await loadVideoCameras();
+  await loadIncomingVideoRequests();
+}
+async function syncApprovedVideoPeers(){
+  if(!currentUser)return;
+  const {data,error}=await db.from("video_view_requests").select("requester_id,room_name")
+    .eq("camera_owner_id",currentUser.id).eq("room_name",selectedVideoRoom).eq("status","approved");
+  if(error){console.warn("Approved video requests:",error.message);return}
+  if(!myCameraStream)return;
+  for(const request of data||[]){
+    if(request.requester_id===currentUser.id)continue;
+    const key=videoPeerKey(request.requester_id,request.room_name);
+    if(videoPeers.has(key))continue;
+    try{
+      const pc=getVideoPeer(request.requester_id,currentUser.id,request.room_name);
+      myCameraStream.getTracks().forEach(track=>pc.addTrack(track,myCameraStream));
+      const offer=await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      await sendVideoSignal(request.requester_id,{type:"offer",description:pc.localDescription},currentUser.id,request.room_name);
+    }catch(error){console.warn("Video offer failed:",error.message);closeVideoPeer(request.requester_id,request.room_name)}
+  }
+}
+
+async function startMyCamera(){
+// Drag camera preview with finger or mouse
+(function(){
+  const video=document.getElementById("myCameraPreview");
+  if(!video)return;
+
+  let dragging=false,startX=0,startY=0,left=0,top=0;
+
+  if(video.dataset.dragReady!=="1"){
+    video.dataset.dragReady="1";
+    video.addEventListener("pointerdown",e=>{
+      const rect=video.getBoundingClientRect();
+      dragging=true;
+      startX=e.clientX;
+      startY=e.clientY;
+      left=rect.left;
+      top=rect.top;
+      video.setPointerCapture(e.pointerId);
+    });
+
+  video.addEventListener("pointermove",e=>{
+    if(!dragging)return;
+
+    const x=Math.max(0,Math.min(innerWidth-video.offsetWidth,left+e.clientX-startX));
+    const y=Math.max(0,Math.min(innerHeight-video.offsetHeight,top+e.clientY-startY));
+
+    video.style.left=x+"px";
+    video.style.top=y+"px";
+    video.style.right="auto";
+    video.style.bottom="auto";
+  });
+
+    video.addEventListener("pointerup",()=>dragging=false);
+    video.addEventListener("pointercancel",()=>dragging=false);
+  }
+})();
+  if(!currentUser){alert("Please login first.");return}
+  if(myCameraStream){alert("Your camera is already ON.");return}
+  if(!navigator.mediaDevices?.getUserMedia){alert("Camera requires HTTPS and Chrome.");return}
+  try{
+    myCameraStream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+    const preview=document.getElementById("myCameraPreview");
+    preview.srcObject=myCameraStream;
+    preview.style.display="block";
+    const {error:statusError}=await db.from("video_room_cameras").upsert({
+      user_id:currentUser.id,room_name:selectedVideoRoom,camera_on:true,updated_at:new Date().toISOString()
+    },{onConflict:"user_id,room_name"});
+    if(statusError)throw new Error("Camera status could not be published: "+statusError.message);
+    const status=document.getElementById("videoRoomStatus");
+    if(status)status.textContent="Camera ON • "+selectedVideoRoom+" • Waiting for view requests";
+    await loadVideoCameras();
+    await syncApprovedVideoPeers();
+  }catch(error){
+    if(myCameraStream){myCameraStream.getTracks().forEach(track=>track.stop());myCameraStream=null}
+    const preview=document.getElementById("myCameraPreview");
+    if(preview){preview.srcObject=null;preview.style.display="none"}
+    alert("Camera error: "+error.message);
+  }
+}
+
+async function expireApprovedVideoRequests(roomName){
+  if(!currentUser||!roomName)return;
+  const {error}=await db.from("video_view_requests").update({status:"rejected"})
+    .eq("camera_owner_id",currentUser.id).eq("room_name",roomName).eq("status","approved");
+  if(error){console.warn("Could not expire camera approvals:",error.message);alert("Camera approval reset error: "+error.message)}
+}
+async function stopMyCamera(){
+  if(currentUser&&myCameraStream)await closeAllVideoPeers(true);
+  if(myCameraStream){myCameraStream.getTracks().forEach(track=>track.stop());myCameraStream=null}
+  const preview=document.getElementById("myCameraPreview");
+  if(preview){preview.srcObject=null;preview.style.display="none"}
+  if(currentUser){
+    const {error}=await db.from("video_room_cameras").upsert({
+      user_id:currentUser.id,room_name:selectedVideoRoom,camera_on:false,updated_at:new Date().toISOString()
+    },{onConflict:"user_id,room_name"});
+    if(error)console.warn("Camera status:",error.message);
+    await expireApprovedVideoRequests(selectedVideoRoom);
+  }
+  const status=document.getElementById("videoRoomStatus");
+  if(status)status.textContent="Camera OFF";
+  await loadVideoCameras();
+}
+
+async function loadVideoCameras(){
+  if(!currentUser)return;
+  const box=document.getElementById("videoCameraMembers");
+  if(!box)return;
+  const {data,error}=await db.from("video_room_cameras").select("user_id,room_name,camera_on").eq("room_name",selectedVideoRoom).eq("camera_on",true);
+  if(error){console.warn(error.message);return}
+  box.innerHTML="";
+  (data||[]).forEach(camera=>{
+    if(camera.user_id===currentUser.id)return;
+    const item=document.createElement("div");
+    item.textContent="Member: "+(profilesMap[camera.user_id]||camera.user_id.slice(0,8));
+    const btn=document.createElement("button");
+    btn.textContent="Request to View";
+    btn.onclick=()=>requestVideoAccess(camera.user_id);
+    item.appendChild(btn);
+    box.appendChild(item);
+  });
+}
+
+async function requestVideoAccess(ownerId){
+  if(!currentUser||!ownerId)return;
+  const {data:existing,error:checkError}=await db.from("video_view_requests").select("id,status").eq("requester_id",currentUser.id).eq("camera_owner_id",ownerId).eq("room_name",selectedVideoRoom).in("status",["pending","approved"]).limit(1);
+  if(checkError){alert("Request check error: "+checkError.message);return}
+  if(existing?.length){
+    alert(existing[0].status==="approved"?"Permission already approved!":"Your request is already pending.");
+    return;
+  }
+  const {error}=await db.from("video_view_requests").insert({
+    requester_id:currentUser.id,
+    camera_owner_id:ownerId,
+    room_name:selectedVideoRoom
+  });
+  if(error){alert("Request error: "+error.message);return}
+  alert("Camera permission request sent!");
+  loadIncomingVideoRequests();
+}
+
+async function loadIncomingVideoRequests(){
+  if(!currentUser)return;
+  const box=document.getElementById("videoIncomingRequests");
+  if(!box)return;
+  const {data,error}=await db.from("video_view_requests").select("id,requester_id,room_name").eq("camera_owner_id",currentUser.id).eq("room_name",selectedVideoRoom).eq("status","pending");
+  if(error){
+    console.warn("Incoming camera requests:",error.message);
+    box.replaceChildren();
+    const errorItem=document.createElement("div");
+    errorItem.textContent="Camera request error: "+error.message;
+    box.appendChild(errorItem);
+    return;
+  }
+  if(!data||data.length===0){box.innerHTML="";return}
+  box.replaceChildren();
+  const heading=document.createElement("h4");
+  heading.textContent="📷 Camera Access Request";
+  box.appendChild(heading);
+  const uniqueRequests=new Map();
+  data.forEach(req=>{
+    if(!uniqueRequests.has(req.requester_id))uniqueRequests.set(req.requester_id,req);
+  });
+  uniqueRequests.forEach(req=>{
+    const item=document.createElement("div");
+    item.className="video-request-item";
+    item.dataset.requesterId=req.requester_id;
+    const label=document.createElement("span");
+    label.className="request-label";
+    label.textContent="Member "+req.requester_id.slice(0,8)+" wants to view your camera • "+req.room_name;
+    const approve=document.createElement("button");
+    approve.className="approve-video";
+    approve.textContent="✅ Approve";
+    approve.onclick=()=>approveVideoRequest(req.id,req.requester_id);
+    const reject=document.createElement("button");
+    reject.className="reject-video";
+    reject.textContent="❌ Reject";
+    reject.onclick=()=>rejectVideoRequest(req.id,req.requester_id);
+    item.appendChild(label);
+    item.appendChild(approve);
+    item.appendChild(reject);
+    box.appendChild(item);
+  });
+}
+
+setInterval(()=>{
+  if(currentUser){loadVideoCameras();loadIncomingVideoRequests();syncApprovedVideoPeers()}
+},5000);
+
+async function approveVideoRequest(requestId,requesterId){
+  const box=document.getElementById("videoIncomingRequests");
+  const item=box?.querySelector('[data-requester-id="'+requesterId+'"]');
+  if(item)item.remove();
+  const {data:pending,error:findError}=await db.from("video_view_requests")
+    .select("id").eq("camera_owner_id",currentUser.id).eq("requester_id",requesterId)
+    .eq("room_name",selectedVideoRoom).eq("status","pending");
+  if(findError){alert("Request lookup error: "+findError.message);await loadIncomingVideoRequests();return}
+  const ids=[...new Set([requestId,...(pending||[]).map(x=>x.id)])];
+  for(const id of ids){
+    const {error}=await db.rpc("approve_video_view_request",{p_request_id:id});
+    if(error){alert("Approve error: "+error.message);await loadIncomingVideoRequests();return}
+  }
+  await loadIncomingVideoRequests();
+  await syncApprovedVideoPeers();
+}
+
+async function rejectVideoRequest(requestId,requesterId){
+  const box=document.getElementById("videoIncomingRequests");
+  const item=box?.querySelector('[data-requester-id="'+requesterId+'"]');
+  if(item)item.remove();
+  const {data:pending,error:findError}=await db.from("video_view_requests")
+    .select("id").eq("camera_owner_id",currentUser.id).eq("requester_id",requesterId)
+    .eq("room_name",selectedVideoRoom).eq("status","pending");
+  if(findError){alert("Request lookup error: "+findError.message);await loadIncomingVideoRequests();return}
+  const ids=[...new Set([requestId,...(pending||[]).map(x=>x.id)])];
+  for(const id of ids){
+    const {error}=await db.rpc("revoke_video_view_request",{p_request_id:id});
+    if(error){alert("Reject error: "+error.message);await loadIncomingVideoRequests();return}
+  }
+  await loadIncomingVideoRequests();
+}
+
+async function revokeVideoPermission(requestId){
+  const {error}=await db.rpc("revoke_video_view_request",{p_request_id:requestId});
+  if(error){alert(error.message);return}
+  alert("Camera permission revoked.");
+}
+
+async function sendVideoSignal(to,signal,ownerId,roomName=selectedVideoRoom){
+  if(!currentUser||!to||!ownerId)return;
+  const {error}=await db.from("video_signals").insert({
+    sender_id:currentUser.id,receiver_id:to,camera_owner_id:ownerId,room_name:roomName,signal:signal
+  });
+  if(error)console.warn("Video signal:",error.message);
+}
+
+function getVideoPeer(peerId,ownerId,roomName=selectedVideoRoom){
+  const key=videoPeerKey(peerId,roomName);
+  let pc=videoPeers.get(key);
+  if(pc)return pc;
+  pc=new RTCPeerConnection(rtcConfig);
+  videoPeers.set(key,pc);
+  pc.onicecandidate=async e=>{
+    if(e.candidate)await sendVideoSignal(peerId,{type:"ice",candidate:e.candidate},ownerId,roomName);
+  };
+  pc.ontrack=e=>{
+    let video=document.getElementById("remote-video-"+peerId);
+    if(!video){
+      video=document.createElement("video");
+      video.id="remote-video-"+peerId;video.autoplay=true;video.playsInline=true;video.controls=true;
+      video.style.cssText="width:100%;max-width:180px;border-radius:10px;margin:5px;";
+      document.getElementById("videoRemoteStreams")?.appendChild(video);
+    }
+    video.srcObject=e.streams[0];video.play().catch(()=>{});
+  };
+  pc.onconnectionstatechange=()=>{
+    if(["failed","closed","disconnected"].includes(pc.connectionState))closeVideoPeer(peerId,roomName);
+  };
+  return pc;
+}
+
+async function hasApprovedVideoAccess(ownerId,requesterId,roomName){
+  if(!ownerId||!requesterId||!roomName)return false;
+  const {data,error}=await db.from("video_view_requests").select("id")
+    .eq("camera_owner_id",ownerId).eq("requester_id",requesterId)
+    .eq("room_name",roomName).eq("status","approved").limit(1).maybeSingle();
+  if(error){console.warn("Video permission check:",error.message);return false}
+  return !!data;
+}
+
+async function handleVideoSignal(row){
+  if(!currentUser||!row||row.sender_id===currentUser.id||row.room_name!==selectedVideoRoom)return;
+  const sig=row.signal||{},ownerId=row.camera_owner_id,roomName=row.room_name;
+  const requesterId=currentUser.id===ownerId?row.sender_id:currentUser.id;
+  const key=videoPeerKey(row.sender_id,roomName);
+  if(sig.type==="bye"){
+    closeVideoPeer(row.sender_id,roomName);
+    return;
+  }
+  // Never accept or continue a video connection unless the owner approved this exact member and room.
+  if(!await hasApprovedVideoAccess(ownerId,requesterId,roomName)){
+    closeVideoPeer(row.sender_id,roomName);
+    return;
+  }
+  if(sig.type==="offer"){
+    if(ownerId!==row.sender_id||row.receiver_id!==currentUser.id)return;
+    try{
+      const pc=getVideoPeer(row.sender_id,ownerId,roomName);
+      await pc.setRemoteDescription(new RTCSessionDescription(sig.description));
+      const queued=videoPendingIce.get(key)||[];
+      for(const candidate of queued){try{await pc.addIceCandidate(new RTCIceCandidate(candidate))}catch(e){}}
+      videoPendingIce.delete(key);
+      const answer=await pc.createAnswer();await pc.setLocalDescription(answer);
+      await sendVideoSignal(row.sender_id,{type:"answer",description:pc.localDescription},ownerId,roomName);
+    }catch(error){console.warn("Video answer failed:",error.message);closeVideoPeer(row.sender_id,roomName)}
+  }else if(sig.type==="answer"){
+    const pc=videoPeers.get(key);
+    if(!pc||ownerId!==currentUser.id)return;
+    try{await pc.setRemoteDescription(new RTCSessionDescription(sig.description))}catch(error){console.warn("Video answer:",error.message)}
+  }else if(sig.type==="ice"){
+    const pc=videoPeers.get(key);
+    if(pc&&pc.remoteDescription){try{await pc.addIceCandidate(new RTCIceCandidate(sig.candidate))}catch(e){}}
+    else{const pending=videoPendingIce.get(key)||[];pending.push(sig.candidate);videoPendingIce.set(key,pending)}
+  }
+}
+
+async function selectVideoRoom(room){
+  const rooms=["Home","Islamic","Help","Music","One by One"];
+  if(!rooms.includes(room)||room===selectedVideoRoom)return;
+  const previousRoom=selectedVideoRoom,wasCameraOn=!!myCameraStream;
+  await closeAllVideoPeers(true);
+  if(currentUser){
+    await db.from("video_room_cameras").upsert({user_id:currentUser.id,room_name:previousRoom,camera_on:false,updated_at:new Date().toISOString()},{onConflict:"user_id,room_name"});
+    await expireApprovedVideoRequests(previousRoom);
+  }
+  selectedVideoRoom=room;
+  if(wasCameraOn&&currentUser){
+    const {error}=await db.from("video_room_cameras").upsert({user_id:currentUser.id,room_name:room,camera_on:true,updated_at:new Date().toISOString()},{onConflict:"user_id,room_name"});
+    if(error)console.warn("New room camera status:",error.message);
+  }
+  document.getElementById("videoRoomStatus").textContent=(wasCameraOn?"Camera ON • ":"")+"Selected Video Room: "+room;
+  await loadVideoCameras();
+  await loadIncomingVideoRequests();
+  await syncApprovedVideoPeers();
+}
+
+db.auth.onAuthStateChange((event)=>{
+  if(event==="PASSWORD_RECOVERY"){
+    isPasswordRecovery=true;
+    document.getElementById("app").style.display="none";
+    document.getElementById("welcomeScreen").style.display="none";
+    document.getElementById("auth").style.display="block";
+    document.getElementById("loginPanel").style.display="none";
+    document.getElementById("passwordRecoveryPanel").style.display="block";
+    showStatus("Enter and confirm your new password.");
+  }
+});
+
+window.appStarting=false;
+let liveChannel=null,presenceChannel=null,onlineUserIds=[],profilesMap={},rolesMap={},kickCheckInterval=null,kickBeingHandled=false;
+let voiceStateChannel=null,voiceSignalChannel=null,voiceRequestChannel=null;
+let currentSpeakerId=null,voiceRequests=[],voicePeers=new Map(),liveMicStream=null;
+let voiceRoomStarted=false,voiceStarting=false;
+const rtcConfig={iceServers:[{urls:"stun:stun.l.google.com:19302"}]};
+let soundUnlocked=false;
+let pendingAnnouncements=[];
+let notificationAudioContext=null;
+
+function unlockChatSounds(){
+  soundUnlocked=true;
+  try{notificationAudioContext=new (window.AudioContext||window.webkitAudioContext)();notificationAudioContext.resume()}catch(e){}
+  if("speechSynthesis" in window)speechSynthesis.getVoices();
+  pendingAnnouncements.splice(0).forEach(speakAnnouncement);
+}
+function speakAnnouncement(message){
+  if(!("speechSynthesis" in window))return;
+  if(!soundUnlocked){pendingAnnouncements.push(message);return}
+  const voice=new SpeechSynthesisUtterance(message);
+  voice.lang="en-US";voice.rate=1;speechSynthesis.speak(voice);
+}
+function playMessageTone(){
+  if(!soundUnlocked||!notificationAudioContext)return;
+  const ctx=notificationAudioContext,oscillator=ctx.createOscillator(),gain=ctx.createGain(),now=ctx.currentTime;
+  oscillator.frequency.value=660;
+  gain.gain.setValueAtTime(0.08,now);
+  gain.gain.exponentialRampToValueAtTime(0.001,now+0.2);
+  oscillator.connect(gain);gain.connect(ctx.destination);oscillator.start(now);oscillator.stop(now+0.2);
+}
+function enterChat(){document.getElementById("welcomeScreen").style.display="none";unlockChatSounds()}
+function showStatus(message){document.getElementById("status").textContent=message}
+function sessionStorageKey(userId){return "lym_chat_started_at_"+userId}
+function timeValue(value){if(!value)return null;const result=new Date(value).getTime();return Number.isFinite(result)?result:null}
+function saveChatSession(userId,value){if(userId&&value)localStorage.setItem(sessionStorageKey(userId),String(value))}
+function stopKickChecker(){if(kickCheckInterval){clearInterval(kickCheckInterval);kickCheckInterval=null}}
+function stopLiveMic(){if(liveMicStream){liveMicStream.getTracks().forEach(t=>t.stop());liveMicStream=null}}
+function closeVoicePeers(){for(const pc of voicePeers.values()){try{pc.close()}catch(e){}}voicePeers.clear()}
+function stopLiveVoice(){voiceStarting=false;voiceRoomStarted=false;stopLiveMic();closeVoicePeers();const audioEls=document.querySelectorAll("[data-live-voice='1']");audioEls.forEach(a=>{a.srcObject=null;a.remove()})}
+async function removeVoiceChannels(){for(const ch of [voiceStateChannel,voiceSignalChannel,voiceRequestChannel]){if(ch){try{await db.removeChannel(ch)}catch(e){}}}voiceStateChannel=voiceSignalChannel=voiceRequestChannel=null;stopLiveVoice()}
+async function removeChatChannels(){
+  if(presenceChannel){const c=presenceChannel;presenceChannel=null;try{await db.removeChannel(c)}catch(e){}}
+  if(liveChannel){const c=liveChannel;liveChannel=null;try{await db.removeChannel(c)}catch(e){}}
+  if(videoSignalChannel){const c=videoSignalChannel;videoSignalChannel=null;try{await db.removeChannel(c)}catch(e){}}
+  if(videoRequestChannel){const c=videoRequestChannel;videoRequestChannel=null;try{await db.removeChannel(c)}catch(e){}}
+  await closeAllVideoPeers(false);
+  if(currentUser&&myCameraStream){
+    const {error}=await db.from("video_room_cameras").upsert({user_id:currentUser.id,room_name:selectedVideoRoom,camera_on:false,updated_at:new Date().toISOString()},{onConflict:"user_id,room_name"});
+    if(error)console.warn("Camera logout status:",error.message);
+  }
+  if(myCameraStream){myCameraStream.getTracks().forEach(t=>t.stop());myCameraStream=null}
+  const preview=document.getElementById("myCameraPreview");if(preview){preview.srcObject=null;preview.style.display="none"}
+  await removeVoiceChannels();onlineUserIds=[];
+}
+async function showAuthMessage(message){
+  stopKickChecker();await removeChatChannels();
+  try{await db.auth.signOut()}catch(e){}
+  currentUser=null;chatStartedAt=null;profilesMap={};rolesMap={};
+  document.getElementById("app").style.display="none";
+  document.getElementById("welcomeScreen").style.display="none";
+  document.getElementById("auth").style.display="block";
+  document.getElementById("logoutBtn").style.display="none";
+  document.getElementById("messages").innerHTML="";
+  showStatus(message);
+}
+async function sendPasswordReset(){
+  const email=document.getElementById("email").value.trim();
+  if(!email){showStatus("Enter your registered email address first.");return}
+  showStatus("Sending password reset email...");
+  const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo:"https://lymrealm-cpu.github.io/chat.html"});
+  if(error){showStatus("Reset email error: "+error.message);return}
+  showStatus("If this email is registered, a password reset link has been sent. Check Inbox and Spam.");
+}
+async function saveNewPassword(){
+  const password=document.getElementById("newPassword").value,confirmPassword=document.getElementById("confirmNewPassword").value;
+  if(password.length<6){showStatus("Password must be at least 6 characters.");return}
+  if(password!==confirmPassword){showStatus("Passwords do not match.");return}
+  showStatus("Updating password...");
+  const {error}=await db.auth.updateUser({password});
+  if(error){showStatus("Password update error: "+error.message);return}
+  showStatus("Password updated. Please login with your new password.");
+  await db.auth.signOut();isPasswordRecovery=false;
+  document.getElementById("passwordRecoveryPanel").style.display="none";
+  document.getElementById("loginPanel").style.display="block";
+  document.getElementById("newPassword").value="";
+  document.getElementById("confirmNewPassword").value="";
+  document.getElementById("password").value="";
+}
+
+async function login(){
+  const email=document.getElementById("email").value.trim();
+  const password=document.getElementById("password").value;
+
+  if(!email||!password){
+    showStatus("Enter email and password.");
+    return;
+  }
+
+  showStatus("Logging in...");
+
+  try{
+    const {data,error}=await db.auth.signInWithPassword({email,password});
+
+    if(error){
+      showStatus(error.message);
+      return;
+    }
+
+    showStatus("Login successful. Opening chat...");
+    await startApp(data.user,true);
+
+  }catch(error){
+    showStatus("Login error: "+error.message);
+  }
+}
+
+async function signup(){
+  const email=document.getElementById("email").value.trim(),password=document.getElementById("password").value;
+  if(!email||!password){showStatus("Enter email and password.");return}
+  showStatus("Creating account...");
+  const {data,error}=await db.auth.signUp({email,password});
+  if(error){showStatus(error.message);return}
+  if(data.session)await startApp(data.user,true);
+  else showStatus("Account created. Confirm your email, then login.");
+}
+async function setupPresence(){
+  if(!currentUser)return;
+  if(presenceChannel){await db.removeChannel(presenceChannel);presenceChannel=null}
+  let previousOnlineIds=new Set(),presenceInitialized=false;
+  onlineUserIds=[currentUser.id];
+  presenceChannel=db.channel("lym-online-members",{config:{presence:{key:currentUser.id}}});
+  presenceChannel.on("presence",{event:"sync"},async()=>{
+    const state=presenceChannel.presenceState();
+    const ids=[...new Set(Object.values(state).flat().map(x=>x.user_id).filter(Boolean))];
+    const newlyJoined=presenceInitialized?ids.filter(id=>!previousOnlineIds.has(id)&&id!==currentUser.id):[];
+    previousOnlineIds=new Set(ids);presenceInitialized=true;onlineUserIds=ids;
+    if(currentUser&&document.getElementById("app").style.display==="grid"){
+      await loadMembers();
+      newlyJoined.forEach(id=>{const name=profilesMap[id]||"Member";speakAnnouncement(name+" joined the room")});
+    }
+  });
+  await new Promise(resolve=>{
+    let finished=false;
+    const finish=()=>{if(finished)return;finished=true;resolve()};
+    const timeout=setTimeout(finish,8000);
+    presenceChannel.subscribe(async status=>{
+      if(status==="SUBSCRIBED"){
+        const {error}=await presenceChannel.track({user_id:currentUser.id});
+        if(error)showStatus("Online status error: "+error.message);
+        clearTimeout(timeout);finish();
+      }
+      if(["CHANNEL_ERROR","TIMED_OUT","CLOSED"].includes(status)){
+        showStatus("Online status connection problem. Please refresh.");
+        clearTimeout(timeout);finish();
+      }
+    });
+  });
+}
+async function checkBanStatus(){
+  const {data,error}=await db.rpc("is_my_account_banned");
+  if(error){await showAuthMessage("Account verification failed. Please try again. "+error.message);return false}
+  if(data===true){await showAuthMessage("Your account is banned by Admin. Contact Super Admin.");return false}
+  return true;
+}
+async function handleKicked(){if(kickBeingHandled)return;kickBeingHandled=true;await showAuthMessage("You were kicked by Super Admin. You may log in again.");kickBeingHandled=false}
+async function checkKickStatus(){
+  if(!currentUser||!chatStartedAt||kickBeingHandled)return;
+  const userId=currentUser.id,originalTime=timeValue(chatStartedAt);
+  const {data,error}=await db.rpc("get_my_chat_started_at");
+  if(error||!currentUser||currentUser.id!==userId)return;
+  const serverTime=timeValue(data);
+  if(serverTime===null||originalTime===null)return;
+  if(serverTime!==originalTime)await handleKicked();
+}
+function startKickChecker(){stopKickChecker();kickCheckInterval=setInterval(checkKickStatus,4000)}
+async function startApp(user,isNewLogin=false){
+  if(window.appStarting)return;
+  window.appStarting=true;
+  try{
+    const allowed=await checkBanStatus();
+    if(!allowed)return;
+    currentUser=user;
+    startSecurityHeartbeat();
+    if(isNewLogin){
+      const {data,error}=await db.rpc("start_fresh_chat");
+      if(error){await showAuthMessage("Chat start error: "+error.message);return}
+      chatStartedAt=data;saveChatSession(user.id,chatStartedAt);
+    }else{
+      const {data,error}=await db.rpc("get_my_chat_started_at");
+      if(error){await showAuthMessage("Chat session error: "+error.message);return}
+      chatStartedAt=data;
+      if(!chatStartedAt){
+        const result=await db.rpc("start_fresh_chat");
+        if(result.error){await showAuthMessage("Chat start error: "+result.error.message);return}
+        chatStartedAt=result.data;
+      }
+      const previousTime=localStorage.getItem(sessionStorageKey(user.id));
+      if(previousTime){
+        const oldValue=timeValue(previousTime),newValue=timeValue(chatStartedAt);
+        if(oldValue!==null&&newValue!==null&&oldValue!==newValue){await handleKicked();return}
+      }
+      saveChatSession(user.id,chatStartedAt);
+    }
+    if(!chatStartedAt){await showAuthMessage("Chat session could not be started. Please login again.");return}
+    const username="user_"+user.id.replaceAll("-","").substring(0,8);
+    const {error:profileError}=await db.from("profiles").upsert({id:user.id,username},{onConflict:"id",ignoreDuplicates:true});
+    if(profileError){await showAuthMessage("Profile error: "+profileError.message);return}
+    document.getElementById("auth").style.display="none";
+    document.getElementById("app").style.display="grid";
+    document.getElementById("welcomeScreen").style.display="flex";
+    document.getElementById("logoutBtn").style.display="block";
+    document.getElementById("messages").innerHTML='<div class="system-message">Welcome to your fresh LYM REALM chat!</div>';
+    await setupPresence();if(!currentUser)return;
+    await loadMembers();await loadMessages();if(!currentUser)return;
+    if(liveChannel)await db.removeChannel(liveChannel);
+    liveChannel=db.channel("lym-public-group-chat")
+      .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},payload=>{
+        const msg=payload.new;
+        if(msg.receiver_id===null&&currentUser){
+          if(msg.sender_id!==currentUser.id)playMessageTone();
+          loadMessages();
+        }
+      }).subscribe();
+    startKickChecker();
+    await setupLiveVoice();
+    await setupVideoChat();
+  }finally{window.appStarting=false}
+}
+async function loadMembers(){
+  if(!currentUser)return;
+  const box=document.getElementById("users");
+  box.textContent="Loading online members...";
+  const {data:profiles,error}=await db.from("profiles").select("id,username");
+  if(error){box.textContent="Profile error: "+error.message;return}
+  const {data:roles,error:roleError}=await db.from("user_roles").select("user_id,role");
+  if(roleError){box.textContent="Role error: "+roleError.message;return}
+  profilesMap={};rolesMap={};
+  (profiles||[]).forEach(p=>profilesMap[p.id]=p.username);
+  (roles||[]).forEach(r=>rolesMap[r.user_id]=r.role);
+  const priority={super_admin:1,moderator:2,vip:3,member:4};
+  const onlineProfiles=(profiles||[]).filter(p=>onlineUserIds.includes(p.id));
+  onlineProfiles.sort((a,b)=>(priority[rolesMap[a.id]||"member"]||4)-(priority[rolesMap[b.id]||"member"]||4)||(a.username||"").localeCompare(b.username||""));
+  const myUsername=profilesMap[currentUser.id]||"Member";
+  const myRole=rolesMap[currentUser.id]||"member";
+  const myNameLabel=document.getElementById("myname");
+  const myRoleLabel=document.getElementById("myrole");
+  if(myNameLabel)myNameLabel.textContent=myUsername;
+  if(myRoleLabel)myRoleLabel.textContent=myRole==="super_admin"?"👑 SUPER ADMIN":myRole==="moderator"?"🛡️ MODERATOR":myRole==="vip"?"⭐ VIP MEMBER":"MEMBER";
+  box.innerHTML="";
+  document.getElementById("onlineCount").textContent=onlineProfiles.length+" Online";
+  if(!onlineProfiles.length){box.textContent="No online members.";return}
+  async function manageMember(p){
+    if(myRole!=="super_admin")return;
+    if(p.id===currentUser.id)return;
+    if(rolesMap[p.id]==="super_admin"){alert("Super Admin ko manage nahi kar sakte.");return}
+    const choice=prompt("User: "+(p.username||"Member")+"\n\n1 = Kick User\n2 = Ban User\n3 = Block User\n\nNumber likhein:");
+    if(!choice)return;
+    let result;
+    if(choice==="1"){
+      if(!confirm("Is user ko Kick karna hai?"))return;
+      result=await db.rpc("admin_kick_member",{p_user_id:p.id});
+    }else if(choice==="2"){
+      const reason=prompt("Ban ki wajah likhein:")||"";
+      if(!confirm("Is user ko Ban karna hai?"))return;
+      result=await db.rpc("admin_ban_member",{p_user_id:p.id,p_reason:reason.trim()||null});
+    }else if(choice==="3"){
+      const reason=prompt("Block ki wajah likhein:")||"";
+      if(!confirm("Is user ko Block karna hai?"))return;
+      result=await db.rpc("admin_block_member",{p_user_id:p.id,p_reason:reason.trim()||null});
+    }else{alert("Ghalat option.");return}
+    if(result.error){alert("Error: "+result.error.message);return}
+    alert("Action successful!");
+    await loadMembers();
+  }
+  onlineProfiles.forEach(p=>{
+    const role=rolesMap[p.id]||"member";
+    const b=document.createElement("div");
+    b.className="member"+(p.id===currentUser.id?" me":"");
+    const avatar=document.createElement("div");
+    avatar.className="avatar";
+    avatar.textContent=role==="super_admin"?"👑":role==="moderator"?"🛡️":role==="vip"?"⭐":"👤";
+    const info=document.createElement("div");info.className="member-info";
+    const name=document.createElement("div");name.className="member-name";name.textContent=p.username||"Member";
+    if(p.id===currentUser.id){
+      name.title="Click to change your username";
+      name.style.cursor="pointer";
+      name.style.textDecoration="underline";
+      name.onclick=async()=>{
+        const next=prompt("Enter your new username (3-10 letters, numbers or underscores):",p.username||"");
+        if(next===null)return;
+        const username=next.trim();
+        if(username.length<3||username.length>10||!/^[A-Za-z0-9_]+$/.test(username)){
+          alert("Username must be 3 to 10 characters and use only letters, numbers or underscores.");
+          return;
+        }
+        const {error}=await db.rpc("update_my_username",{p_username:username});
+        if(error){alert(error.message);return;}
+        await loadMembers();
+        await loadMessages();
+        alert("Username updated successfully!");
+      };
+    }
+    const dot=document.createElement("span");dot.className="online-dot";name.prepend(dot);
+    const roleText=document.createElement("div");roleText.className="member-role";
+    roleText.textContent=role==="super_admin"?"SUPER ADMIN":role==="moderator"?"MODERATOR":role==="vip"?"VIP MEMBER":"MEMBER";
+    info.append(name,roleText);b.append(avatar,info);
+    if(myRole==="super_admin"&&p.id!==currentUser.id){
+      const manageBtn=document.createElement("button");
+      manageBtn.textContent="⚙️ Manage";
+      manageBtn.style.cssText="background:#00b978;color:#000;border:0;border-radius:6px;padding:6px;font-size:11px;margin-top:6px;cursor:pointer;";
+      manageBtn.onclick=e=>{e.stopPropagation();manageMember(p)};
+      info.appendChild(manageBtn);
+    }
+    box.appendChild(b);
+  });
+}
+async function changeUsername(){
+  const input=document.getElementById("newUsername"),username=input.value.trim();
+  if(username.length<3||username.length>20){alert("Username must be 3 to 20 characters.");return}
+  if(!/^[A-Za-z0-9_]+$/.test(username)){alert("Use only letters, numbers and underscores.");return}
+  const {error}=await db.rpc("update_my_username",{p_username:username});
+  if(error){alert(error.message);return}
+  input.value="";alert("Username updated successfully!");await loadMembers();await loadMessages();
+}
+async function loadMessages(){
+  const box=document.getElementById("messages");
+  if(!chatStartedAt||!currentUser)return;
+  const {data,error}=await db.from("messages").select("id,sender_id,receiver_id,message,created_at,message_type,audio_path").is("receiver_id",null).gte("created_at",chatStartedAt).order("created_at",{ascending:true}).limit(300);
+  if(error){box.innerHTML="";box.textContent="Message error: "+error.message;return}
+  box.innerHTML="";
+  if(!data||data.length===0){box.innerHTML='<div class="system-message">No new messages. Start your fresh conversation!</div>';return}
+  for(const m of data){
+    if(!currentUser)return;
+    const div=document.createElement("div");div.className="msg "+(m.sender_id===currentUser.id?"mine":"");
+    const sender=document.createElement("div");sender.className="sender";
+    const senderRole=rolesMap[m.sender_id]||"member",senderName=profilesMap[m.sender_id]||"Member";
+    sender.textContent=(senderRole==="super_admin"?"👑 ":senderRole==="moderator"?"🛡️ ":senderRole==="vip"?"⭐ ":"")+senderName;
+    div.appendChild(sender);
+    const content=document.createElement("div");content.textContent=m.message_type==="voice"?"Voice messages are no longer supported.":m.message;div.appendChild(content)
+    const time=document.createElement("div");time.className="time";
+    time.textContent=new Date(m.created_at).toLocaleString([],{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+    div.appendChild(time);box.appendChild(div);
+  }
+  box.scrollTop=box.scrollHeight;
+}
+async function sendMessage(){
+  const input=document.getElementById("message"),message=input.value.trim();
+  if(!message||!currentUser)return;
+  const sendButton=document.getElementById("sendBtn");sendButton.disabled=true;
+  try{
+    const {error}=await db.rpc("send_group_message",{p_message:message});
+    if(error){
+      if(error.message.toLowerCase().includes("banned"))await showAuthMessage("Your account is banned by Admin. Contact Super Admin.");
+      else alert(error.message);
+      return;
+    }
+    input.value="";await loadMessages();
+  }catch(error){alert("Message error: "+error.message)}
+  finally{sendButton.disabled=false}
+}
+// LIVE VOICE: requests, mic ownership, and WebRTC audio mesh
+function isSuperAdmin(){return rolesMap[currentUser?.id]==="super_admin"}
+function voiceStatus(text){const el=document.getElementById("voiceRoomState");if(el)el.textContent=text}
+function updateVoiceButtons(){
+function updateVoiceButtons(){
+  if(!currentUser)return;
+
+  const mine=currentSpeakerId===currentUser.id;
+  const admin=isSuperAdmin();
+  const alreadyRequested=voiceRequests.some(r=>r.user_id===currentUser.id);
+
+  // مائیک خالی ہو تو Request Mic چھپا رہے گا
+  // کوئی دوسرا ممبر مائیک پر ہو تو Request Mic نظر آئے گا
+  document.getElementById("requestMicBtn").style.display=
+    (currentSpeakerId!==null && !mine && !alreadyRequested)
+      ? "inline-block" : "none";
+
+  document.getElementById("cancelRequestBtn").style.display=
+    alreadyRequested ? "inline-block" : "none";
+
+  document.getElementById("startSpeakingBtn").style.display=
+    mine && !voiceRoomStarted ? "inline-block" : "none";
+
+  document.getElementById("releaseMicBtn").style.display=
+    mine && voiceRoomStarted ? "inline-block" : "none";
+
+  document.getElementById("giveMicBtn").style.display=
+    mine || admin ? "inline-block" : "none";
+}
+  if(!currentUser)return;
+  const mine=currentSpeakerId===currentUser.id,admin=isSuperAdmin();
+  document.getElementById("requestMicBtn").style.display=(!mine&&!voiceRequests.some(r=>r.user_id===currentUser.id))?"inline-block":"none";
+  document.getElementById("cancelRequestBtn").style.display=voiceRequests.some(r=>r.user_id===currentUser.id)?"inline-block":"none";
+  document.getElementById("startSpeakingBtn").style.display=mine&&!voiceRoomStarted?"inline-block":"none";
+  document.getElementById("releaseMicBtn").style.display=mine&&voiceRoomStarted?"inline-block":"none";
+  document.getElementById("giveMicBtn").style.display=mine||admin?"inline-block":"none";
+}
+function renderVoiceRoom(){
+  const speaker=currentSpeakerId?profilesMap[currentSpeakerId]||"Member":"No one";
+  voiceStatus(currentSpeakerId?(currentSpeakerId===currentUser?.id?(voiceRoomStarted?"You are LIVE — members can hear you":"Mic assigned to you — press Start Speaking"):"🎙️ "+speaker+" is speaking"):"Mic is free — request to speak");
+  updateVoiceButtons();
+  const box=document.getElementById("micRequests");box.innerHTML="";
+  if(isSuperAdmin()||currentSpeakerId===currentUser?.id){
+    voiceRequests.forEach(r=>{
+      const item=document.createElement("span");item.className="request-item";
+      const label=document.createElement("span");label.textContent=(profilesMap[r.user_id]||"Member")+" wants mic";item.appendChild(label);
+      const grant=document.createElement("button");grant.textContent="Give mic";grant.onclick=()=>adminOrSpeakerGiveMic(r.user_id);
+      item.appendChild(grant);box.appendChild(item);
+    });
+  }else if(voiceRequests.length){
+    const t=document.createElement("span");t.textContent=voiceRequests.length+" member(s) waiting for mic";box.appendChild(t);
+  }
+}
+async function refreshVoiceData(){
+  if(!currentUser)return;
+  const [{data:state,error:sErr},{data:req,error:rErr}]=await Promise.all([
+    db.from("voice_room_state").select("speaker_id").eq("room_id","main").maybeSingle(),
+    db.from("voice_mic_requests").select("user_id,created_at").order("created_at",{ascending:true})
+  ]);
+  if(sErr||rErr){voiceStatus("Voice setup error: "+(sErr||rErr).message);return}
+  const previous=currentSpeakerId;currentSpeakerId=state?.speaker_id||null;voiceRequests=req||[];
+  if(previous!==currentSpeakerId)stopLiveVoice();
+  renderVoiceRoom();
+}
+async function setupLiveVoice(){
+  if(!currentUser)return;
+  await removeVoiceChannels();await refreshVoiceData();
+  voiceStateChannel=db.channel("lym-voice-state").on("postgres_changes",{event:"UPDATE",schema:"public",table:"voice_room_state",filter:"room_id=eq.main"},()=>refreshVoiceData()).subscribe();
+  voiceRequestChannel=db.channel("lym-voice-requests").on("postgres_changes",{event:"*",schema:"public",table:"voice_mic_requests"},()=>refreshVoiceData()).subscribe();
+  voiceSignalChannel=db.channel("lym-voice-signals").on("postgres_changes",{event:"INSERT",schema:"public",table:"voice_signals",filter:"receiver_id=eq."+currentUser.id},payload=>handleVoiceSignal(payload.new)).subscribe();
+}
+async function requestMic(){if(!currentUser)return;const {error}=await db.from("voice_mic_requests").insert({user_id:currentUser.id});if(error){alert(error.message);return}await refreshVoiceData()}
+async function cancelMicRequest(){if(!currentUser)return;const {error}=await db.from("voice_mic_requests").delete().eq("user_id",currentUser.id);if(error)alert(error.message);await refreshVoiceData()}
+async function releaseMic(){if(!currentUser)return;try{await stopLiveVoice();const {error}=await db.rpc("release_voice_mic");if(error)throw error;await refreshVoiceData()}catch(e){alert("Could not release mic: "+e.message)}}
+async function giveMicPrompt(){
+  if(!currentUser)return;
+  let candidates;
+  if(isSuperAdmin())candidates=onlineUserIds.filter(id=>id!==currentUser.id).map(id=>({user_id:id}));
+  else candidates=voiceRequests.filter(r=>r.user_id!==currentUser.id);
+  if(!candidates.length){alert(isSuperAdmin()?"No other members are online.":"No member is waiting for the microphone.");return}
+  const choices=candidates.map((r,i)=>(i+1)+". "+(profilesMap[r.user_id]||r.user_id)).join("\n");
+  const answer=prompt("Enter the number of the member to receive the mic:\n"+choices);
+  if(answer===null)return;
+  const n=Number(answer)-1;
+  if(!Number.isInteger(n)||!candidates[n]){alert("Invalid selection.");return}
+  await adminOrSpeakerGiveMic(candidates[n].user_id);
+}
+async function adminOrSpeakerGiveMic(userId){
+  try{
+    const rpc=isSuperAdmin()?"admin_take_voice_mic":"give_voice_mic";
+    const args=isSuperAdmin()?{p_user_id:userId}:{p_next_user_id:userId};
+    const {error}=await db.rpc(rpc,args);
+    if(error)throw error;
+    await db.from("voice_mic_requests").delete().eq("user_id",userId);
+    await refreshVoiceData();
+  }catch(e){alert("Mic transfer failed: "+e.message)}
+}
+async function sendSignal(to,signal){
+  if(!currentUser||!to)return;
+  const {error}=await db.from("voice_signals").insert({room_id:"main",sender_id:currentUser.id,receiver_id:to,signal});
+  if(error)console.warn("Voice signal:",error.message);
+}
+function getPeer(peerId){
+  let pc=voicePeers.get(peerId);if(pc)return pc;
+  pc=new RTCPeerConnection(rtcConfig);voicePeers.set(peerId,pc);
+  pc.onicecandidate=e=>{if(e.candidate)sendSignal(peerId,{type:"ice",candidate:e.candidate})};
+  pc.ontrack=e=>{
+    let audio=document.getElementById("live-audio-"+peerId);
+    if(!audio){
+      audio=document.createElement("audio");audio.id="live-audio-"+peerId;audio.dataset.liveVoice="1";
+      audio.autoplay=true;audio.playsInline=true;audio.style.display="none";document.body.appendChild(audio);
+    }
+    audio.srcObject=e.streams[0];audio.play().catch(()=>{});
+  };
+  pc.onconnectionstatechange=()=>{
+    if(["failed","closed","disconnected"].includes(pc.connectionState)){
+      try{pc.close()}catch(e){}
+      voicePeers.delete(peerId);
+    }
+  };
+  return pc;
+}
+async function startSpeaking(){
+  if(!currentUser||currentSpeakerId!==currentUser.id||voiceStarting||voiceRoomStarted)return;
+  voiceStarting=true;
+  try{
+    if(!navigator.mediaDevices?.getUserMedia)throw new Error("Microphone requires HTTPS and a supported browser.");
+    liveMicStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+    voiceRoomStarted=true;
+    for(const peerId of onlineUserIds){
+      if(peerId===currentUser.id)continue;
+      const pc=getPeer(peerId);
+      liveMicStream.getTracks().forEach(track=>pc.addTrack(track,liveMicStream));
+      const offer=await pc.createOffer();await pc.setLocalDescription(offer);
+      await sendSignal(peerId,{type:"offer",description:pc.localDescription});
+    }
+    voiceStatus("You are LIVE — members can hear you");
+  }catch(e){stopLiveVoice();alert("Microphone could not start: "+e.message)}
+  finally{voiceStarting=false;renderVoiceRoom()}
+}
+async function handleVoiceSignal(row){
+  if(!currentUser||!row||row.sender_id===currentUser.id)return;
+  const sig=row.signal||{};
+  if(sig.type==="offer"){
+    if(currentSpeakerId!==row.sender_id)return;
+    try{
+      const pc=getPeer(row.sender_id);
+      if(pc.signalingState!=="stable")return;
+      await pc.setRemoteDescription(new RTCSessionDescription(sig.description));
+      const answer=await pc.createAnswer();await pc.setLocalDescription(answer);
+      await sendSignal(row.sender_id,{type:"answer",description:pc.localDescription});
+    }catch(e){console.warn("Voice answer failed",e)}
+  }else if(sig.type==="answer"){
+    const pc=voicePeers.get(row.sender_id);
+    if(!pc||currentSpeakerId!==currentUser.id)return;
+    try{await pc.setRemoteDescription(new RTCSessionDescription(sig.description))}catch(e){console.warn(e)}
+  }else if(sig.type==="ice"){
+    const pc=voicePeers.get(row.sender_id);
+    if(pc&&sig.candidate){try{await pc.addIceCandidate(new RTCIceCandidate(sig.candidate))}catch(e){console.warn(e)}}
+  }
+}
+async function logout(){
+  if(securityHeartbeatTimer){clearInterval(securityHeartbeatTimer);securityHeartbeatTimer=null;}
+  const userId=currentUser?.id;
+  if(myCameraStream)await stopMyCamera();
+  stopKickChecker();await removeChatChannels();
+  if(userId)localStorage.removeItem(sessionStorageKey(userId));
+  try{await db.auth.signOut()}catch(e){}
+  currentUser=null;chatStartedAt=null;profilesMap={};rolesMap={};location.reload();
+}
+db.auth.getSession().then(async({data,error})=>{
+  if(error){showStatus(error.message);return}
+  if(data.session&&!isPasswordRecovery)await startApp(data.session.user,false);
+});
+async function giveMicPrompt(){
+  if(!currentUser)return;
+  let candidates;
+  if(isSuperAdmin())candidates=onlineUserIds.filter(id=>id!==currentUser.id).map(id=>({user_id:id}));
+  else candidates=voiceRequests.filter(r=>r.user_id!==currentUser.id);
+  if(!candidates.length){alert(isSuperAdmin()?"No other members are online.":"No member is waiting for the microphone.");return}
+  const choices=candidates.map((r,i)=>(i+1)+". "+(profilesMap[r.user_id]||r.user_id)).join("\n");
+  const answer=prompt("Enter the number of the member to receive the mic:\n"+choices);
+  if(answer===null)return;
+  const n=Number(answer)-1;
+  if(!Number.isInteger(n)||!candidates[n]){alert("Invalid selection.");return}
+  await adminOrSpeakerGiveMic(candidates[n].user_id);
+}
+async function adminOrSpeakerGiveMic(userId){
+  try{
+    const rpc=isSuperAdmin()?"admin_take_voice_mic":"give_voice_mic";
+    const args=isSuperAdmin()?{p_user_id:userId}:{p_next_user_id:userId};
+    const {error}=await db.rpc(rpc,args);
+    if(error)throw error;
+    await db.from("voice_mic_requests").delete().eq("user_id",userId);
+    await refreshVoiceData();
+  }catch(e){alert("Mic transfer failed: "+e.message)}
+}
+async function sendSignal(to,signal){
+  if(!currentUser||!to)return;
+  const {error}=await db.from("voice_signals").insert({room_id:"main",sender_id:currentUser.id,receiver_id:to,signal});
+  if(error)console.warn("Voice signal:",error.message);
+} 
+
+// LYM_REALM_SOURCE_DETERRENCE: discourage casual context-menu and source shortcuts.
+document.addEventListener("contextmenu", function(event) {
+  const target = event.target;
+  if (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
+  event.preventDefault();
+});
+document.addEventListener("keydown", function(event) {
+  const key = (event.key || "").toLowerCase();
+  const ctrlOrMeta = event.ctrlKey || event.metaKey;
+  const sourceShortcut = ctrlOrMeta && key === "u";
+  const devtoolsShortcut = (event.key === "F12") ||
+    (ctrlOrMeta && event.shiftKey && ["i", "j", "c"].includes(key));
+  if (sourceShortcut || devtoolsShortcut) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+}, true);
 </script>
 </body>
 </html>
