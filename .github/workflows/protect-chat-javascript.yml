@@ -1,0 +1,95 @@
+name: Protect Chat JavaScript
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: protect-chat-javascript
+  cancel-in-progress: false
+
+jobs:
+  obfuscate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install JavaScript tools
+        run: npm install --no-save terser javascript-obfuscator
+
+      - name: Minify and obfuscate inline chat code
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const terser = require('terser');
+          const JavaScriptObfuscator = require('javascript-obfuscator');
+
+          (async () => {
+            const file = 'chat.html';
+            let html = fs.readFileSync(file, 'utf8');
+            const scriptTag = /<script(?![^>]*\bsrc\s*=)[^>]*>([\s\S]*?)<\/script>/i;
+            const match = html.match(scriptTag);
+
+            if (!match) throw new Error('Inline application script was not found.');
+            const source = match[1];
+            if (!source.trim()) throw new Error('Inline application script is empty.');
+
+            const minified = await terser.minify(source, {
+              compress: { passes: 1 },
+              mangle: true,
+              format: { comments: false }
+            });
+            if (!minified.code) throw new Error('Terser returned empty output.');
+
+            const obfuscated = JavaScriptObfuscator.obfuscate(minified.code, {
+              compact: true,
+              simplify: true,
+              identifierNamesGenerator: 'hexadecimal',
+              renameGlobals: false,
+              stringArray: true,
+              stringArrayThreshold: 0.5,
+              stringArrayRotate: true,
+              stringArrayShuffle: true,
+              stringArrayEncoding: [],
+              controlFlowFlattening: false,
+              deadCodeInjection: false,
+              selfDefending: false,
+              debugProtection: false,
+              disableConsoleOutput: false,
+              sourceMap: false
+            }).getObfuscatedCode();
+
+            if (!obfuscated || obfuscated.length < 100) {
+              throw new Error('Obfuscation output failed validation.');
+            }
+
+            html = html.replace(scriptTag, match[0].replace(source, '\n' + obfuscated + '\n'));
+            fs.writeFileSync(file, html);
+            console.log('Inline application script minified and obfuscated.');
+          })().catch(error => {
+            console.error(error);
+            process.exit(1);
+          });
+          NODE
+
+      - name: Commit protected chat page
+        run: |
+          if git diff --quiet -- chat.html; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add chat.html
+          git commit -m "Minify and obfuscate chat JavaScript"
+          git push
