@@ -592,7 +592,7 @@ stopLiveVoice = function() {
 </script>
 
 
-<!-- LYM REALM: synchronized YouTube player for mobile and desktop -->
+<!-- LYM REALM: synchronized YouTube player with approved music requests -->
 <style>
 #lymYtOpenBtn{background:linear-gradient(135deg,#f4d77c,#b98b2f)!important;color:#182015!important;border:1px solid #ffe7a0!important}
 #lymYtModal{display:none;position:fixed;inset:0;z-index:100050;background:#000c;align-items:center;justify-content:center;padding:12px}
@@ -606,31 +606,45 @@ stopLiveVoice = function() {
 #lymYtActions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
 #lymYtActions button{font-size:12px;padding:8px 11px}
 #lymYtStatus{font-size:12px;color:#c8ffe6;margin-top:8px;min-height:18px}
+#lymMusicAdminQueue{display:none;margin-top:12px;padding:10px;border:1px solid #b98b2f;border-radius:10px;background:#10251f}
+#lymMusicAdminQueue h4{margin:0 0 8px;color:#f5d477;font-size:13px}
+.lym-music-request{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid #31564a;font-size:12px}
+.lym-music-request button{padding:6px 9px;font-size:11px}
 @media(max-width:650px){#lymYtPlayer{height:220px}#lymYtCard{padding:10px}}
 </style>
 <div id="lymYtModal" aria-hidden="true">
  <div id="lymYtCard" role="dialog" aria-modal="true" aria-label="LYM REALM YouTube Room">
   <h3>🎵 LYM REALM — YouTube Room</h3>
-  <div id="lymYtInputRow"><input id="lymYtUrl" type="url" placeholder="YouTube video link paste karein"><button id="lymYtLoad" type="button">Load</button></div>
-  <div id="lymYtPlayer"></div>
-  <div id="lymYtActions">
-   <button id="lymYtShare" type="button" class="gold">▶ Play for Everyone</button>
-   <button id="lymYtJoin" type="button" style="background:#087b55">🔊 Join & Play</button>
-   <button id="lymYtPause" type="button">⏸ Pause Everyone</button>
-   <button id="lymYtClose" type="button" class="danger">Close</button>
+  <div id="lymYtPermissionArea">
+   <button id="lymYtRequest" type="button" style="background:#b98b2f;color:#182015">🙋 Request Music Permission</button>
+   <span id="lymYtPermissionText" style="font-size:12px;color:#c8ffe6;margin-left:6px">گانا چلانے کے لیے منظوری درکار ہے۔</span>
   </div>
-  <div id="lymYtStatus">Link paste karke Load karein. Har member ko sound enable karne ke liye ek dafa Join & Play dabana par sakta hai.</div>
+  <div id="lymYtController" style="display:none;margin-top:10px">
+   <div id="lymYtInputRow"><input id="lymYtUrl" type="url" placeholder="YouTube video link paste karein"><button id="lymYtLoad" type="button">Load</button></div>
+   <div id="lymYtActions">
+    <button id="lymYtShare" type="button" class="gold">▶ Play for Everyone</button>
+    <button id="lymYtJoin" type="button" style="background:#087b55">🔊 Join & Play</button>
+   </div>
+  </div>
+  <div id="lymYtPlayer"></div>
+  <div id="lymMusicAdminQueue">
+   <h4>🎼 Music Permission Requests</h4>
+   <div id="lymMusicRequestList">درخواستیں لوڈ ہو رہی ہیں…</div>
+  </div>
+  <div id="lymYtStatus">مائیک جوائن کیے بغیر گانا سن سکتے ہیں۔ ہر ممبر کو پہلی بار آواز کے لیے Join & Play دبانا پڑ سکتا ہے۔</div>
+  <div style="text-align:right;margin-top:9px"><button id="lymYtClose" type="button" class="danger">Close</button></div>
  </div>
 </div>
 <script>
 (function(){
   const openBtn=document.getElementById("lymYtOpenBtn");
   const modal=document.getElementById("lymYtModal"), urlInput=document.getElementById("lymYtUrl");
-  const status=document.getElementById("lymYtStatus");
+  const status=document.getElementById("lymYtStatus"), permissionText=document.getElementById("lymYtPermissionText");
+  const requestBtn=document.getElementById("lymYtRequest"), controller=document.getElementById("lymYtController");
+  const adminQueue=document.getElementById("lymMusicAdminQueue"), requestList=document.getElementById("lymMusicRequestList");
   const loadBtn=document.getElementById("lymYtLoad"), shareBtn=document.getElementById("lymYtShare");
-  const joinBtn=document.getElementById("lymYtJoin"), pauseBtn=document.getElementById("lymYtPause");
-  const closeBtn=document.getElementById("lymYtClose");
-  let player=null, apiReady=false, channel=null, currentVideoId="", pendingStart=0, isLeader=false, remoteAction=false, startedAt=0;
+  const joinBtn=document.getElementById("lymYtJoin"), closeBtn=document.getElementById("lymYtClose");
+  let player=null, apiReady=false, channel=null, currentVideoId="", pendingStart=0, canControl=false, remoteAction=false, startedAt=0, refreshTimer=null;
   function say(t){status.textContent=t;}
   function getVideoId(raw){
     try{
@@ -652,19 +666,18 @@ stopLiveVoice = function() {
   }
   function makePlayer(){
     if(player||!apiReady)return;
-    player=new YT.Player("lymYtPlayer",{width:"100%",height:"280",videoId:"",playerVars:{playsinline:1,controls:1,rel:0,enablejsapi:1,origin:location.origin},events:{
+    player=new YT.Player("lymYtPlayer",{width:"100%",height:"280",videoId:"",playerVars:{playsinline:1,controls:0,rel:0,disablekb:1,fs:0,enablejsapi:1,origin:location.origin},events:{
       onReady:()=>{if(currentVideoId)player.cueVideoById(currentVideoId);},
       onStateChange:e=>{
-        if(remoteAction||!isLeader||!channel)return;
-        if(e.data===YT.PlayerState.PAUSED) sendState("pause");
+        if(remoteAction||!canControl||!channel)return;
         if(e.data===YT.PlayerState.PLAYING) sendState("play");
       },
-      onError:e=>say("YouTube video embed allow nahi karta ya video unavailable hai. Error: "+e.data),
-      onAutoplayBlocked:()=>say("Browser ne auto-play roki. 🔊 Join & Play dabayein.")
+      onError:e=>say("یہ YouTube ویڈیو Embed کی اجازت نہیں دیتی یا دستیاب نہیں۔ Error: "+e.data),
+      onAutoplayBlocked:()=>say("براؤزر نے خودکار آواز روکی ہے۔ 🔊 Join & Play دبائیں۔")
     }});
   }
   function send(payload){
-    if(!channel||typeof currentUser==="undefined"||!currentUser)return;
+    if(!channel||!canControl||typeof currentUser==="undefined"||!currentUser)return;
     channel.send({type:"broadcast",event:"yt-room",payload:Object.assign({sender:currentUser.id},payload)});
   }
   function sendState(action){
@@ -673,63 +686,106 @@ stopLiveVoice = function() {
   }
   function applyRemote(p){
     if(!p||p.sender===(typeof currentUser!=="undefined"&&currentUser&&currentUser.id))return;
-    isLeader=false;
     if(p.videoId&&p.videoId!==currentVideoId){
       currentVideoId=p.videoId;urlInput.value="https://youtu.be/"+currentVideoId;
       pendingStart=Number(p.seconds)||0;startedAt=Number(p.sentAt)||Date.now();
       if(player)player.cueVideoById(currentVideoId);
-      say("Naya song share hua hai. 🔊 Join & Play dabakar sunein.");
+      say("🎵 نیا گانا روم میں شیئر ہوا ہے۔ آواز کے لیے Join & Play دبائیں۔");
       return;
     }
-    if(p.action==="load"&&p.videoId){pendingStart=Number(p.seconds)||0;startedAt=Number(p.sentAt)||Date.now();say("Song share hua hai. 🔊 Join & Play dabayein.");return;}
-    if(p.action==="pause"&&player){remoteAction=true;player.pauseVideo();setTimeout(()=>remoteAction=false,700);}
-    if(p.action==="play"&&player){pendingStart=Number(p.seconds)||0;startedAt=Number(p.sentAt)||Date.now();say("Song play ho raha hai — awaaz ke liye Join & Play dabayein.");}
+    if(p.action==="load"&&p.videoId){pendingStart=Number(p.seconds)||0;startedAt=Number(p.sentAt)||Date.now();say("🎵 گانا شیئر ہو گیا۔ Join & Play دبائیں۔");return;}
+    if(p.action==="play"&&player){pendingStart=Number(p.seconds)||0;startedAt=Number(p.sentAt)||Date.now();say("گانا چل رہا ہے۔ اگر آواز نہ آئے تو Join & Play دبائیں۔");}
   }
   function subscribe(){
     if(channel||typeof db==="undefined"||typeof currentUser==="undefined"||!currentUser)return;
-    channel=db.channel("lymrealm-youtube-room-sync",{config:{broadcast:{self:false}}})
+    channel=db.channel("lymrealm-youtube-room-sync",{config:{private:true,broadcast:{self:false}}})
       .on("broadcast",{event:"yt-room"},({payload})=>applyRemote(payload))
-      .subscribe((s)=>{if(s==="SUBSCRIBED")say("YouTube Room connected. Link paste karke Load karein.");});
+      .subscribe(s=>{if(s==="SUBSCRIBED")say("YouTube Room connected.");});
   }
-  window.openLymYouTubeRoom=function(){modal.classList.add("open");modal.setAttribute("aria-hidden","false");loadApi();subscribe();};
+  async function refreshAccess(){
+    if(typeof db==="undefined"||!currentUser)return;
+    try{
+      const {data,error}=await db.rpc("my_music_access");
+      if(error)throw error;
+      canControl=!!data;
+      controller.style.display=canControl?"block":"none";
+      requestBtn.style.display=canControl?"none":"inline-block";
+      permissionText.textContent=canControl?"آپ کو گانا چلانے کی اجازت ہے۔":"گانا چلانے کے لیے Super Admin یا Moderator سے منظوری لیں۔";
+      if(canControl){say("اجازت منظور ہے۔ YouTube لنک Load کریں اور Play for Everyone دبائیں۔");}
+      await refreshRequests();
+    }catch(e){say("Music permission check failed: "+(e.message||e));}
+  }
+  async function refreshRequests(){
+    try{
+      const {data,error}=await db.rpc("list_music_requests");
+      if(error)throw error;
+      adminQueue.style.display="block";
+      requestList.textContent="";
+      if(!data||!data.length){requestList.textContent="کوئی نئی درخواست نہیں۔";return;}
+      data.forEach(item=>{
+        const row=document.createElement("div");row.className="lym-music-request";
+        const name=document.createElement("span");name.textContent=item.username||"Member";
+        const actions=document.createElement("span");
+        const yes=document.createElement("button");yes.type="button";yes.textContent="Approve";yes.style.background="#087b55";
+        const no=document.createElement("button");no.type="button";no.textContent="Reject";no.style.background="#8d3030";
+        yes.addEventListener("click",()=>reviewRequest(item.request_id,true));
+        no.addEventListener("click",()=>reviewRequest(item.request_id,false));
+        actions.append(yes,no);row.append(name,actions);requestList.appendChild(row);
+      });
+    }catch(e){adminQueue.style.display="none";}
+  }
+  async function reviewRequest(id,approve){
+    const {error}=await db.rpc("review_music_request",{p_request_id:id,p_approve:approve});
+    if(error){say("درخواست پر کارروائی نہیں ہوئی: "+error.message);return;}
+    say(approve?"Music permission منظور کر دی گئی۔":"Music request رد کر دی گئی۔");
+    await refreshRequests();
+  }
+  window.openLymYouTubeRoom=function(){
+    modal.classList.add("open");modal.setAttribute("aria-hidden","false");loadApi();subscribe();refreshAccess();
+    if(refreshTimer)clearInterval(refreshTimer);
+    refreshTimer=setInterval(()=>{if(modal.classList.contains("open")){refreshAccess();}},12000);
+  };
   openBtn.addEventListener("click",window.openLymYouTubeRoom);
-  closeBtn.addEventListener("click",()=>{modal.classList.remove("open");modal.setAttribute("aria-hidden","true");});
+  closeBtn.addEventListener("click",()=>{modal.classList.remove("open");modal.setAttribute("aria-hidden","true");if(refreshTimer)clearInterval(refreshTimer);});
   modal.addEventListener("click",e=>{if(e.target===modal)closeBtn.click();});
+  requestBtn.addEventListener("click",async()=>{
+    const {error}=await db.rpc("request_music_access");
+    if(error){say(error.message.includes("already approved")?"آپ کو پہلے ہی اجازت ملی ہوئی ہے۔":error.message);await refreshAccess();return;}
+    permissionText.textContent="درخواست بھیج دی گئی ہے۔ منظوری کا انتظار کریں۔";
+    say("Music Request Super Admin اور Moderator کو بھیج دی گئی ہے۔");
+  });
   loadBtn.addEventListener("click",()=>{
+    if(!canControl){say("پہلے Music Permission منظور کروائیں۔");return;}
     const id=getVideoId(urlInput.value);
-    if(!id){say("Sahi YouTube video link paste karein.");return;}
-    currentVideoId=id;isLeader=true;pendingStart=0;
-    if(!apiReady){loadApi();say("YouTube Player load ho raha hai. Dobara Load dabayein.");return;}
-    makePlayer();player.loadVideoById({videoId:id,startSeconds:0});
-    say("Video load ho gayi. Play for Everyone dabayein.");
+    if(!id){say("درست YouTube لنک پیسٹ کریں۔");return;}
+    currentVideoId=id;pendingStart=0;
+    if(!apiReady){loadApi();say("YouTube Player لوڈ ہو رہا ہے؛ چند لمحوں بعد دوبارہ Load دبائیں۔");return;}
+    makePlayer();player.cueVideoById(id);say("ویڈیو تیار ہے۔ اب Play for Everyone دبائیں۔");
   });
   shareBtn.addEventListener("click",()=>{
-    if(!currentVideoId||!player){say("Pehle YouTube link Load karein.");return;}
-    isLeader=true;startedAt=Date.now();remoteAction=true;
+    if(!canControl){say("آپ کو گانا چلانے کی اجازت نہیں۔");return;}
+    if(!currentVideoId||!player){say("پہلے YouTube لنک Load کریں۔");return;}
+    startedAt=Date.now();remoteAction=true;
     player.loadVideoById({videoId:currentVideoId,startSeconds:0});player.playVideo();
     send({action:"load",videoId:currentVideoId,seconds:0,sentAt:startedAt});
     setTimeout(()=>remoteAction=false,900);
-    say("Aap ne song share kar diya. Doosre members Join & Play dabakar sun sakte hain.");
+    say("آپ نے گانا پورے روم کے لیے شیئر کر دیا۔");
   });
   joinBtn.addEventListener("click",()=>{
-    if(!currentVideoId||!player){say("Abhi koi song share nahi hua.");return;}
+    if(!currentVideoId||!player){say("ابھی کوئی گانا شیئر نہیں ہوا۔");return;}
     const elapsed=startedAt?Math.max(0,(Date.now()-startedAt)/1000):0;
     const start=Math.max(0,pendingStart+elapsed);
     remoteAction=true;player.loadVideoById({videoId:currentVideoId,startSeconds:start});player.playVideo();
     setTimeout(()=>remoteAction=false,900);
-    say("Awaaz enable karne ki koshish ki ja rahi hai. Agar na chale to dobara Join & Play dabayein.");
-  });
-  pauseBtn.addEventListener("click",()=>{
-    if(!isLeader){say("Pause sirf song share karne wala member kar sakta hai.");return;}
-    if(player)player.pauseVideo();sendState("pause");
+    say("آواز آن کرنے کی کوشش ہو رہی ہے۔ اگر نہ چلے تو دوبارہ Join & Play دبائیں۔");
   });
   if(typeof db!=="undefined"&&db.auth){
     db.auth.onAuthStateChange((event,session)=>{
-      if(session&&session.user){setTimeout(subscribe,0);}
-      else if(channel){try{db.removeChannel(channel);}catch(e){}channel=null;isLeader=false;}
+      if(session&&session.user){setTimeout(()=>{subscribe();refreshAccess();},0);}
+      else{if(channel){try{db.removeChannel(channel);}catch(e){}channel=null;}canControl=false;}
     });
   }
-  setInterval(()=>{if(!channel&&typeof currentUser!=="undefined"&&currentUser)subscribe();},1500);
+  setInterval(()=>{if(!channel&&typeof currentUser!=="undefined"&&currentUser)subscribe();},2500);
 })();
 </script>
 
