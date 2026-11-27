@@ -456,6 +456,11 @@ let lymMusicBusy = false;
 
 async function toggleYouTubeMusicShare() {
   const button = document.getElementById("shareMusicBtn");
+  // On phones, open YouTube first; keep desktop tab-audio sharing unchanged.
+  if (window.matchMedia("(max-width: 800px)").matches) {
+    window.open("https://m.youtube.com/", "_blank", "noopener");
+    return;
+  }
   if (lymMusicMixedStream) {
     await stopYouTubeMusicShare(false);
     return;
