@@ -357,6 +357,61 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 <style>
 @media (max-width: 800px){#shareMusicBtn{display:inline-flex!important;align-items:center;justify-content:center;min-height:36px;padding:8px 13px;border-radius:999px;font-weight:700;background:linear-gradient(135deg,#f4d77c,#b98b2f);border:1px solid #ffe7a0;color:#182015;box-shadow:0 2px 8px rgba(0,0,0,.22)}}
 </style>
+
+<style id="lymGreenControlStyle">
+/* Compact green voice/music controls: keep every label on one line */
+.voice-actions{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  align-items:center;
+  gap:7px;
+  max-width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+  white-space:nowrap;
+  padding:3px 2px 7px;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+}
+.voice-actions button{
+  display:inline-flex!important;
+  flex:0 0 auto!important;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  width:auto!important;
+  min-width:max-content;
+  max-width:none!important;
+  white-space:nowrap!important;
+  word-break:keep-all!important;
+  overflow-wrap:normal!important;
+  padding:9px 13px!important;
+  min-height:38px;
+  border:1px solid #65e6a2!important;
+  border-radius:999px!important;
+  background:linear-gradient(135deg,#087b50,#075638)!important;
+  color:#f1fff7!important;
+  box-shadow:0 3px 10px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.12);
+  font-weight:700;
+  line-height:1.1;
+}
+.voice-actions button[style*="display:none"]{display:none!important}
+.voice-actions button::before{
+  color:#8dffbd;
+  font-size:16px;
+  line-height:1;
+  flex:0 0 auto;
+}
+#requestMicBtn::before{content:"◉"}
+#giveMicBtn::before{content:"⇢"}
+#shareMusicBtn::before{content:"♫"}
+#lymYtOpenBtn::before{content:"▶"}
+.voice-actions button:active{transform:scale(.97)}
+@media(max-width:650px){
+  .voice-actions button{padding:8px 11px!important;font-size:12px!important;min-height:36px}
+}
+</style>
+
 </head>
 <body>
 <header><div><div class="logo">♛ LYM REALM CHAT</div><div class="sub">ONE REALM • ONE COMMUNITY</div></div><button id="logoutBtn" onclick="logout()" style="display:none">Logout</button></header>
@@ -377,8 +432,8 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
     <button id="startSpeakingBtn" onclick="startSpeaking()" style="display:none">Start Speaking</button>
     <button id="releaseMicBtn" onclick="releaseMic()" style="display:none" class="danger">Release Mic</button>
     <button id="giveMicBtn" onclick="giveMicPrompt()" style="display:none" class="gold">Pass Mic</button>
-    <button id="shareMusicBtn" type="button" onclick="toggleYouTubeMusicShare()" class="gold">🎵 Share YouTube Music</button>
-    <button id="lymYtOpenBtn" type="button" class="gold" onclick="openLymYouTubeRoom()">🎵 YouTube Room</button>
+    <button id="shareMusicBtn" type="button" onclick="toggleYouTubeMusicShare()" class="gold">Share YouTube Music</button>
+    <button id="lymYtOpenBtn" type="button" class="gold" onclick="openLymYouTubeRoom()">YouTube Room</button>
   </div>
   <div id="micRequests"></div>
 
