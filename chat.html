@@ -590,5 +590,149 @@ stopLiveVoice = function() {
 })();
 </script>
 
+
+<!-- LYM REALM: synchronized YouTube player for mobile and desktop -->
+<style>
+#lymYtOpenBtn{background:linear-gradient(135deg,#f4d77c,#b98b2f)!important;color:#182015!important;border:1px solid #ffe7a0!important}
+#lymYtModal{display:none;position:fixed;inset:0;z-index:100050;background:#000c;align-items:center;justify-content:center;padding:12px}
+#lymYtModal.open{display:flex}
+#lymYtCard{width:min(560px,calc(100vw - 24px));max-height:92dvh;overflow:auto;background:#092b21;border:2px solid #d7b65c;border-radius:16px;padding:12px;box-shadow:0 10px 36px #000b}
+#lymYtCard h3{color:#f5d477;margin:0 0 10px}
+#lymYtInputRow{display:flex;gap:7px}
+#lymYtUrl{min-width:0;flex:1;margin:0}
+#lymYtPlayer{width:100%;height:280px;min-height:200px;margin-top:10px;background:#000;border-radius:10px;overflow:hidden}
+#lymYtPlayer iframe{width:100%!important;height:100%!important}
+#lymYtActions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+#lymYtActions button{font-size:12px;padding:8px 11px}
+#lymYtStatus{font-size:12px;color:#c8ffe6;margin-top:8px;min-height:18px}
+@media(max-width:650px){#lymYtPlayer{height:220px}#lymYtCard{padding:10px}}
+</style>
+<div id="lymYtModal" aria-hidden="true">
+ <div id="lymYtCard" role="dialog" aria-modal="true" aria-label="LYM REALM YouTube Room">
+  <h3>🎵 LYM REALM — YouTube Room</h3>
+  <div id="lymYtInputRow"><input id="lymYtUrl" type="url" placeholder="YouTube video link paste karein"><button id="lymYtLoad" type="button">Load</button></div>
+  <div id="lymYtPlayer"></div>
+  <div id="lymYtActions">
+   <button id="lymYtShare" type="button" class="gold">▶ Play for Everyone</button>
+   <button id="lymYtJoin" type="button" style="background:#087b55">🔊 Join & Play</button>
+   <button id="lymYtPause" type="button">⏸ Pause Everyone</button>
+   <button id="lymYtClose" type="button" class="danger">Close</button>
+  </div>
+  <div id="lymYtStatus">Link paste karke Load karein. Har member ko sound enable karne ke liye ek dafa Join & Play dabana par sakta hai.</div>
+ </div>
+</div>
+<script>
+(function(){
+  const openBtn=document.createElement("button");
+  openBtn.id="lymYtOpenBtn";openBtn.type="button";openBtn.textContent="🎵 YouTube Room";
+  const actions=document.querySelector(".voice-actions");
+  if(actions) actions.appendChild(openBtn);
+  const modal=document.getElementById("lymYtModal"), urlInput=document.getElementById("lymYtUrl");
+  const status=document.getElementById("lymYtStatus");
+  const loadBtn=document.getElementById("lymYtLoad"), shareBtn=document.getElementById("lymYtShare");
+  const joinBtn=document.getElementById("lymYtJoin"), pauseBtn=document.getElementById("lymYtPause");
+  const closeBtn=document.getElementById("lymYtClose");
+  let player=null, apiReady=false, channel=null, currentVideoId="", pendingStart=0, isLeader=false, remoteAction=false, startedAt=0;
+  function say(t){status.textContent=t;}
+  function getVideoId(raw){
+    try{
+      const u=new URL(raw.trim());
+      if(u.hostname==="youtu.be") return u.pathname.split("/").filter(Boolean)[0]||"";
+      if(/(^|\.)youtube\.com$/.test(u.hostname)||u.hostname==="m.youtube.com"||u.hostname==="www.youtube-nocookie.com"){
+        if(u.pathname==="/watch") return u.searchParams.get("v")||"";
+        const m=u.pathname.match(/^\/(?:embed|shorts|live)\/([^/?]+)/);return m?m[1]:"";
+      }
+    }catch(e){}
+    return "";
+  }
+  function loadApi(){
+    if(window.YT&&window.YT.Player){apiReady=true;makePlayer();return;}
+    if(document.querySelector('script[src="https://www.youtube.com/iframe_api"]'))return;
+    const tag=document.createElement("script");tag.src="https://www.youtube.com/iframe_api";document.head.appendChild(tag);
+    const old=window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady=function(){if(typeof old==="function")old();apiReady=true;makePlayer();};
+  }
+  function makePlayer(){
+    if(player||!apiReady)return;
+    player=new YT.Player("lymYtPlayer",{width:"100%",height:"280",videoId:"",playerVars:{playsinline:1,controls:1,rel:0,enablejsapi:1,origin:location.origin},events:{
+      onReady:()=>{if(currentVideoId)player.cueVideoById(currentVideoId);},
+      onStateChange:e=>{
+        if(remoteAction||!isLeader||!channel)return;
+        if(e.data===YT.PlayerState.PAUSED) sendState("pause");
+        if(e.data===YT.PlayerState.PLAYING) sendState("play");
+      },
+      onError:e=>say("YouTube video embed allow nahi karta ya video unavailable hai. Error: "+e.data),
+      onAutoplayBlocked:()=>say("Browser ne auto-play roki. 🔊 Join & Play dabayein.")
+    }});
+  }
+  function send(payload){
+    if(!channel||typeof currentUser==="undefined"||!currentUser)return;
+    channel.send({type:"broadcast",event:"yt-room",payload:Object.assign({sender:currentUser.id},payload)});
+  }
+  function sendState(action){
+    if(!player||!currentVideoId)return;
+    send({action,videoId:currentVideoId,seconds:Math.max(0,player.getCurrentTime()||0),sentAt:Date.now()});
+  }
+  function applyRemote(p){
+    if(!p||p.sender===(typeof currentUser!=="undefined"&&currentUser&&currentUser.id))return;
+    isLeader=false;
+    if(p.videoId&&p.videoId!==currentVideoId){
+      currentVideoId=p.videoId;urlInput.value="https://youtu.be/"+currentVideoId;
+      pendingStart=Number(p.seconds)||0;startedAt=Number(p.sentAt)||Date.now();
+      if(player)player.cueVideoById(currentVideoId);
+      say("Naya song share hua hai. 🔊 Join & Play dabakar sunein.");
+      return;
+    }
+    if(p.action==="load"&&p.videoId){pendingStart=Number(p.seconds)||0;startedAt=Number(p.sentAt)||Date.now();say("Song share hua hai. 🔊 Join & Play dabayein.");return;}
+    if(p.action==="pause"&&player){remoteAction=true;player.pauseVideo();setTimeout(()=>remoteAction=false,700);}
+    if(p.action==="play"&&player){pendingStart=Number(p.seconds)||0;startedAt=Number(p.sentAt)||Date.now();say("Song play ho raha hai — awaaz ke liye Join & Play dabayein.");}
+  }
+  function subscribe(){
+    if(channel||typeof db==="undefined"||typeof currentUser==="undefined"||!currentUser)return;
+    channel=db.channel("lymrealm-youtube-room-sync",{config:{broadcast:{self:false}}})
+      .on("broadcast",{event:"yt-room"},({payload})=>applyRemote(payload))
+      .subscribe((s)=>{if(s==="SUBSCRIBED")say("YouTube Room connected. Link paste karke Load karein.");});
+  }
+  openBtn.addEventListener("click",()=>{modal.classList.add("open");modal.setAttribute("aria-hidden","false");loadApi();subscribe();});
+  closeBtn.addEventListener("click",()=>{modal.classList.remove("open");modal.setAttribute("aria-hidden","true");});
+  modal.addEventListener("click",e=>{if(e.target===modal)closeBtn.click();});
+  loadBtn.addEventListener("click",()=>{
+    const id=getVideoId(urlInput.value);
+    if(!id){say("Sahi YouTube video link paste karein.");return;}
+    currentVideoId=id;isLeader=true;pendingStart=0;
+    if(!apiReady){loadApi();say("YouTube Player load ho raha hai. Dobara Load dabayein.");return;}
+    makePlayer();player.loadVideoById({videoId:id,startSeconds:0});
+    say("Video load ho gayi. Play for Everyone dabayein.");
+  });
+  shareBtn.addEventListener("click",()=>{
+    if(!currentVideoId||!player){say("Pehle YouTube link Load karein.");return;}
+    isLeader=true;startedAt=Date.now();remoteAction=true;
+    player.loadVideoById({videoId:currentVideoId,startSeconds:0});player.playVideo();
+    send({action:"load",videoId:currentVideoId,seconds:0,sentAt:startedAt});
+    setTimeout(()=>remoteAction=false,900);
+    say("Aap ne song share kar diya. Doosre members Join & Play dabakar sun sakte hain.");
+  });
+  joinBtn.addEventListener("click",()=>{
+    if(!currentVideoId||!player){say("Abhi koi song share nahi hua.");return;}
+    const elapsed=startedAt?Math.max(0,(Date.now()-startedAt)/1000):0;
+    const start=Math.max(0,pendingStart+elapsed);
+    remoteAction=true;player.loadVideoById({videoId:currentVideoId,startSeconds:start});player.playVideo();
+    setTimeout(()=>remoteAction=false,900);
+    say("Awaaz enable karne ki koshish ki ja rahi hai. Agar na chale to dobara Join & Play dabayein.");
+  });
+  pauseBtn.addEventListener("click",()=>{
+    if(!isLeader){say("Pause sirf song share karne wala member kar sakta hai.");return;}
+    if(player)player.pauseVideo();sendState("pause");
+  });
+  if(typeof db!=="undefined"&&db.auth){
+    db.auth.onAuthStateChange((event,session)=>{
+      if(session&&session.user){setTimeout(subscribe,0);}
+      else if(channel){try{db.removeChannel(channel);}catch(e){}channel=null;isLeader=false;}
+    });
+  }
+  setInterval(()=>{if(!channel&&typeof currentUser!=="undefined"&&currentUser)subscribe();},1500);
+})();
+</script>
+
 </body>
 </html>
