@@ -557,5 +557,38 @@ stopLiveVoice = function() {
 
 
 
+
+<!-- LYM REALM: friendly microphone permission notice -->
+<style>
+#lymMicPermissionNotice{position:fixed;z-index:999999;left:14px;right:14px;bottom:18px;max-width:560px;margin:0 auto;padding:13px 15px;border:1px solid #c99b3b;border-radius:12px;background:#10251d;color:#fff4d2;box-shadow:0 8px 28px rgba(0,0,0,.38);font:14px/1.45 Arial,sans-serif}
+#lymMicPermissionNotice strong{display:block;margin-bottom:4px;color:#f4d77c}
+#lymMicPermissionNotice button{float:right;margin-left:12px;border:0;border-radius:7px;padding:6px 11px;background:#e4c36b;color:#17251c;font-weight:700}
+</style>
+<script>
+(function(){
+  if(window.__lymMicAlertHandled) return;
+  window.__lymMicAlertHandled = true;
+  const originalAlert = window.alert ? window.alert.bind(window) : function(){};
+  window.alert = function(message){
+    const text = String(message == null ? "" : message);
+    if(/microphone[^\\n]*(could not start|permission denied)|permission denied[^\\n]*microphone/i.test(text)){
+      let notice = document.getElementById("lymMicPermissionNotice");
+      if(!notice){
+        notice = document.createElement("div");
+        notice.id = "lymMicPermissionNotice";
+        notice.setAttribute("role","status");
+        notice.setAttribute("aria-live","polite");
+        notice.innerHTML = '<button type="button" aria-label="Dismiss">OK</button><strong>Microphone permission needed</strong><span>Chrome mein site settings khol kar Microphone ko Allow karein, phir page reload karein. Text chat baqi chalti rahegi.</span>';
+        document.body.appendChild(notice);
+        notice.querySelector("button").addEventListener("click",function(){notice.remove();});
+        window.setTimeout(function(){if(notice.isConnected) notice.remove();},10000);
+      }
+      return;
+    }
+    return originalAlert(message);
+  };
+})();
+</script>
+
 </body>
 </html>
