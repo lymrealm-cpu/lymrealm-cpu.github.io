@@ -373,6 +373,7 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
     <button id="startSpeakingBtn" onclick="startSpeaking()" style="display:none">Start Speaking</button>
     <button id="releaseMicBtn" onclick="releaseMic()" style="display:none" class="danger">Release Mic</button>
     <button id="giveMicBtn" onclick="giveMicPrompt()" style="display:none" class="gold">Pass Mic</button>
+    <button id="shareMusicBtn" type="button" onclick="toggleYouTubeMusicShare()" class="gold">🎵 Share YouTube Music</button>
   </div>
   <div id="micRequests"></div>
 </section>
@@ -436,5 +437,108 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
   });
 })();
 </script>
+
+<script>
+/* LYM REALM: user-controlled YouTube tab audio mixed with the live mic. */
+let lymMusicDisplayStream = null;
+let lymMusicAudioContext = null;
+let lymMusicDestination = null;
+let lymMusicOriginalMicStream = null;
+let lymMusicMixedStream = null;
+let lymMusicBusy = false;
+
+async function toggleYouTubeMusicShare() {
+  const button = document.getElementById("shareMusicBtn");
+  if (lymMusicMixedStream) {
+    await stopYouTubeMusicShare(false);
+    return;
+  }
+  if (lymMusicBusy) return;
+  if (!currentUser || !voiceRoomStarted || currentSpeakerId !== currentUser.id || !liveMicStream) {
+    alert("پہلے وائس روم میں اپنی مائیک کی باری لیں اور Start Speaking کریں۔");
+    return;
+  }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+    alert("YouTube آڈیو شیئر کرنے کے لیے کمپیوٹر پر تازہ Chrome استعمال کریں۔");
+    return;
+  }
+  lymMusicBusy = true;
+  if (button) button.disabled = true;
+  try {
+    alert("اگلی ونڈو میں YouTube والا Chrome Tab منتخب کریں اور Share tab audio کو ضرور منتخب کریں، پھر Share دبائیں۔");
+    const display = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+    const tabAudio = display.getAudioTracks()[0];
+    if (!tabAudio) {
+      display.getTracks().forEach(track => track.stop());
+      throw new Error("آڈیو نہیں ملی۔ دوبارہ Share کریں اور YouTube Tab کے لیے Share tab audio منتخب کریں۔");
+    }
+    const micTrack = liveMicStream.getAudioTracks()[0];
+    if (!micTrack) {
+      display.getTracks().forEach(track => track.stop());
+      throw new Error("مائیک کی آڈیو دستیاب نہیں۔");
+    }
+    lymMusicOriginalMicStream = liveMicStream;
+    lymMusicDisplayStream = display;
+    lymMusicAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+    await lymMusicAudioContext.resume();
+    lymMusicDestination = lymMusicAudioContext.createMediaStreamDestination();
+    lymMusicAudioContext.createMediaStreamSource(new MediaStream([micTrack])).connect(lymMusicDestination);
+    lymMusicAudioContext.createMediaStreamSource(new MediaStream([tabAudio])).connect(lymMusicDestination);
+    lymMusicMixedStream = lymMusicDestination.stream;
+    liveMicStream = lymMusicMixedStream;
+    const mixedTrack = lymMusicMixedStream.getAudioTracks()[0];
+    for (const peer of voicePeers.values()) {
+      const sender = peer.getSenders().find(item => item.track && item.track.kind === "audio");
+      if (sender) await sender.replaceTrack(mixedTrack);
+    }
+    if (button) button.textContent = "⏹ Stop YouTube Music";
+    display.getTracks().forEach(track => track.addEventListener("ended", () => stopYouTubeMusicShare(false), { once: true }));
+    voiceStatus("YouTube music is being shared with your microphone.");
+  } catch (error) {
+    await stopYouTubeMusicShare(true);
+    alert("Music share: " + (error && error.message ? error.message : error));
+  } finally {
+    lymMusicBusy = false;
+    if (button) button.disabled = false;
+  }
+}
+
+async function stopYouTubeMusicShare(fromCleanup) {
+  const button = document.getElementById("shareMusicBtn");
+  const originalMic = lymMusicOriginalMicStream;
+  if (originalMic) liveMicStream = originalMic;
+  if (originalMic && lymMusicMixedStream) {
+    const originalTrack = originalMic.getAudioTracks()[0] || null;
+    for (const peer of voicePeers.values()) {
+      const sender = peer.getSenders().find(item => item.track && item.track.kind === "audio");
+      if (sender) {
+        try { await sender.replaceTrack(originalTrack); } catch (error) {}
+      }
+    }
+  }
+  if (lymMusicDisplayStream) lymMusicDisplayStream.getTracks().forEach(track => { try { track.stop(); } catch (error) {} });
+  if (lymMusicMixedStream) lymMusicMixedStream.getTracks().forEach(track => { try { track.stop(); } catch (error) {} });
+  if (lymMusicAudioContext) {
+    try { await lymMusicAudioContext.close(); } catch (error) {}
+  }
+  lymMusicDisplayStream = null;
+  lymMusicAudioContext = null;
+  lymMusicDestination = null;
+  lymMusicOriginalMicStream = null;
+  lymMusicMixedStream = null;
+  if (button) {
+    button.textContent = "🎵 Share YouTube Music";
+    button.disabled = false;
+  }
+  if (!fromCleanup && voiceRoomStarted) voiceStatus("Live voice is running.");
+}
+
+const lymOriginalStopLiveVoice = stopLiveVoice;
+stopLiveVoice = function() {
+  stopYouTubeMusicShare(true);
+  lymOriginalStopLiveVoice();
+};
+</script>
+
 </body>
 </html>
