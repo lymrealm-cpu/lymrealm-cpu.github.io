@@ -359,46 +359,52 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
 </style>
 
 <style id="lymGreenControlStyle">
-/* Compact green voice/music controls: keep every label on one line */
+/* Compact gold-accent voice/music controls; wrap cleanly on narrow screens */
 .voice-actions{
   display:flex!important;
-  flex-wrap:nowrap!important;
+  flex-wrap:wrap!important;
   align-items:center;
-  gap:7px;
+  gap:6px;
   max-width:100%;
-  overflow-x:auto;
-  overflow-y:hidden;
-  white-space:nowrap;
+  overflow:visible;
+  white-space:normal;
   padding:3px 2px 7px;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:thin;
 }
 .voice-actions button{
   display:inline-flex!important;
-  flex:0 0 auto!important;
+  flex:0 1 auto!important;
   align-items:center;
   justify-content:center;
-  gap:7px;
+  gap:5px;
   width:auto!important;
-  min-width:max-content;
-  max-width:none!important;
-  white-space:nowrap!important;
-  word-break:keep-all!important;
-  overflow-wrap:normal!important;
-  padding:9px 13px!important;
-  min-height:38px;
-  border:1px solid #65e6a2!important;
-  border-radius:999px!important;
-  background:linear-gradient(135deg,#087b50,#075638)!important;
-  color:#f1fff7!important;
-  box-shadow:0 3px 10px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.12);
+  min-width:0!important;
+  max-width:100%!important;
+  white-space:normal!important;
+  word-break:normal!important;
+  overflow-wrap:anywhere;
+  padding:7px 9px!important;
+  min-height:30px;
+  border:1px solid #c9a64d!important;
+  border-radius:8px!important;
+  background:linear-gradient(135deg,#173b2e,#0b2b22)!important;
+  color:#f7e4a1!important;
+  box-shadow:0 2px 7px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.08);
+  font-size:11px!important;
   font-weight:700;
-  line-height:1.1;
+  line-height:1.15;
 }
+#requestMicBtn::before{content:"🎙";font-size:12px;color:#f5d477}
+#cancelRequestBtn::before{content:"✕";font-size:11px;color:#f5d477}
+#startSpeakingBtn::before{content:"▶";font-size:11px;color:#f5d477}
+#releaseMicBtn::before{content:"■";font-size:10px;color:#f5d477}
+#giveMicBtn::before{content:"⇢";font-size:13px;color:#f5d477}
+#shareMusicBtn::before{content:"♫";font-size:13px;color:#f5d477}
+#lymYtOpenBtn::before{content:"▶";font-size:11px;color:#f5d477}
 .voice-actions button[style*="display:none"]{display:none!important}
 .voice-actions button:active{transform:scale(.97)}
 @media(max-width:650px){
-  .voice-actions button{padding:8px 11px!important;font-size:12px!important;min-height:36px}
+  .voice-actions{gap:5px}
+  .voice-actions button{padding:6px 7px!important;font-size:10px!important;min-height:28px}
 }
 </style>
 
