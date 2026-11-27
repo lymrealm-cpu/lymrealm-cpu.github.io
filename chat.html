@@ -378,6 +378,7 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
     <button id="releaseMicBtn" onclick="releaseMic()" style="display:none" class="danger">Release Mic</button>
     <button id="giveMicBtn" onclick="giveMicPrompt()" style="display:none" class="gold">Pass Mic</button>
     <button id="shareMusicBtn" type="button" onclick="toggleYouTubeMusicShare()" class="gold">🎵 Share YouTube Music</button>
+    <button id="lymYtOpenBtn" type="button" class="gold">🎵 YouTube Room</button>
   </div>
   <div id="micRequests"></div>
 
@@ -623,10 +624,7 @@ stopLiveVoice = function() {
 </div>
 <script>
 (function(){
-  const openBtn=document.createElement("button");
-  openBtn.id="lymYtOpenBtn";openBtn.type="button";openBtn.textContent="🎵 YouTube Room";
-  const actions=document.querySelector(".voice-actions");
-  if(actions) actions.appendChild(openBtn);
+  const openBtn=document.getElementById("lymYtOpenBtn");
   const modal=document.getElementById("lymYtModal"), urlInput=document.getElementById("lymYtUrl");
   const status=document.getElementById("lymYtStatus");
   const loadBtn=document.getElementById("lymYtLoad"), shareBtn=document.getElementById("lymYtShare");
