@@ -378,6 +378,7 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
     <button id="releaseMicBtn" onclick="releaseMic()" style="display:none" class="danger">Release Mic</button>
     <button id="giveMicBtn" onclick="giveMicPrompt()" style="display:none" class="gold">Pass Mic</button>
     <button id="shareMusicBtn" type="button" onclick="toggleYouTubeMusicShare()" class="gold">🎵 Share YouTube Music</button>
+    <button id="lymYtOpenBtn" type="button" class="gold" onclick="openLymYouTubeRoom()">🎵 YouTube Room</button>
   </div>
   <div id="micRequests"></div>
 
@@ -623,10 +624,7 @@ stopLiveVoice = function() {
 </div>
 <script>
 (function(){
-  const openBtn=document.createElement("button");
-  openBtn.id="lymYtOpenBtn";openBtn.type="button";openBtn.textContent="🎵 YouTube Room";
-  const actions=document.querySelector(".voice-actions");
-  if(actions) actions.appendChild(openBtn);
+  const openBtn=document.getElementById("lymYtOpenBtn");
   const modal=document.getElementById("lymYtModal"), urlInput=document.getElementById("lymYtUrl");
   const status=document.getElementById("lymYtStatus");
   const loadBtn=document.getElementById("lymYtLoad"), shareBtn=document.getElementById("lymYtShare");
@@ -693,7 +691,8 @@ stopLiveVoice = function() {
       .on("broadcast",{event:"yt-room"},({payload})=>applyRemote(payload))
       .subscribe((s)=>{if(s==="SUBSCRIBED")say("YouTube Room connected. Link paste karke Load karein.");});
   }
-  openBtn.addEventListener("click",()=>{modal.classList.add("open");modal.setAttribute("aria-hidden","false");loadApi();subscribe();});
+  window.openLymYouTubeRoom=function(){modal.classList.add("open");modal.setAttribute("aria-hidden","false");loadApi();subscribe();};
+  openBtn.addEventListener("click",window.openLymYouTubeRoom);
   closeBtn.addEventListener("click",()=>{modal.classList.remove("open");modal.setAttribute("aria-hidden","true");});
   modal.addEventListener("click",e=>{if(e.target===modal)closeBtn.click();});
   loadBtn.addEventListener("click",()=>{
