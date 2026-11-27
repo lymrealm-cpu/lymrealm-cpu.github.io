@@ -376,6 +376,17 @@ input{width:100%;padding:12px;border:1px solid #28584a;border-radius:9px;backgro
     <button id="shareMusicBtn" type="button" onclick="toggleYouTubeMusicShare()" class="gold">🎵 Share YouTube Music</button>
   </div>
   <div id="micRequests"></div>
+
+<div id="lymMobileMusicPanel" class="lym-mobile-music">
+  <h3>🎵 Mobile Music Player</h3>
+  <p>فون سے MP3 گانا منتخب کریں، پھر Play & Share دبائیں۔ گانا اور مائیک وائس روم میں ساتھ جائیں گے۔</p>
+  <input id="lymMobileMusicFile" type="file" accept="audio/*">
+  <audio id="lymMobileMusicAudio" controls playsinline preload="none"></audio>
+  <button id="lymMobileMusicShareBtn" type="button">▶ Play & Share Music</button>
+  <button id="lymMobileMusicStopBtn" type="button" style="display:none">⏹ Stop Sharing</button>
+  <small id="lymMobileMusicStatus">صرف موبائل کے لیے۔ MP3 فائل فون میں موجود ہونی چاہیے۔</small>
+</div>
+
 </section>
 <section class="video-room">
 <h3>📹 LIVE VIDEO CHAT</h3>
@@ -538,6 +549,91 @@ stopLiveVoice = function() {
   stopYouTubeMusicShare(true);
   lymOriginalStopLiveVoice();
 };
+</script>
+
+
+<style>
+.lym-mobile-music{display:none;margin:12px 0;padding:14px;border:1px solid #d6b65d;border-radius:14px;background:#06271d;color:#f7e8b2}
+.lym-mobile-music h3{margin:0 0 8px;color:#f5d477}
+.lym-mobile-music p,.lym-mobile-music small{display:block;font-size:13px;line-height:1.5}
+.lym-mobile-music input,.lym-mobile-music audio{display:block;width:100%;margin:10px 0}
+.lym-mobile-music button{margin:5px;padding:10px 14px;border-radius:9px;background:#08784b;color:white;border:1px solid #d6b65d}
+@media (max-width: 800px){.lym-mobile-music{display:block}}
+</style>
+
+<script>
+(function(){
+  const panel=document.getElementById("lymMobileMusicPanel");
+  if(!panel)return;
+  const fileInput=document.getElementById("lymMobileMusicFile");
+  const audio=document.getElementById("lymMobileMusicAudio");
+  const playBtn=document.getElementById("lymMobileMusicShareBtn");
+  const stopBtn=document.getElementById("lymMobileMusicStopBtn");
+  const status=document.getElementById("lymMobileMusicStatus");
+  let fileUrl=null,ctx=null,destination=null,mixedStream=null,originalMic=null,source=null,sharing=false,busy=false;
+  fileInput.addEventListener("change",()=>{
+    const file=fileInput.files&&fileInput.files[0];
+    if(!file)return;
+    if(fileUrl)URL.revokeObjectURL(fileUrl);
+    fileUrl=URL.createObjectURL(file);
+    audio.src=fileUrl;
+    status.textContent="منتخب: "+file.name+" — اب Play & Share دبائیں۔";
+  });
+  async function restore(){
+    if(originalMic&&mixedStream){
+      const track=originalMic.getAudioTracks()[0]||null;
+      for(const peer of voicePeers.values()){
+        const sender=peer.getSenders().find(x=>x.track&&x.track.kind==="audio");
+        if(sender){try{await sender.replaceTrack(track)}catch(e){}}
+      }
+    }
+    try{audio.pause();}catch(e){}
+    if(mixedStream)mixedStream.getTracks().forEach(t=>{try{t.stop()}catch(e){}});
+    if(ctx){try{await ctx.close()}catch(e){}}
+    ctx=null;destination=null;mixedStream=null;originalMic=null;source=null;sharing=false;
+    playBtn.style.display="";stopBtn.style.display="none";
+    playBtn.textContent="▶ Play & Share Music";
+    status.textContent="موسیقی شیئرنگ بند ہے۔";
+  }
+  playBtn.addEventListener("click",async()=>{
+    if(busy)return;
+    if(!fileInput.files||!fileInput.files[0]){alert("پہلے فون سے MP3 یا آڈیو فائل منتخب کریں۔");return}
+    if(!currentUser||!voiceRoomStarted||currentSpeakerId!==currentUser.id||!liveMicStream){
+      alert("پہلے وائس روم میں مائیک کی باری لیں اور Start Speaking کریں۔");return;
+    }
+    busy=true;playBtn.disabled=true;
+    try{
+      originalMic=liveMicStream;
+      const micTrack=originalMic.getAudioTracks()[0];
+      if(!micTrack)throw new Error("مائیک آڈیو دستیاب نہیں۔");
+      ctx=new (window.AudioContext||window.webkitAudioContext)();
+      await ctx.resume();
+      destination=ctx.createMediaStreamDestination();
+      ctx.createMediaStreamSource(new MediaStream([micTrack])).connect(destination);
+      source=ctx.createMediaElementSource(audio);
+      source.connect(destination);
+      source.connect(ctx.destination);
+      mixedStream=destination.stream;
+      const mixedTrack=mixedStream.getAudioTracks()[0];
+      let replaced=0;
+      for(const peer of voicePeers.values()){
+        const sender=peer.getSenders().find(x=>x.track&&x.track.kind==="audio");
+        if(sender){await sender.replaceTrack(mixedTrack);replaced++}
+      }
+      if(!replaced)throw new Error("وائس روم کا آڈیو کنکشن نہیں ملا۔ دوبارہ Start Speaking کریں۔");
+      await audio.play();
+      sharing=true;
+      playBtn.style.display="none";stopBtn.style.display="";
+      status.textContent="گانا اور مائیک وائس روم میں شیئر ہو رہے ہیں۔";
+      audio.onended=()=>{if(sharing)restore()};
+    }catch(e){await restore();alert("Music Player: "+(e.message||e))}
+    finally{busy=false;playBtn.disabled=false}
+  });
+  stopBtn.addEventListener("click",restore);
+  const oldStop=stopLiveVoice;
+  stopLiveVoice=function(){restore();oldStop()};
+  window.addEventListener("beforeunload",()=>{if(fileUrl)URL.revokeObjectURL(fileUrl)});
+})();
 </script>
 
 </body>
