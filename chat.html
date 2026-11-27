@@ -666,7 +666,7 @@ stopLiveVoice = function() {
     }});
   }
   function send(payload){
-    if(!channel||!currentUser)return;
+    if(!channel||typeof currentUser==="undefined"||!currentUser)return;
     channel.send({type:"broadcast",event:"yt-room",payload:Object.assign({sender:currentUser.id},payload)});
   }
   function sendState(action){
@@ -674,20 +674,21 @@ stopLiveVoice = function() {
     send({action,videoId:currentVideoId,seconds:Math.max(0,player.getCurrentTime()||0),sentAt:Date.now()});
   }
   function applyRemote(p){
-    if(!p||p.sender===(currentUser&&currentUser.id))return;
+    if(!p||p.sender===(typeof currentUser!=="undefined"&&currentUser&&currentUser.id))return;
     isLeader=false;
     if(p.videoId&&p.videoId!==currentVideoId){
       currentVideoId=p.videoId;urlInput.value="https://youtu.be/"+currentVideoId;
-      pendingStart=Number(p.seconds)||0;
+      pendingStart=Number(p.seconds)||0;startedAt=Number(p.sentAt)||Date.now();
       if(player)player.cueVideoById(currentVideoId);
       say("Naya song share hua hai. 🔊 Join & Play dabakar sunein.");
       return;
     }
+    if(p.action==="load"&&p.videoId){pendingStart=Number(p.seconds)||0;startedAt=Number(p.sentAt)||Date.now();say("Song share hua hai. 🔊 Join & Play dabayein.");return;}
     if(p.action==="pause"&&player){remoteAction=true;player.pauseVideo();setTimeout(()=>remoteAction=false,700);}
     if(p.action==="play"&&player){pendingStart=Number(p.seconds)||0;startedAt=Number(p.sentAt)||Date.now();say("Song play ho raha hai — awaaz ke liye Join & Play dabayein.");}
   }
   function subscribe(){
-    if(channel||!window.db||!window.currentUser)return;
+    if(channel||typeof db==="undefined"||typeof currentUser==="undefined"||!currentUser)return;
     channel=db.channel("lymrealm-youtube-room-sync",{config:{broadcast:{self:false}}})
       .on("broadcast",{event:"yt-room"},({payload})=>applyRemote(payload))
       .subscribe((s)=>{if(s==="SUBSCRIBED")say("YouTube Room connected. Link paste karke Load karein.");});
@@ -723,13 +724,13 @@ stopLiveVoice = function() {
     if(!isLeader){say("Pause sirf song share karne wala member kar sakta hai.");return;}
     if(player)player.pauseVideo();sendState("pause");
   });
-  if(window.db&&window.db.auth){
-    window.db.auth.onAuthStateChange((event,session)=>{
+  if(typeof db!=="undefined"&&db.auth){
+    db.auth.onAuthStateChange((event,session)=>{
       if(session&&session.user){setTimeout(subscribe,0);}
-      else if(channel){try{window.db.removeChannel(channel);}catch(e){}channel=null;isLeader=false;}
+      else if(channel){try{db.removeChannel(channel);}catch(e){}channel=null;isLeader=false;}
     });
   }
-  setInterval(()=>{if(!channel&&window.currentUser)subscribe();},1500);
+  setInterval(()=>{if(!channel&&typeof currentUser!=="undefined"&&currentUser)subscribe();},1500);
 })();
 </script>
 
