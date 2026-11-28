@@ -1053,5 +1053,105 @@ async function submitForgotScreen(){
 #lymYtOpenBtn { display:none!important; }
 </style>
 
+
+<!-- LYM REALM: MP3 music shared through the active voice microphone -->
+<style id="lymMp3PlayerStyle">
+#lymMp3PlayerControls{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:7px}
+#lymMp3PlayerControls button,#lymMp3PlayerControls label{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:8px 12px;border-radius:999px;border:1px solid #ffe7a0;background:linear-gradient(135deg,#f4d77c,#b98b2f);color:#182015;font-size:11px;font-weight:800;box-shadow:0 2px 8px #0005;cursor:pointer}
+#lymMp3PlayerControls button:disabled{opacity:.45;filter:grayscale(.5)}
+#lymMp3FileName{color:#f5d477;font-size:11px;max-width:100%;overflow-wrap:anywhere}
+#lymMp3FileInput{display:none}
+#shareMusicBtn{display:none!important}
+</style>
+<div id="lymMp3PlayerControls" class="voice-actions">
+ <label for="lymMp3FileInput">🎵 Select MP3</label>
+ <input id="lymMp3FileInput" type="file" accept="audio/mpeg,audio/mp3,audio/*">
+ <button id="lymMp3Play" type="button" disabled>▶ Play</button>
+ <button id="lymMp3Pause" type="button" disabled>⏸ Pause</button>
+ <button id="lymMp3Stop" type="button" disabled>■ Stop</button>
+ <span id="lymMp3FileName">No song selected</span>
+</div>
+<audio id="lymMp3Audio" preload="none" style="display:none"></audio>
+<script>
+(function(){
+ const picker=document.getElementById("lymMp3FileInput");
+ const audio=document.getElementById("lymMp3Audio");
+ const playBtn=document.getElementById("lymMp3Play");
+ const pauseBtn=document.getElementById("lymMp3Pause");
+ const stopBtn=document.getElementById("lymMp3Stop");
+ const name=document.getElementById("lymMp3FileName");
+ if(!picker||!audio||!playBtn||!pauseBtn||!stopBtn)return;
+ let fileUrl="",ctx=null,micSource=null,musicSource=null,mixDestination=null,mixedTrack=null,originalMic=null,busy=false;
+ function state(){
+   playBtn.disabled=!fileUrl||busy||!audio.paused;
+   pauseBtn.disabled=!fileUrl||audio.paused;
+   stopBtn.disabled=!fileUrl;
+ }
+ async function restoreMic(){
+   if(originalMic){
+     liveMicStream=originalMic;
+     const track=originalMic.getAudioTracks()[0]||null;
+     if(typeof voicePeers!=="undefined"&&voicePeers&&voicePeers.values){
+       for(const peer of voicePeers.values()){
+         const sender=peer.getSenders().find(x=>x.track&&x.track.kind==="audio");
+         if(sender){try{await sender.replaceTrack(track);}catch(e){}}
+       }
+     }
+   }
+   if(mixedTrack){try{mixedTrack.stop();}catch(e){}}
+   if(ctx){try{await ctx.close();}catch(e){}}
+   ctx=null;micSource=null;musicSource=null;mixDestination=null;mixedTrack=null;originalMic=null;
+ }
+ async function prepareMix(){
+   if(!currentUser||!voiceRoomStarted||currentSpeakerId!==currentUser.id||!liveMicStream){
+     throw new Error("پہلے وائس روم میں اپنی مائیک کی باری لیں اور Start Speaking کریں۔");
+   }
+   const micTrack=liveMicStream.getAudioTracks()[0];
+   if(!micTrack)throw new Error("مائیک کی آواز دستیاب نہیں۔");
+   originalMic=liveMicStream;
+   ctx=new (window.AudioContext||window.webkitAudioContext)();
+   await ctx.resume();
+   mixDestination=ctx.createMediaStreamDestination();
+   micSource=ctx.createMediaStreamSource(originalMic);
+   musicSource=ctx.createMediaElementSource(audio);
+   micSource.connect(mixDestination);
+   musicSource.connect(mixDestination);
+   musicSource.connect(ctx.destination);
+   mixedTrack=mixDestination.stream.getAudioTracks()[0];
+   for(const peer of voicePeers.values()){
+     const sender=peer.getSenders().find(x=>x.track&&x.track.kind==="audio");
+     if(sender)await sender.replaceTrack(mixedTrack);
+   }
+ }
+ picker.addEventListener("change",()=>{
+   const file=picker.files&&picker.files[0];if(!file)return;
+   if(fileUrl)URL.revokeObjectURL(fileUrl);
+   fileUrl=URL.createObjectURL(file);audio.src=fileUrl;audio.load();
+   name.textContent="🎵 "+file.name;state();
+ });
+ playBtn.addEventListener("click",async()=>{
+   if(!fileUrl||busy)return;
+   busy=true;state();
+   try{
+     if(!ctx)await prepareMix();
+     await audio.play();
+   }catch(e){
+     await restoreMic();
+     alert("MP3: "+(e&&e.message?e.message:e));
+   }finally{busy=false;state();}
+ });
+ pauseBtn.addEventListener("click",()=>{audio.pause();state();});
+ stopBtn.addEventListener("click",async()=>{
+   audio.pause();audio.currentTime=0;
+   await restoreMic();state();
+ });
+ audio.addEventListener("play",state);
+ audio.addEventListener("pause",state);
+ audio.addEventListener("ended",async()=>{await restoreMic();state();});
+ window.addEventListener("beforeunload",()=>{if(fileUrl)URL.revokeObjectURL(fileUrl);});
+ state();
+})();
+</script>
+
 </body>
 </html>
