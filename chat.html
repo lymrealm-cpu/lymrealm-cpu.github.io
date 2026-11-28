@@ -868,50 +868,135 @@ async function submitForgotScreen(){
 }
 </script>
 
-<!-- LYM ROOM LIST TOP FIX: keep the existing room list at the top of the left sidebar on phones. -->
-<script id="lymRoomListTopFix">
+<!-- LYM MOBILE SIDE PANELS: voice/music controls above rooms; camera above online members. -->
+<script id="lymMobileSidePanels">
 (function () {
-  function placeRoomListFirst() {
+  function arrangeSidePanels() {
     const app = document.getElementById("app");
-    const sidebar = app && app.querySelector(".rooms-sidebar");
-    if (!sidebar) return false;
+    if (!app) return false;
+    const left = app.querySelector(".rooms-sidebar");
+    const right = app.querySelector(".users-sidebar");
+    if (!left || !right) return false;
 
-    const heading = Array.from(sidebar.querySelectorAll(".side-heading"))
-      .find(el => /ROOMS/i.test(el.textContent || ""));
-    if (!heading) return false;
+    const voice = app.querySelector(".voice-room");
+    const video = app.querySelector(".video-room");
+    const roomPanel = Array.from(left.children).find(el =>
+      el.querySelector && el.querySelector(".side-heading") &&
+      /ROOMS/i.test(el.querySelector(".side-heading").textContent || "")
+    );
 
-    let panel = heading;
-    while (panel.parentElement && panel.parentElement !== sidebar) {
-      panel = panel.parentElement;
+    if (voice && voice.parentElement !== left) left.insertBefore(voice, left.firstElementChild);
+    if (video && video.parentElement !== left) {
+      if (voice && voice.parentElement === left) voice.insertAdjacentElement("afterend", video);
+      else left.insertBefore(video, left.firstElementChild);
+    } else if (video && voice && video.previousElementSibling !== voice) {
+      voice.insertAdjacentElement("afterend", video);
     }
-    if (panel.parentElement !== sidebar) return false;
 
-    if (sidebar.firstElementChild !== panel) {
-      sidebar.insertBefore(panel, sidebar.firstElementChild);
-      sidebar.scrollTop = 0;
+    if (roomPanel) {
+      if (video && video.parentElement === left && video.nextElementSibling !== roomPanel) {
+        video.insertAdjacentElement("afterend", roomPanel);
+      } else if (!video && voice && voice.parentElement === left && voice.nextElementSibling !== roomPanel) {
+        voice.insertAdjacentElement("afterend", roomPanel);
+      }
     }
-    return true;
+
+    const cameraPanel = right.querySelector(".camera-panel");
+    if (cameraPanel && cameraPanel.parentElement === right && right.firstElementChild !== cameraPanel) {
+      right.insertBefore(cameraPanel, right.firstElementChild);
+    }
+    return !!(voice || video || roomPanel || cameraPanel);
   }
 
   function start() {
-    if (placeRoomListFirst()) return;
+    if (arrangeSidePanels()) return;
     const app = document.getElementById("app");
     if (!app) return;
-    const observer = new MutationObserver(() => {
-      if (placeRoomListFirst()) observer.disconnect();
-    });
+    const observer = new MutationObserver(() => arrangeSidePanels());
     observer.observe(app, { childList: true, subtree: true });
-    setTimeout(() => { placeRoomListFirst(); }, 400);
-    setTimeout(() => { placeRoomListFirst(); }, 1200);
+    setTimeout(() => { arrangeSidePanels(); }, 500);
+    setTimeout(() => { arrangeSidePanels(); }, 1500);
+    setTimeout(() => { observer.disconnect(); }, 10000);
   }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", start, { once: true });
-  } else {
-    start();
-  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once:true });
+  else start();
 })();
 </script>
+<style id="lymMobileSidePanelStyle">
+@media (max-width:650px) {
+  #app {
+    grid-template-columns:minmax(96px,27vw) minmax(0,1fr) minmax(88px,25vw)!important;
+  }
+  #app>.rooms-sidebar, #app>.users-sidebar {
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    min-width:0!important;
+  }
+  #app>.rooms-sidebar .voice-room,
+  #app>.rooms-sidebar .video-room {
+    width:100%!important;
+    box-sizing:border-box!important;
+    margin:0 0 8px!important;
+    padding:7px 5px!important;
+    border:1px solid #b98b2f!important;
+    border-radius:12px!important;
+    background:linear-gradient(160deg,#0b3024,#061f18)!important;
+    box-shadow:0 0 9px rgba(215,182,92,.2)!important;
+  }
+  #app>.rooms-sidebar .voice-actions {
+    display:flex!important;
+    flex-direction:column!important;
+    gap:6px!important;
+    align-items:stretch!important;
+  }
+  #app>.rooms-sidebar .voice-actions button,
+  #app>.rooms-sidebar #videoRooms button {
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:38px!important;
+    box-sizing:border-box!important;
+    padding:7px 4px!important;
+    margin:3px 0!important;
+    border:1px solid #f5d477!important;
+    border-radius:11px!important;
+    background:linear-gradient(135deg,#f4d77c,#b98b2f)!important;
+    color:#182015!important;
+    font-size:10px!important;
+    font-weight:800!important;
+    line-height:1.2!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+    box-shadow:0 2px 8px rgba(0,0,0,.25)!important;
+  }
+  #app>.rooms-sidebar .video-room h3,
+  #app>.rooms-sidebar .side-heading {
+    font-size:11px!important;
+    line-height:1.25!important;
+    text-align:center!important;
+    overflow-wrap:anywhere!important;
+  }
+  #app>.rooms-sidebar #videoRooms {
+    display:flex!important;
+    flex-direction:column!important;
+    gap:4px!important;
+  }
+  #app>.rooms-sidebar #videoRoomStatus {font-size:10px!important;text-align:center!important}
+  #app>.users-sidebar .camera-panel {
+    width:100%!important;
+    box-sizing:border-box!important;
+    padding:7px!important;
+    margin-bottom:10px!important;
+  }
+  #app>.users-sidebar .camera-panel button {
+    min-height:42px!important;
+    border-radius:12px!important;
+    font-size:11px!important;
+  }
+}
+</style>
 
 </body>
 </html>
