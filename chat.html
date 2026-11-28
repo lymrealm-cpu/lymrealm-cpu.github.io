@@ -867,5 +867,51 @@ async function submitForgotScreen(){
   await sendPasswordReset();
 }
 </script>
+
+<!-- LYM ROOM LIST TOP FIX: keep the existing room list at the top of the left sidebar on phones. -->
+<script id="lymRoomListTopFix">
+(function () {
+  function placeRoomListFirst() {
+    const app = document.getElementById("app");
+    const sidebar = app && app.querySelector(".rooms-sidebar");
+    if (!sidebar) return false;
+
+    const heading = Array.from(sidebar.querySelectorAll(".side-heading"))
+      .find(el => /ROOMS/i.test(el.textContent || ""));
+    if (!heading) return false;
+
+    let panel = heading;
+    while (panel.parentElement && panel.parentElement !== sidebar) {
+      panel = panel.parentElement;
+    }
+    if (panel.parentElement !== sidebar) return false;
+
+    if (sidebar.firstElementChild !== panel) {
+      sidebar.insertBefore(panel, sidebar.firstElementChild);
+      sidebar.scrollTop = 0;
+    }
+    return true;
+  }
+
+  function start() {
+    if (placeRoomListFirst()) return;
+    const app = document.getElementById("app");
+    if (!app) return;
+    const observer = new MutationObserver(() => {
+      if (placeRoomListFirst()) observer.disconnect();
+    });
+    observer.observe(app, { childList: true, subtree: true });
+    setTimeout(() => { placeRoomListFirst(); }, 400);
+    setTimeout(() => { placeRoomListFirst(); }, 1200);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start, { once: true });
+  } else {
+    start();
+  }
+})();
+</script>
+
 </body>
 </html>
