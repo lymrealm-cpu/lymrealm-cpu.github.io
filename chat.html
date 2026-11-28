@@ -1099,8 +1099,8 @@ async function submitForgotScreen(){
      }
    }
    if(mixedTrack){try{mixedTrack.stop();}catch(e){}}
-   if(ctx){try{await ctx.close();}catch(e){}}
-   ctx=null;micSource=null;musicSource=null;mixDestination=null;mixedTrack=null;originalMic=null;
+   if(micSource){try{micSource.disconnect();}catch(e){}}
+   micSource=null;mixDestination=null;mixedTrack=null;originalMic=null;
  }
  async function prepareMix(){
    if(!currentUser||!voiceRoomStarted||currentSpeakerId!==currentUser.id||!liveMicStream){
@@ -1109,14 +1109,16 @@ async function submitForgotScreen(){
    const micTrack=liveMicStream.getAudioTracks()[0];
    if(!micTrack)throw new Error("مائیک کی آواز دستیاب نہیں۔");
    originalMic=liveMicStream;
-   ctx=new (window.AudioContext||window.webkitAudioContext)();
+   if(!ctx)ctx=new (window.AudioContext||window.webkitAudioContext)();
    await ctx.resume();
    mixDestination=ctx.createMediaStreamDestination();
    micSource=ctx.createMediaStreamSource(originalMic);
-   musicSource=ctx.createMediaElementSource(audio);
+   if(!musicSource){
+     musicSource=ctx.createMediaElementSource(audio);
+     musicSource.connect(ctx.destination);
+   }
    micSource.connect(mixDestination);
    musicSource.connect(mixDestination);
-   musicSource.connect(ctx.destination);
    mixedTrack=mixDestination.stream.getAudioTracks()[0];
    for(const peer of voicePeers.values()){
      const sender=peer.getSenders().find(x=>x.track&&x.track.kind==="audio");
