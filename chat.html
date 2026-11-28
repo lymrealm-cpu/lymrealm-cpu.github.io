@@ -998,5 +998,14 @@ async function submitForgotScreen(){
 }
 </style>
 
+
+<style id="lymVoiceConditionalButtonsFix">
+/* Keep mic controls conditional: Cancel only while request is pending; Release only while speaking. */
+#app>.rooms-sidebar .voice-actions button[style*="display:none"],
+#app>.rooms-sidebar .voice-actions button[style*="display: none"] {
+  display:none!important;
+}
+</style>
+
 </body>
 </html>
